@@ -1,0 +1,64 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+NQDPDB	nqdpdb.h	/^} NQDPDB;$/;"	t	typeref:struct:__anon1
+NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon3
+NQRDBREC	nqrdb.h	/^} NQRDBREC;$/;"	t	typeref:struct:__anon2
+_GUARD_GQDPDB_	nqdpdb.h	7;"	d
+_GUARD_GQDPDB_	nqrdb.h	7;"	d
+__anon1::ba32	nqdpdb.h	/^	uint32_t* ba32;$/;"	m	struct:__anon1	access:public
+__anon1::basiz	nqdpdb.h	/^	uint64_t basiz;$/;"	m	struct:__anon1	access:public
+__anon1::name	nqdpdb.h	/^	char* name;$/;"	m	struct:__anon1	access:public
+__anon1::rdp	nqdpdb.h	/^	CvMat** rdp;$/;"	m	struct:__anon1	access:public
+__anon1::rdpc	nqdpdb.h	/^	CvFeatureTree** rdpc;$/;"	m	struct:__anon1	access:public
+__anon1::rnum	nqdpdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon1	access:public
+__anon2::chd	nqrdb.h	/^	NQRDBREC* chd[256];$/;"	m	struct:__anon2	access:public
+__anon2::ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:__anon2	access:public
+__anon2::kstr	nqrdb.h	/^	char kstr[32];$/;"	m	struct:__anon2	access:public
+__anon2::next	nqrdb.h	/^	NQRDBREC* next;$/;"	m	struct:__anon2	access:public
+__anon2::pr	nqrdb.h	/^	NQRDBREC* pr;$/;"	m	struct:__anon2	access:public
+__anon2::prev	nqrdb.h	/^	NQRDBREC* prev;$/;"	m	struct:__anon2	access:public
+__anon2::rnum	nqrdb.h	/^	uint8_t rnum;$/;"	m	struct:__anon2	access:public
+__anon2::vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:__anon2	access:public
+__anon3::head	nqrdb.h	/^	NQRDBREC* head;$/;"	m	struct:__anon3	access:public
+__anon3::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon3	access:public
+__anon3::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon3	access:public
+ba32	nqdpdb.h	/^	uint32_t* ba32;$/;"	m	struct:__anon1	access:public
+basiz	nqdpdb.h	/^	uint64_t basiz;$/;"	m	struct:__anon1	access:public
+chd	nqrdb.h	/^	NQRDBREC* chd[256];$/;"	m	struct:__anon2	access:public
+db_pool	nqrdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
+head	nqrdb.h	/^	NQRDBREC* head;$/;"	m	struct:__anon3	access:public
+ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:__anon2	access:public
+kmatch	nqrdb.c	/^inline bool kmatch(char* kstr1, char* kstr2, uint32_t k)$/;"	f	signature:(char* kstr1, char* kstr2, uint32_t k)
+kstr	nqrdb.h	/^	char kstr[32];$/;"	m	struct:__anon2	access:public
+mtx_pool	nqrdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
+name	nqdpdb.h	/^	char* name;$/;"	m	struct:__anon1	access:public
+next	nqrdb.h	/^	NQRDBREC* next;$/;"	m	struct:__anon2	access:public
+nqdpdblike	nqdpdb.h	/^bool nqdpdblike(NQDPDB* dpdb, );$/;"	p	signature:(NQDPDB* dpdb, )
+nqdpdbnew	nqdpdb.h	/^NQDPDB* nqdpdbnew(void);$/;"	p	signature:(void)
+nqdpdbput	nqdpdb.h	/^bool nqdpdbput(NQDPDB* dpdb, const void* kbuf, int ksiz, CvArr* img);$/;"	p	signature:(NQDPDB* dpdb, const void* kbuf, int ksiz, CvArr* img)
+nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb)$/;"	f	file:	signature:(NQRDB* rdb)
+nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb);$/;"	p	file:	signature:(NQRDB* rdb)
+nqrdbdel	nqrdb.c	/^void nqrdbdel(NQRDB* rdb)$/;"	f	signature:(NQRDB* rdb)
+nqrdbdel	nqrdb.h	/^void nqrdbdel(NQRDB* rdb);$/;"	p	signature:(NQRDB* rdb)
+nqrdbget	nqrdb.c	/^void* nqrdbget(NQRDB* rdb, const char* kstr)$/;"	f	signature:(NQRDB* rdb, const char* kstr)
+nqrdbget	nqrdb.h	/^void* nqrdbget(NQRDB* rdb, const char* kstr);$/;"	p	signature:(NQRDB* rdb, const char* kstr)
+nqrdbnew	nqrdb.c	/^NQRDB* nqrdbnew(void)$/;"	f	signature:(void)
+nqrdbnew	nqrdb.h	/^NQRDB* nqrdbnew(void);$/;"	p	signature:(void)
+nqrdbout	nqrdb.c	/^bool nqrdbout(NQRDB* rdb, const char* kstr)$/;"	f	signature:(NQRDB* rdb, const char* kstr)
+nqrdbout	nqrdb.h	/^bool nqrdbout(NQRDB* rdb, const char* kstr);$/;"	p	signature:(NQRDB* rdb, const char* kstr)
+nqrdbput	nqrdb.c	/^bool nqrdbput(NQRDB* rdb, const char* kstr, const void* vbuf)$/;"	f	signature:(NQRDB* rdb, const char* kstr, const void* vbuf)
+nqrdbput	nqrdb.h	/^bool nqrdbput(NQRDB* rdb, const char* kstr, const void* vbuf);$/;"	p	signature:(NQRDB* rdb, const char* kstr, const void* vbuf)
+pr	nqrdb.h	/^	NQRDBREC* pr;$/;"	m	struct:__anon2	access:public
+prev	nqrdb.h	/^	NQRDBREC* prev;$/;"	m	struct:__anon2	access:public
+rdp	nqdpdb.h	/^	CvMat** rdp;$/;"	m	struct:__anon1	access:public
+rdpc	nqdpdb.h	/^	CvFeatureTree** rdpc;$/;"	m	struct:__anon1	access:public
+rec_pool	nqrdb.c	/^static frl_slab_pool_t* rec_pool = 0;$/;"	v	file:
+rnum	nqdpdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon1	access:public
+rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon3	access:public
+rnum	nqrdb.h	/^	uint8_t rnum;$/;"	m	struct:__anon2	access:public
+rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon3	access:public
+vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:__anon2	access:public
