@@ -11,7 +11,7 @@
 typedef struct NQRDBREC {
 	uint8_t ht;
 	uint8_t rnum;
-	char kstr[16];
+	unsigned char kstr[16];
 	void* vbuf;
 	NQRDBREC* pr;
 	NQRDBREC* chd[256];

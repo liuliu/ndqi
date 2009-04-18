@@ -1,7 +1,7 @@
 #include "nqrdb.h"
 #include "assert.h"
 
-inline bool kmatch(char* kstr1, char* kstr2, uint32_t k)
+inline bool kmatch(unsigned char* kstr1, unsigned char* kstr2, uint32_t k)
 {
 	for (; k < 16; k++)
 		if (kstr1[k] != kstr2[k])
@@ -75,7 +75,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 #endif
 			return 1;
 		} else {
-			if (kmatch(rec->kstr, kstr, i+1))
+			if (kmatch(rec->kstr, (unsigned char*)kstr, i+1))
 				break;
 			rec = rec->chd[*kp];
 		}
@@ -105,7 +105,7 @@ void* nqrdbget(NQRDB* rdb, char* kstr)
 #endif
 			return 0;
 		}
-		if (kmatch(rec->kstr, kstr, i+1))
+		if (kmatch(rec->kstr, (unsigned char*)kstr, i+1))
 		{
 			void* vbuf = rec->vbuf;
 #if APR_HAS_THREADS
@@ -139,7 +139,7 @@ bool nqrdbout(NQRDB* rdb, char* kstr)
 #endif
 			return 0;
 		}
-		if (kmatch(rec->kstr, kstr, i+1))
+		if (kmatch(rec->kstr, (unsigned char*)kstr, i+1))
 			break;
 		kp++;
 	}
@@ -164,26 +164,16 @@ bool nqrdbout(NQRDB* rdb, char* kstr)
 		}
 		lrec = nrec;
 	}
-	if (lrec->pr != 0)
+	lrec->pr->chd[lrec->kstr[lrec->ht]] = 0;
+	lrec->pr->rnum--;
+	if (lrec != rec)
 	{
-		lrec->pr->chd[lrec->kstr[lrec->ht]] = 0;
-		lrec->pr->rnum--;
-		if (lrec != rec)
-		{
-			memcpy(rec->kstr, lrec->kstr, 16);
-			rec->vbuf = lrec->vbuf;
-		}
-		lrec->prev->next = lrec->next;
-		lrec->next->prev = lrec->prev;
-		frl_slab_pfree(lrec);
-	} else {
-		memset(lrec->chd, 0, sizeof(lrec->chd[0]) * 256);
-		lrec->ht = 0;
-		lrec->pr = 0;
-		lrec->rnum = 0;
-		lrec->vbuf = 0;
-		lrec->prev = lrec->next = lrec;
+		memcpy(rec->kstr, lrec->kstr, 16);
+		rec->vbuf = lrec->vbuf;
 	}
+	lrec->prev->next = lrec->next;
+	lrec->next->prev = lrec->prev;
+	frl_slab_pfree(lrec);
 	rdb->rnum--;
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(rdb->rwlock);
