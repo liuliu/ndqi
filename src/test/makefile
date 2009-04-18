@@ -1,4 +1,4 @@
-COMPFLAG=-O2
+COMPFLAG=-O3
 LINKFLAG=-ldl -lpthread -lrt
 LINKLIB=-lapr-1 -laprutil-1
 CXXFLAGS=-I"/opt/apr/include" -I"/opt/apr-util/include"

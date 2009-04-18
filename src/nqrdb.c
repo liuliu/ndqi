@@ -1,9 +1,9 @@
 #include "nqrdb.h"
 #include "assert.h"
 
-inline bool kmatch(unsigned char* kstr1, unsigned char* kstr2, uint32_t k)
+inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
 {
-	for (; k < 16; k++)
+	for (; k < 4; k++)
 		if (kstr1[k] != kstr2[k])
 			return 0;
 	return 1;
@@ -12,20 +12,30 @@ inline bool kmatch(unsigned char* kstr1, unsigned char* kstr2, uint32_t k)
 static apr_pool_t* mtx_pool = 0;
 static frl_slab_pool_t* db_pool = 0;
 static frl_slab_pool_t* rec_pool = 0;
+static frl_slab_pool_t* b16_pool = 0;
+static frl_slab_pool_t* b6_pool = 0;
+static frl_slab_pool_t* b2_pool = 0;
 static void nqrdbclear(NQRDB* rdb);
 
 NQRDB* nqrdbnew(void)
 {
 	if (mtx_pool == 0)
 		apr_pool_create(&mtx_pool, NULL);
-	if (rec_pool == 0)
-		frl_slab_pool_create(&rec_pool, mtx_pool, 1024, sizeof(NQRDBREC), FRL_LOCK_WITH);
 	if (db_pool == 0)
 		frl_slab_pool_create(&db_pool, mtx_pool, 64, sizeof(NQRDB), FRL_LOCK_WITH);
+	if (rec_pool == 0)
+		frl_slab_pool_create(&rec_pool, mtx_pool, 1024, sizeof(NQRDBREC), FRL_LOCK_WITH);
+	if (b16_pool == 0)
+		frl_slab_pool_create(&b16_pool, mtx_pool, 16, sizeof(NQRDBREC*) * 65536, FRL_LOCK_WITH);
+	if (b6_pool == 0)
+		frl_slab_pool_create(&b6_pool, mtx_pool, 1024, sizeof(NQRDBREC*) * 64, FRL_LOCK_WITH);
+	if (b2_pool == 0)
+		frl_slab_pool_create(&b2_pool, mtx_pool, 4096, sizeof(NQRDBREC*) * 4, FRL_LOCK_WITH);
 	NQRDB* rdb = (NQRDB*)frl_slab_palloc(db_pool);
 	nqrdbclear(rdb);
 	rdb->head = (NQRDBREC*)frl_slab_palloc(rec_pool);
-	memset(rdb->head->chd, 0, sizeof(rdb->head->chd[0]) * 256);
+	rdb->head->chd = (NQRDBREC**)frl_slab_pcalloc(b16_pool);
+	rdb->head->max = 65536;
 	rdb->head->ht = 0;
 	rdb->head->pr = 0;
 	rdb->head->rnum = 0;
@@ -44,43 +54,103 @@ static void nqrdbclear(NQRDB* rdb)
 	rdb->head = 0;
 }
 
+static NQRDBREC* nqrdbirt(NQRDB* rdb, NQRDBREC* rec, uint8_t ht, uint32_t i, uint32_t* kint, void* vbuf)
+{
+	NQRDBREC* nrec = (NQRDBREC*)frl_slab_palloc(rec_pool);
+	nrec->rnum = 0;
+	memcpy(nrec->kint, kint, 16);
+	nrec->vbuf = vbuf;
+	nrec->pr = rec;
+	nrec->ht = ht;
+	nrec->prev = rdb->head->prev;
+	nrec->next = rdb->head;
+	rdb->head->prev->next = nrec;
+	rdb->head->prev = nrec;
+	rec->chd[i] = nrec;
+	rec->rnum++;
+	rdb->rnum++;
+	return nrec;
+}
+
 bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 {
-	int i;
-	unsigned char* kp = (unsigned char*)kstr;
+	uint32_t* kint = (uint32_t*)kstr;
+	uint32_t* kp = kint;
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(rdb->rwlock);
 #endif
 	NQRDBREC* rec = rdb->head;
-	for (i = 0; i < 16; i++)
+	uint32_t b16 = (*kp)>>16;
+	if (rec->chd[b16] == 0)
 	{
-		if (rec->chd[*kp] == 0)
+		nqrdbirt(rdb, rec, 1, b16, kint, vbuf);
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 1;
+	} else {
+		rec = rec->chd[b16];
+		if (kmatch(rec->kint, kint, 0))
 		{
-			NQRDBREC* nrec = (NQRDBREC*)frl_slab_palloc(rec_pool);
-			memset(nrec->chd, 0, sizeof(nrec->chd[0]) * 256);
-			nrec->rnum = 0;
-			memcpy(nrec->kstr, kstr, 16);
-			nrec->vbuf = vbuf;
-			nrec->pr = rec;
-			nrec->ht = i;
-			nrec->prev = rdb->head->prev;
-			nrec->next = rdb->head;
-			rdb->head->prev->next = nrec;
-			rdb->head->prev = nrec;
-			rec->chd[*kp] = nrec;
-			rec->rnum++;
-			rdb->rnum++;
+#if APR_HAS_THREADS
+			apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+			return 0;
+		}
+	}
+	uint32_t b6 = ((*kp)>>10)&0x3F;
+	if (rec->chd == 0)
+	{
+		rec->chd = (NQRDBREC**)frl_slab_pcalloc(b6_pool);
+		rec->max = 64;
+	}
+	if (rec->chd[b6] == 0)
+	{
+		nqrdbirt(rdb, rec, 2, b6, kint, vbuf);
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 1;
+	} else {
+		rec = rec->chd[b6];
+		if (kmatch(rec->kint, kint, 0))
+		{
+#if APR_HAS_THREADS
+			apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+			return 0;
+		}
+	}
+	uint32_t i = 8;
+	uint32_t ht = 3;
+	do {
+		uint32_t b2 = ((*kp)>>i)&0x3;
+		if (rec->chd == 0)
+		{
+			rec->chd = (NQRDBREC**)frl_slab_pcalloc(b2_pool);
+			rec->max = 4;
+		}
+		if (rec->chd[b2] == 0)
+		{
+			nqrdbirt(rdb, rec, ht, b2, kint, vbuf);
 #if APR_HAS_THREADS
 			apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
 			return 1;
 		} else {
-			if (kmatch(rec->kstr, (unsigned char*)kstr, i+1))
-				break;
-			rec = rec->chd[*kp];
+			rec = rec->chd[b2];
+			if (kmatch(rec->kint, kint, 0))
+			{
+#if APR_HAS_THREADS
+				apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+				return 0;
+			}
 		}
-		kp++;
-	}
+		ht++;
+		kp += (i == 0);
+		i = (i+30)&0x1F;
+	} while (kp < kint+4);
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
@@ -89,23 +159,22 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 
 void* nqrdbget(NQRDB* rdb, char* kstr)
 {
-	int i;
-	unsigned char* kp = (unsigned char*)kstr;
+	uint32_t* kint = (uint32_t*)kstr;
+	uint32_t* kp = kint;
 #if APR_HAS_THREADS
 	apr_thread_rwlock_rdlock(rdb->rwlock);
 #endif
 	NQRDBREC* rec = rdb->head;
-	for (i = 0; i < 16; i++)
+	uint32_t b16 = (*kp)>>16;
+	if (rec->chd[b16] == 0)
 	{
-		rec = rec->chd[*kp];
-		if (rec == 0)
-		{
 #if APR_HAS_THREADS
-			apr_thread_rwlock_unlock(rdb->rwlock);
+		apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
-			return 0;
-		}
-		if (kmatch(rec->kstr, (unsigned char*)kstr, i+1))
+		return 0;
+	} else {
+		rec = rec->chd[b16];
+		if (kmatch(rec->kint, kint, 0))
 		{
 			void* vbuf = rec->vbuf;
 #if APR_HAS_THREADS
@@ -113,8 +182,48 @@ void* nqrdbget(NQRDB* rdb, char* kstr)
 #endif
 			return vbuf;
 		}
-		kp++;
 	}
+	uint32_t b6 = ((*kp)>>10)&0x3F;
+	if (rec->chd == 0 || rec->chd[b6] == 0)
+	{
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 0;
+	} else {
+		rec = rec->chd[b6];
+		if (kmatch(rec->kint, kint, 0))
+		{
+			void* vbuf = rec->vbuf;
+#if APR_HAS_THREADS
+			apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+			return vbuf;
+		}
+	}
+	uint32_t i = 8;
+	do {
+		uint32_t b2 = ((*kp)>>i)&0x3;
+		if (rec->chd == 0 || rec->chd[b2] == 0)
+		{
+#if APR_HAS_THREADS
+			apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+			return 0;
+		} else {
+			rec = rec->chd[b2];
+			if (kmatch(rec->kint, kint, 0))
+			{
+				void* vbuf = rec->vbuf;
+#if APR_HAS_THREADS
+				apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+				return vbuf;
+			}
+		}
+		kp += (i == 0);
+		i = (i+30)&0x1F;
+	} while (kp < kint+4);
 #if APR_HAS_THREADS
 		apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
@@ -123,33 +232,61 @@ void* nqrdbget(NQRDB* rdb, char* kstr)
 
 bool nqrdbout(NQRDB* rdb, char* kstr)
 {
-	int i;
-	unsigned char* kp = (unsigned char*)kstr;
+	uint32_t* kint = (uint32_t*)kstr;
+	uint32_t* kp = kint;
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(rdb->rwlock);
 #endif
 	NQRDBREC* rec = rdb->head;
-	for (i = 0; i < 16; i++)
+	uint32_t b16, b6, b2, i;
+	b16 = (*kp)>>16;
+	if (rec->chd[b16] == 0)
 	{
-		rec = rec->chd[*kp];
-		if (rec == 0)
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 0;
+	} else {
+		rec = rec->chd[b16];
+		if (kmatch(rec->kint, kint, 0))
+			goto RMPS;
+	}
+	b6 = ((*kp)>>10)&0x3F;
+	if (rec->chd == 0 || rec->chd[b6] == 0)
+	{
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 0;
+	} else {
+		rec = rec->chd[b6];
+		if (kmatch(rec->kint, kint, 0))
+			goto RMPS;
+	}
+	i = 8;
+	do {
+		b2 = ((*kp)>>i)&0x3;
+		if (rec->chd == 0 || rec->chd[b2] == 0)
 		{
 #if APR_HAS_THREADS
 			apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
 			return 0;
+		} else {
+			rec = rec->chd[b2];
+			if (kmatch(rec->kint, kint, 0))
+				goto RMPS;
 		}
-		if (kmatch(rec->kstr, (unsigned char*)kstr, i+1))
-			break;
-		kp++;
-	}
+		kp += (i == 0);
+		i = (i+30)&0x1F;
+	} while (kp < kint+4);
+RMPS:
 	NQRDBREC* lrec = rec;
 	NQRDBREC* nrec;
 	while (lrec->rnum > 0)
 	{
 		nrec = 0;
-		int i;
-		for (i = 0; i < 256; i++)
+		for (i = 0; i < lrec->max; i++)
 		{
 			if (lrec->chd[i] != 0)
 			{
@@ -164,11 +301,19 @@ bool nqrdbout(NQRDB* rdb, char* kstr)
 		}
 		lrec = nrec;
 	}
-	lrec->pr->chd[lrec->kstr[lrec->ht]] = 0;
+	uint32_t k;
+	if (lrec->ht == 1)
+		k = lrec->kint[0]>>16;
+	else if (lrec->ht == 2)
+		k = (lrec->kint[0]>>10)&0x3F;
+	else {
+		k = (lrec->kint[(lrec->ht+8)>>4]>>(32-(((lrec->ht+9)<<1)&0x1F)))&0x3;
+	}
+	lrec->pr->chd[k] = 0;
 	lrec->pr->rnum--;
 	if (lrec != rec)
 	{
-		memcpy(rec->kstr, lrec->kstr, 16);
+		memcpy(rec->kint, lrec->kint, 16);
 		rec->vbuf = lrec->vbuf;
 	}
 	lrec->prev->next = lrec->next;

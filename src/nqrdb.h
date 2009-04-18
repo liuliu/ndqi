@@ -10,11 +10,12 @@
 
 typedef struct NQRDBREC {
 	uint8_t ht;
-	uint8_t rnum;
-	unsigned char kstr[16];
+	uint32_t rnum;
+	uint32_t max;
+	uint32_t kint[4];
 	void* vbuf;
 	NQRDBREC* pr;
-	NQRDBREC* chd[256];
+	NQRDBREC** chd;
 	NQRDBREC* prev;
 	NQRDBREC* next;
 } NQRDBREC;
