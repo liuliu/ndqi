@@ -3,4 +3,6 @@
 
 #include "lib/frl_slab_pool.h"
 
+typedef void (*NQFOREACH) (char*, void*, void*);
+
 #endif

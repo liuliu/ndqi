@@ -4,61 +4,221 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.7	//
-NQDPDB	nqdpdb.h	/^} NQDPDB;$/;"	t	typeref:struct:__anon1
+APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_block_create(frl_slab_block_t** newblock, frl_slab_pool_t* pool, apr_size_t capacity)$/;"	f
+APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_block_destory(frl_slab_block_t* block)$/;"	f
+APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_create(frl_slab_pool_t** newpool, apr_pool_t *mempool, apr_uint32_t capacity, apr_uint32_t per_size, frl_lock_u lock)$/;"	f
+APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_destroy(frl_slab_pool_t* pool)$/;"	f
+APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_safe(frl_slab_pool_t* pool)$/;"	f
+APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(frl_mem_stat_t) frl_slab_pool_stat(frl_slab_pool_t* pool)$/;"	f
+COMPFLAG	test/makefile	/^COMPFLAG=-O3$/;"	m
+CXXFLAGS	test/makefile	/^CXXFLAGS=-I"\/opt\/apr\/include" -I"\/opt\/apr-util\/include"$/;"	m
+DCAS_BUSY_VAL	lib/frl_slab_pool.c	54;"	d	file:
+FRL_INSERT_AFTER	lib/frl_base.h	/^	FRL_INSERT_AFTER$/;"	e	enum:frl_insert_u
+FRL_INSERT_BEFORE	lib/frl_base.h	/^	FRL_INSERT_BEFORE,$/;"	e	enum:frl_insert_u
+FRL_LEVEL_ERROR	lib/frl_base.h	/^	FRL_LEVEL_ERROR,$/;"	e	enum:frl_level_u
+FRL_LEVEL_INFO	lib/frl_base.h	/^	FRL_LEVEL_INFO$/;"	e	enum:frl_level_u
+FRL_LEVEL_WARNING	lib/frl_base.h	/^	FRL_LEVEL_WARNING,$/;"	e	enum:frl_level_u
+FRL_LOCK_FREE	lib/frl_base.h	/^	FRL_LOCK_FREE$/;"	e	enum:frl_lock_u
+FRL_LOCK_WITH	lib/frl_base.h	/^	FRL_LOCK_WITH,$/;"	e	enum:frl_lock_u
+FRL_MEMLEAK	lib/frl_slab_pool.h	13;"	d
+FRL_MEMORY_GLOBAL	lib/frl_base.h	/^	FRL_MEMORY_GLOBAL$/;"	e	enum:frl_memory_u
+FRL_MEMORY_SELF	lib/frl_base.h	/^	FRL_MEMORY_SELF,$/;"	e	enum:frl_memory_u
+FRL_PROGRESS_COMLETE	lib/frl_base.h	14;"	d
+FRL_PROGRESS_CONTINUE	lib/frl_base.h	16;"	d
+FRL_PROGRESS_INTERRUPT	lib/frl_base.h	13;"	d
+FRL_PROGRESS_IS_COMLETE	lib/frl_base.h	19;"	d
+FRL_PROGRESS_IS_CONTINUE	lib/frl_base.h	21;"	d
+FRL_PROGRESS_IS_INTERRUPT	lib/frl_base.h	18;"	d
+FRL_PROGRESS_IS_RESTART	lib/frl_base.h	22;"	d
+FRL_PROGRESS_IS_WAIT_SIGNAL	lib/frl_base.h	20;"	d
+FRL_PROGRESS_RESTART	lib/frl_base.h	17;"	d
+FRL_PROGRESS_WAIT_SIGNAL	lib/frl_base.h	15;"	d
+FRL_STACKBUSY	lib/frl_slab_pool.h	15;"	d
+FRL_STACKERR	lib/frl_slab_pool.h	14;"	d
+FRL_THREAD_CONSUMER_PRODUCER	lib/frl_base.h	/^	FRL_THREAD_CONSUMER_PRODUCER$/;"	e	enum:frl_thread_model_u
+FRL_THREAD_LEADER_FOLLOWER	lib/frl_base.h	/^	FRL_THREAD_LEADER_FOLLOWER,$/;"	e	enum:frl_thread_model_u
+GUARD_frl_base_h	lib/frl_base.h	2;"	d
+GUARD_frl_slab_pool_h	lib/frl_slab_pool.h	8;"	d
+GUARD_frl_util_md5_h	lib/frl_util_md5.h	2;"	d
+LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt$/;"	m
+LINKLIB	test/makefile	/^LINKLIB=-lapr-1 -laprutil-1$/;"	m
+NQDPDB	nqdpdb.h	/^typedef NQRDB NQDPDB;$/;"	t
+NQDPDBDATUM	nqdpdb.h	/^} NQDPDBDATUM;$/;"	t	typeref:struct:__anon2
+NQFOREACH	nqutil.h	/^typedef void (*NQFOREACH) (char*, void*, void*);$/;"	t
 NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon3
-NQRDBREC	nqrdb.h	/^} NQRDBREC;$/;"	t	typeref:struct:__anon2
-_GUARD_GQDPDB_	nqdpdb.h	7;"	d
-_GUARD_GQDPDB_	nqrdb.h	7;"	d
-__anon1::ba32	nqdpdb.h	/^	uint32_t* ba32;$/;"	m	struct:__anon1	access:public
-__anon1::basiz	nqdpdb.h	/^	uint64_t basiz;$/;"	m	struct:__anon1	access:public
-__anon1::name	nqdpdb.h	/^	char* name;$/;"	m	struct:__anon1	access:public
-__anon1::rdp	nqdpdb.h	/^	CvMat** rdp;$/;"	m	struct:__anon1	access:public
-__anon1::rdpc	nqdpdb.h	/^	CvFeatureTree** rdpc;$/;"	m	struct:__anon1	access:public
-__anon1::rnum	nqdpdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon1	access:public
-__anon2::chd	nqrdb.h	/^	NQRDBREC* chd[256];$/;"	m	struct:__anon2	access:public
-__anon2::ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:__anon2	access:public
-__anon2::kstr	nqrdb.h	/^	char kstr[32];$/;"	m	struct:__anon2	access:public
-__anon2::next	nqrdb.h	/^	NQRDBREC* next;$/;"	m	struct:__anon2	access:public
-__anon2::pr	nqrdb.h	/^	NQRDBREC* pr;$/;"	m	struct:__anon2	access:public
-__anon2::prev	nqrdb.h	/^	NQRDBREC* prev;$/;"	m	struct:__anon2	access:public
-__anon2::rnum	nqrdb.h	/^	uint8_t rnum;$/;"	m	struct:__anon2	access:public
-__anon2::vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:__anon2	access:public
-__anon3::head	nqrdb.h	/^	NQRDBREC* head;$/;"	m	struct:__anon3	access:public
+NQRDBDATUM	nqrdb.h	/^typedef struct NQRDBDATUM {$/;"	s
+NQRDBDATUM	nqrdb.h	/^} NQRDBDATUM;$/;"	t	typeref:struct:NQRDBDATUM
+NQRDBDATUM::chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::kint	nqrdb.h	/^	uint32_t kint[4];$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::max	nqrdb.h	/^	uint32_t max;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::next	nqrdb.h	/^	NQRDBDATUM* next;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::pr	nqrdb.h	/^	NQRDBDATUM* pr;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::prev	nqrdb.h	/^	NQRDBDATUM* prev;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
+NQRDBDATUM::vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:NQRDBDATUM	access:public
+SIZEOF_APR_UINT32_T	lib/frl_base.h	/^const apr_uint32_t SIZEOF_APR_UINT32_T = sizeof(apr_uint32_t);$/;"	v
+SIZEOF_FRL_MD5	lib/frl_util_md5.h	/^const unsigned int SIZEOF_FRL_MD5 = sizeof(frl_md5);$/;"	v
+SIZEOF_FRL_MEM_SAFE_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_MEM_SAFE_T = sizeof(frl_mem_safe_t);$/;"	v
+SIZEOF_FRL_MEM_STAT_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_MEM_STAT_T = sizeof(frl_mem_stat_t);$/;"	v
+SIZEOF_FRL_MEM_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_MEM_T = sizeof(frl_mem_t);$/;"	v
+SIZEOF_FRL_SLAB_BLOCK_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_SLAB_BLOCK_T = sizeof(frl_slab_block_t);$/;"	v
+SIZEOF_FRL_SLAB_POOL_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_SLAB_POOL_T = sizeof(frl_slab_pool_t);$/;"	v
+SIZEOF_POINTER	lib/frl_base.h	/^const apr_uint32_t SIZEOF_POINTER = sizeof(void*);$/;"	v
+_GUARD_NQDPDB_	nqdpdb.h	7;"	d
+_GUARD_NQRDB_	nqrdb.h	7;"	d
+_GUARD_NQUTIL_	nqutil.h	2;"	d
+__anon2::dp	nqdpdb.h	/^	CvMat* dp;$/;"	m	struct:__anon2	access:public
+__anon2::dpft	nqdpdb.h	/^	CvFeatureTree* dpft;$/;"	m	struct:__anon2	access:public
+__anon3::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon3	access:public
 __anon3::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon3	access:public
 __anon3::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon3	access:public
-ba32	nqdpdb.h	/^	uint32_t* ba32;$/;"	m	struct:__anon1	access:public
-basiz	nqdpdb.h	/^	uint64_t basiz;$/;"	m	struct:__anon1	access:public
-chd	nqrdb.h	/^	NQRDBREC* chd[256];$/;"	m	struct:__anon2	access:public
+arena	lib/frl_slab_pool.h	/^	apr_byte_t* arena;$/;"	m	struct:frl_slab_block_t	access:public
+b16_pool	nqrdb.c	/^static frl_slab_pool_t* b16_pool = 0;$/;"	v	file:
+b2_pool	nqrdb.c	/^static frl_slab_pool_t* b2_pool = 0;$/;"	v	file:
+b6_pool	nqrdb.c	/^static frl_slab_pool_t* b6_pool = 0;$/;"	v	file:
+base64_decode	lib/frl_util_md5.cpp	/^int frl_md5::base64_decode(const apr_byte_t* x)$/;"	f	class:frl_md5	signature:(const apr_byte_t* x)
+base64_decode	lib/frl_util_md5.h	/^		int base64_decode(const apr_byte_t* x);$/;"	p	class:frl_md5	access:public	signature:(const apr_byte_t* x)
+base64_encode	lib/frl_util_md5.cpp	/^int frl_md5::base64_encode(apr_byte_t* q)$/;"	f	class:frl_md5	signature:(apr_byte_t* q)
+base64_encode	lib/frl_util_md5.h	/^		int base64_encode(apr_byte_t* q);$/;"	p	class:frl_md5	access:public	signature:(apr_byte_t* q)
+base64_index	lib/frl_util_md5.cpp	/^inline unsigned long long base64_index(const apr_byte_t& x)$/;"	f	signature:(const apr_byte_t& x)
+base64table	lib/frl_util_md5.cpp	/^const apr_byte_t base64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";$/;"	v
+block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_mem_t	access:public
+block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_slab_pool_t	access:public
+block_size	lib/frl_slab_pool.h	/^	apr_uint32_t block_size;$/;"	m	struct:frl_mem_stat_t	access:public
+capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_mem_stat_t	access:public
+capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_slab_block_t	access:public
+chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
 db_pool	nqrdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
-head	nqrdb.h	/^	NQRDBREC* head;$/;"	m	struct:__anon3	access:public
-ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:__anon2	access:public
-kmatch	nqrdb.c	/^inline bool kmatch(char* kstr1, char* kstr2, uint32_t k)$/;"	f	signature:(char* kstr1, char* kstr2, uint32_t k)
-kstr	nqrdb.h	/^	char kstr[32];$/;"	m	struct:__anon2	access:public
+digest	lib/frl_util_md5.h	/^			apr_byte_t digest[16];$/;"	m	union:frl_md5::__anon1	access:public
+dp	nqdpdb.h	/^	CvMat* dp;$/;"	m	struct:__anon2	access:public
+dpft	nqdpdb.h	/^	CvFeatureTree* dpft;$/;"	m	struct:__anon2	access:public
+dt_pool	nqdpdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
+flag	lib/frl_slab_pool.h	/^	apr_uint32_t flag;$/;"	m	struct:frl_mem_safe_t	access:public
+frl_insert_u	lib/frl_base.h	/^enum frl_insert_u$/;"	g
+frl_level_u	lib/frl_base.h	/^enum frl_level_u$/;"	g
+frl_lock_u	lib/frl_base.h	/^enum frl_lock_u$/;"	g
+frl_md5	lib/frl_util_md5.h	/^		frl_md5()$/;"	f	class:frl_md5	access:public	signature:()
+frl_md5	lib/frl_util_md5.h	/^		frl_md5(const apr_byte_t* x)$/;"	f	class:frl_md5	access:public	signature:(const apr_byte_t* x)
+frl_md5	lib/frl_util_md5.h	/^		frl_md5(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
+frl_md5	lib/frl_util_md5.h	/^class frl_md5$/;"	c
+frl_md5::__anon1::digest	lib/frl_util_md5.h	/^			apr_byte_t digest[16];$/;"	m	union:frl_md5::__anon1	access:public
+frl_md5::__anon1::uid	lib/frl_util_md5.h	/^			apr_uint64_t uid[2];$/;"	m	union:frl_md5::__anon1	access:public
+frl_md5::base64_decode	lib/frl_util_md5.cpp	/^int frl_md5::base64_decode(const apr_byte_t* x)$/;"	f	class:frl_md5	signature:(const apr_byte_t* x)
+frl_md5::base64_decode	lib/frl_util_md5.h	/^		int base64_decode(const apr_byte_t* x);$/;"	p	class:frl_md5	access:public	signature:(const apr_byte_t* x)
+frl_md5::base64_encode	lib/frl_util_md5.cpp	/^int frl_md5::base64_encode(apr_byte_t* q)$/;"	f	class:frl_md5	signature:(apr_byte_t* q)
+frl_md5::base64_encode	lib/frl_util_md5.h	/^		int base64_encode(apr_byte_t* q);$/;"	p	class:frl_md5	access:public	signature:(apr_byte_t* q)
+frl_md5::frl_md5	lib/frl_util_md5.h	/^		frl_md5()$/;"	f	class:frl_md5	access:public	signature:()
+frl_md5::frl_md5	lib/frl_util_md5.h	/^		frl_md5(const apr_byte_t* x)$/;"	f	class:frl_md5	access:public	signature:(const apr_byte_t* x)
+frl_md5::frl_md5	lib/frl_util_md5.h	/^		frl_md5(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
+frl_md5::hash	lib/frl_util_md5.cpp	/^int frl_md5::hash(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	signature:(const void* s, const apr_size_t size)
+frl_md5::hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	p	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
+frl_mem_safe_t	lib/frl_slab_pool.h	/^struct frl_mem_safe_t$/;"	s
+frl_mem_safe_t::flag	lib/frl_slab_pool.h	/^	apr_uint32_t flag;$/;"	m	struct:frl_mem_safe_t	access:public
+frl_mem_stat_t	lib/frl_slab_pool.h	/^struct frl_mem_stat_t$/;"	s
+frl_mem_stat_t::block_size	lib/frl_slab_pool.h	/^	apr_uint32_t block_size;$/;"	m	struct:frl_mem_stat_t	access:public
+frl_mem_stat_t::capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_mem_stat_t	access:public
+frl_mem_stat_t::per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_mem_stat_t	access:public
+frl_mem_stat_t::usage	lib/frl_slab_pool.h	/^	apr_size_t usage;$/;"	m	struct:frl_mem_stat_t	access:public
+frl_mem_t	lib/frl_slab_pool.h	/^struct frl_mem_t$/;"	s
+frl_mem_t::block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_mem_t	access:public
+frl_mem_t::id	lib/frl_slab_pool.h	/^	apr_uint32_t id;$/;"	m	struct:frl_mem_t	access:public
+frl_mem_t::pointer	lib/frl_slab_pool.h	/^	void* pointer;$/;"	m	struct:frl_mem_t	access:public
+frl_memory_u	lib/frl_base.h	/^enum frl_memory_u$/;"	g
+frl_slab_block_t	lib/frl_slab_pool.h	/^struct frl_slab_block_t$/;"	s
+frl_slab_block_t::arena	lib/frl_slab_pool.h	/^	apr_byte_t* arena;$/;"	m	struct:frl_slab_block_t	access:public
+frl_slab_block_t::capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_slab_block_t	access:public
+frl_slab_block_t::next	lib/frl_slab_pool.h	/^	frl_slab_block_t* next;$/;"	m	struct:frl_slab_block_t	access:public
+frl_slab_block_t::pool	lib/frl_slab_pool.h	/^	frl_slab_pool_t* pool;$/;"	m	struct:frl_slab_block_t	access:public
+frl_slab_block_t::stack_pointer	lib/frl_slab_pool.h	/^	apr_byte_t** stack_pointer;$/;"	m	struct:frl_slab_block_t	access:public
+frl_slab_block_t::usage_stack	lib/frl_slab_pool.h	/^	apr_byte_t** usage_stack;$/;"	m	struct:frl_slab_block_t	access:public
+frl_slab_palloc	lib/frl_slab_pool.c	/^APR_DECLARE(void*) frl_slab_palloc(frl_slab_pool_t* pool)$/;"	f	signature:(frl_slab_pool_t* pool)
+frl_slab_palloc_lock_free	lib/frl_slab_pool.c	/^APR_DECLARE(void*) frl_slab_palloc_lock_free(frl_slab_pool_t* pool)$/;"	f	signature:(frl_slab_pool_t* pool)
+frl_slab_palloc_lock_with	lib/frl_slab_pool.c	/^APR_DECLARE(void*) frl_slab_palloc_lock_with(frl_slab_pool_t* pool)$/;"	f	signature:(frl_slab_pool_t* pool)
+frl_slab_pcalloc	lib/frl_slab_pool.c	/^APR_DECLARE(void*) frl_slab_pcalloc(frl_slab_pool_t* pool)$/;"	f	signature:(frl_slab_pool_t* pool)
+frl_slab_pfree	lib/frl_slab_pool.c	/^APR_DECLARE(void) frl_slab_pfree(void* pointer)$/;"	f	signature:(void* pointer)
+frl_slab_pfree_lock_free	lib/frl_slab_pool.c	/^APR_DECLARE(void) frl_slab_pfree_lock_free(void* pointer)$/;"	f	signature:(void* pointer)
+frl_slab_pfree_lock_with	lib/frl_slab_pool.c	/^APR_DECLARE(void) frl_slab_pfree_lock_with(void* pointer)$/;"	f	signature:(void* pointer)
+frl_slab_pool_clear	lib/frl_slab_pool.c	/^APR_DECLARE(void) frl_slab_pool_clear(frl_slab_pool_t* pool)$/;"	f	signature:(frl_slab_pool_t* pool)
+frl_slab_pool_t	lib/frl_slab_pool.h	/^struct frl_slab_pool_t$/;"	s
+frl_slab_pool_t::block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_slab_pool_t	access:public
+frl_slab_pool_t::lock	lib/frl_slab_pool.h	/^	frl_lock_u lock;$/;"	m	struct:frl_slab_pool_t	access:public
+frl_slab_pool_t::max_capacity	lib/frl_slab_pool.h	/^	apr_uint32_t max_capacity;$/;"	m	struct:frl_slab_pool_t	access:public
+frl_slab_pool_t::mutex	lib/frl_slab_pool.h	/^	apr_thread_mutex_t* mutex;$/;"	m	struct:frl_slab_pool_t	access:public
+frl_slab_pool_t::per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_slab_pool_t	access:public
+frl_thread_model_u	lib/frl_base.h	/^enum frl_thread_model_u$/;"	g
+hash	lib/frl_util_md5.cpp	/^int frl_md5::hash(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	signature:(const void* s, const apr_size_t size)
+hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	p	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
+head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon3	access:public
+ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:NQRDBDATUM	access:public
+id	lib/frl_slab_pool.h	/^	apr_uint32_t id;$/;"	m	struct:frl_mem_t	access:public
+kint	nqrdb.h	/^	uint32_t kint[4];$/;"	m	struct:NQRDBDATUM	access:public
+kmatch	nqrdb.c	/^inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)$/;"	f	signature:(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
+lock	lib/frl_slab_pool.h	/^	frl_lock_u lock;$/;"	m	struct:frl_slab_pool_t	access:public
+main	test/rdb_test.cpp	/^int main()$/;"	f	signature:()
+max	nqrdb.h	/^	uint32_t max;$/;"	m	struct:NQRDBDATUM	access:public
+max_capacity	lib/frl_slab_pool.h	/^	apr_uint32_t max_capacity;$/;"	m	struct:frl_slab_pool_t	access:public
+mempool	test/rdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
+mtx_pool	nqdpdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mtx_pool	nqrdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
-name	nqdpdb.h	/^	char* name;$/;"	m	struct:__anon1	access:public
-next	nqrdb.h	/^	NQRDBREC* next;$/;"	m	struct:__anon2	access:public
-nqdpdblike	nqdpdb.h	/^bool nqdpdblike(NQDPDB* dpdb, );$/;"	p	signature:(NQDPDB* dpdb, )
+mutex	lib/frl_slab_pool.h	/^	apr_thread_mutex_t* mutex;$/;"	m	struct:frl_slab_pool_t	access:public
+next	lib/frl_slab_pool.h	/^	frl_slab_block_t* next;$/;"	m	struct:frl_slab_block_t	access:public
+next	nqrdb.h	/^	NQRDBDATUM* next;$/;"	m	struct:NQRDBDATUM	access:public
+nqdpdbdel	nqdpdb.c	/^void nqdpdbdel(NQDPDB* dpdb)$/;"	f	signature:(NQDPDB* dpdb)
+nqdpdbdel	nqdpdb.h	/^void nqdpdbdel(NQDPDB* dpdb);$/;"	p	signature:(NQDPDB* dpdb)
+nqdpdbget	nqdpdb.c	/^CvMat* nqdpdbget(NQDPDB* dpdb, char* kstr)$/;"	f	signature:(NQDPDB* dpdb, char* kstr)
+nqdpdbget	nqdpdb.h	/^CvMat* nqdpdbget(NQDPDB* dpdb, char* kstr);$/;"	p	signature:(NQDPDB* dpdb, char* kstr)
+nqdpdblike	nqdpdb.c	/^bool nqdpdblike(NQDPDB* dpdb, CvMat* dpm, char** kstr, int lmt, float** likeness = 0)$/;"	f	signature:(NQDPDB* dpdb, CvMat* dpm, char** kstr, int lmt, float** likeness = 0)
+nqdpdblike	nqdpdb.h	/^bool nqdpdblike(NQDPDB* dpdb, CvMat* dpm, char** kstr, int lmt, float** likeness = 0);$/;"	p	signature:(NQDPDB* dpdb, CvMat* dpm, char** kstr, int lmt, float** likeness = 0)
+nqdpdbnew	nqdpdb.c	/^NQDPDB* nqdpdbnew(void)$/;"	f	signature:(void)
 nqdpdbnew	nqdpdb.h	/^NQDPDB* nqdpdbnew(void);$/;"	p	signature:(void)
-nqdpdbput	nqdpdb.h	/^bool nqdpdbput(NQDPDB* dpdb, const void* kbuf, int ksiz, CvArr* img);$/;"	p	signature:(NQDPDB* dpdb, const void* kbuf, int ksiz, CvArr* img)
+nqdpdbout	nqdpdb.c	/^bool nqdpdbout(NQDPDB* dpdb, char* kstr)$/;"	f	signature:(NQDPDB* dpdb, char* kstr)
+nqdpdbout	nqdpdb.h	/^bool nqdpdbout(NQDPDB* dpdb, char* kstr);$/;"	p	signature:(NQDPDB* dpdb, char* kstr)
+nqdpdbput	nqdpdb.c	/^bool nqdpdbput(NQDPDB* dpdb, char* kstr, CvMat* dpm)$/;"	f	signature:(NQDPDB* dpdb, char* kstr, CvMat* dpm)
+nqdpdbput	nqdpdb.h	/^bool nqdpdbput(NQDPDB* dpdb, char* kstr, CvMat* dpm);$/;"	p	signature:(NQDPDB* dpdb, char* kstr, CvMat* dpm)
+nqdpdel	nqdpdb.c	/^void nqdpdel(CvMat* dp)$/;"	f	signature:(CvMat* dp)
+nqdpdel	nqdpdb.h	/^void nqdpdel(CvMat* dp);$/;"	p	signature:(CvMat* dp)
+nqdpnew	nqdpdb.c	/^CvMat* nqdpnew(CvArr* img)$/;"	f	signature:(CvArr* img)
+nqdpnew	nqdpdb.h	/^CvMat* nqdpnew(CvArr* img);$/;"	p	signature:(CvArr* img)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb)$/;"	f	file:	signature:(NQRDB* rdb)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb);$/;"	p	file:	signature:(NQRDB* rdb)
 nqrdbdel	nqrdb.c	/^void nqrdbdel(NQRDB* rdb)$/;"	f	signature:(NQRDB* rdb)
 nqrdbdel	nqrdb.h	/^void nqrdbdel(NQRDB* rdb);$/;"	p	signature:(NQRDB* rdb)
-nqrdbget	nqrdb.c	/^void* nqrdbget(NQRDB* rdb, const char* kstr)$/;"	f	signature:(NQRDB* rdb, const char* kstr)
-nqrdbget	nqrdb.h	/^void* nqrdbget(NQRDB* rdb, const char* kstr);$/;"	p	signature:(NQRDB* rdb, const char* kstr)
+nqrdbforeach	nqrdb.c	/^bool nqrdbforeach(NQRDB* rdb, void* op, void* ud)$/;"	f	signature:(NQRDB* rdb, void* op, void* ud)
+nqrdbforeach	nqrdb.h	/^bool nqrdbforeach(NQRDB* rdb, NQFOREACH* op, void* ud);$/;"	p	signature:(NQRDB* rdb, NQFOREACH* op, void* ud)
+nqrdbget	nqrdb.c	/^void* nqrdbget(NQRDB* rdb, char* kstr)$/;"	f	signature:(NQRDB* rdb, char* kstr)
+nqrdbget	nqrdb.h	/^void* nqrdbget(NQRDB* rdb, char* kstr);$/;"	p	signature:(NQRDB* rdb, char* kstr)
+nqrdbirt	nqrdb.c	/^static NQRDBDATUM* nqrdbirt(NQRDB* rdb, NQRDBDATUM* rec, uint8_t ht, uint32_t i, uint32_t* kint, void* vbuf)$/;"	f	file:	signature:(NQRDB* rdb, NQRDBDATUM* rec, uint8_t ht, uint32_t i, uint32_t* kint, void* vbuf)
 nqrdbnew	nqrdb.c	/^NQRDB* nqrdbnew(void)$/;"	f	signature:(void)
 nqrdbnew	nqrdb.h	/^NQRDB* nqrdbnew(void);$/;"	p	signature:(void)
-nqrdbout	nqrdb.c	/^bool nqrdbout(NQRDB* rdb, const char* kstr)$/;"	f	signature:(NQRDB* rdb, const char* kstr)
-nqrdbout	nqrdb.h	/^bool nqrdbout(NQRDB* rdb, const char* kstr);$/;"	p	signature:(NQRDB* rdb, const char* kstr)
-nqrdbput	nqrdb.c	/^bool nqrdbput(NQRDB* rdb, const char* kstr, const void* vbuf)$/;"	f	signature:(NQRDB* rdb, const char* kstr, const void* vbuf)
-nqrdbput	nqrdb.h	/^bool nqrdbput(NQRDB* rdb, const char* kstr, const void* vbuf);$/;"	p	signature:(NQRDB* rdb, const char* kstr, const void* vbuf)
-pr	nqrdb.h	/^	NQRDBREC* pr;$/;"	m	struct:__anon2	access:public
-prev	nqrdb.h	/^	NQRDBREC* prev;$/;"	m	struct:__anon2	access:public
-rdp	nqdpdb.h	/^	CvMat** rdp;$/;"	m	struct:__anon1	access:public
-rdpc	nqdpdb.h	/^	CvFeatureTree** rdpc;$/;"	m	struct:__anon1	access:public
+nqrdbout	nqrdb.c	/^bool nqrdbout(NQRDB* rdb, char* kstr)$/;"	f	signature:(NQRDB* rdb, char* kstr)
+nqrdbout	nqrdb.h	/^bool nqrdbout(NQRDB* rdb, char* kstr);$/;"	p	signature:(NQRDB* rdb, char* kstr)
+nqrdbput	nqrdb.c	/^bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)$/;"	f	signature:(NQRDB* rdb, char* kstr, void* vbuf)
+nqrdbput	nqrdb.h	/^bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf);$/;"	p	signature:(NQRDB* rdb, char* kstr, void* vbuf)
+operator !=	lib/frl_util_md5.h	/^inline bool operator!=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+operator <	lib/frl_util_md5.h	/^inline bool operator<(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+operator <=	lib/frl_util_md5.h	/^inline bool operator<=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+operator ==	lib/frl_util_md5.h	/^inline bool operator==(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+operator >	lib/frl_util_md5.h	/^inline bool operator>(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+operator >=	lib/frl_util_md5.h	/^inline bool operator>=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_mem_stat_t	access:public
+per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_slab_pool_t	access:public
+pointer	lib/frl_slab_pool.h	/^	void* pointer;$/;"	m	struct:frl_mem_t	access:public
+pool	lib/frl_slab_pool.h	/^	frl_slab_pool_t* pool;$/;"	m	struct:frl_slab_block_t	access:public
+pool	lib/frl_slab_pool.h	/^APR_DECLARE(apr_status_t) frl_slab_pool_destroy(frl_slab_pool_t* pool);$/;"	v
+pool	lib/frl_slab_pool.h	/^APR_DECLARE(apr_status_t) frl_slab_pool_safe(frl_slab_pool_t* pool);$/;"	v
+pool	lib/frl_slab_pool.h	/^APR_DECLARE(frl_mem_stat_t) frl_slab_pool_stat(frl_slab_pool_t* pool);$/;"	v
+pool	lib/frl_slab_pool.h	/^APR_DECLARE(void) frl_slab_pool_clear(frl_slab_pool_t* pool);$/;"	v
+pool	lib/frl_slab_pool.h	/^APR_DECLARE(void*) frl_slab_palloc(frl_slab_pool_t* pool);$/;"	v
+pool	lib/frl_slab_pool.h	/^APR_DECLARE(void*) frl_slab_pcalloc(frl_slab_pool_t* pool);$/;"	v
+pr	nqrdb.h	/^	NQRDBDATUM* pr;$/;"	m	struct:NQRDBDATUM	access:public
+prev	nqrdb.h	/^	NQRDBDATUM* prev;$/;"	m	struct:NQRDBDATUM	access:public
 rec_pool	nqrdb.c	/^static frl_slab_pool_t* rec_pool = 0;$/;"	v	file:
-rnum	nqdpdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon1	access:public
+rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
 rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon3	access:public
-rnum	nqrdb.h	/^	uint8_t rnum;$/;"	m	struct:__anon2	access:public
 rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon3	access:public
-vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:__anon2	access:public
+stack_pointer	lib/frl_slab_pool.h	/^	apr_byte_t** stack_pointer;$/;"	m	struct:frl_slab_block_t	access:public
+uid	lib/frl_util_md5.h	/^			apr_uint64_t uid[2];$/;"	m	union:frl_md5::__anon1	access:public
+usage	lib/frl_slab_pool.h	/^	apr_size_t usage;$/;"	m	struct:frl_mem_stat_t	access:public
+usage_stack	lib/frl_slab_pool.h	/^	apr_byte_t** usage_stack;$/;"	m	struct:frl_slab_block_t	access:public
+vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:NQRDBDATUM	access:public

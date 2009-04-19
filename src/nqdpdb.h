@@ -9,18 +9,19 @@
 #include <cv.h>
 
 typedef struct {
-	char* name;
-	uint64_t rnum;
-	CvMat** rdp;
-	CvFeatureTree** rdpc;
-	uint64_t basiz;
-	uint32_t* ba32;
-} NQDPDB;
+	CvMat* dp;
+	CvFeatureTree* dpft;
+} NQDPDBDATUM;
+
+typedef NQRDB NQDPDB;
 
 NQDPDB* nqdpdbnew(void);
-
-bool nqdpdbput(NQDPDB* dpdb, const void* kbuf, int ksiz, CvArr* img);
-
-bool nqdpdblike(NQDPDB* dpdb, );
+CvMat* nqdpnew(CvArr* img);
+bool nqdpdbput(NQDPDB* dpdb, char* kstr, CvMat* dpm);
+CvMat* nqdpdbget(NQDPDB* dpdb, char* kstr);
+bool nqdpdblike(NQDPDB* dpdb, CvMat* dpm, char** kstr, int lmt, float** likeness = 0);
+bool nqdpdbout(NQDPDB* dpdb, char* kstr);
+void nqdpdel(CvMat* dp);
+void nqdpdbdel(NQDPDB* dpdb);
 
 #endif

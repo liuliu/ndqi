@@ -24,17 +24,17 @@ NQRDB* nqrdbnew(void)
 	if (db_pool == 0)
 		frl_slab_pool_create(&db_pool, mtx_pool, 64, sizeof(NQRDB), FRL_LOCK_WITH);
 	if (rec_pool == 0)
-		frl_slab_pool_create(&rec_pool, mtx_pool, 1024, sizeof(NQRDBREC), FRL_LOCK_WITH);
+		frl_slab_pool_create(&rec_pool, mtx_pool, 1024, sizeof(NQRDBDATUM), FRL_LOCK_WITH);
 	if (b16_pool == 0)
-		frl_slab_pool_create(&b16_pool, mtx_pool, 16, sizeof(NQRDBREC*) * 65536, FRL_LOCK_WITH);
+		frl_slab_pool_create(&b16_pool, mtx_pool, 16, sizeof(NQRDBDATUM*) * 65536, FRL_LOCK_WITH);
 	if (b6_pool == 0)
-		frl_slab_pool_create(&b6_pool, mtx_pool, 1024, sizeof(NQRDBREC*) * 64, FRL_LOCK_WITH);
+		frl_slab_pool_create(&b6_pool, mtx_pool, 1024, sizeof(NQRDBDATUM*) * 64, FRL_LOCK_WITH);
 	if (b2_pool == 0)
-		frl_slab_pool_create(&b2_pool, mtx_pool, 4096, sizeof(NQRDBREC*) * 4, FRL_LOCK_WITH);
+		frl_slab_pool_create(&b2_pool, mtx_pool, 4096, sizeof(NQRDBDATUM*) * 4, FRL_LOCK_WITH);
 	NQRDB* rdb = (NQRDB*)frl_slab_palloc(db_pool);
 	nqrdbclear(rdb);
-	rdb->head = (NQRDBREC*)frl_slab_palloc(rec_pool);
-	rdb->head->chd = (NQRDBREC**)frl_slab_pcalloc(b16_pool);
+	rdb->head = (NQRDBDATUM*)frl_slab_palloc(rec_pool);
+	rdb->head->chd = (NQRDBDATUM**)frl_slab_pcalloc(b16_pool);
 	rdb->head->max = 65536;
 	rdb->head->ht = 0;
 	rdb->head->pr = 0;
@@ -54,9 +54,9 @@ static void nqrdbclear(NQRDB* rdb)
 	rdb->head = 0;
 }
 
-static NQRDBREC* nqrdbirt(NQRDB* rdb, NQRDBREC* rec, uint8_t ht, uint32_t i, uint32_t* kint, void* vbuf)
+static NQRDBDATUM* nqrdbirt(NQRDB* rdb, NQRDBDATUM* rec, uint8_t ht, uint32_t i, uint32_t* kint, void* vbuf)
 {
-	NQRDBREC* nrec = (NQRDBREC*)frl_slab_palloc(rec_pool);
+	NQRDBDATUM* nrec = (NQRDBDATUM*)frl_slab_palloc(rec_pool);
 	nrec->rnum = 0;
 	memcpy(nrec->kint, kint, 16);
 	nrec->vbuf = vbuf;
@@ -79,7 +79,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(rdb->rwlock);
 #endif
-	NQRDBREC* rec = rdb->head;
+	NQRDBDATUM* rec = rdb->head;
 	uint32_t b16 = (*kp)>>16;
 	if (rec->chd[b16] == 0)
 	{
@@ -101,7 +101,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 	uint32_t b6 = ((*kp)>>10)&0x3F;
 	if (rec->chd == 0)
 	{
-		rec->chd = (NQRDBREC**)frl_slab_pcalloc(b6_pool);
+		rec->chd = (NQRDBDATUM**)frl_slab_pcalloc(b6_pool);
 		rec->max = 64;
 	}
 	if (rec->chd[b6] == 0)
@@ -127,7 +127,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 		uint32_t b2 = ((*kp)>>i)&0x3;
 		if (rec->chd == 0)
 		{
-			rec->chd = (NQRDBREC**)frl_slab_pcalloc(b2_pool);
+			rec->chd = (NQRDBDATUM**)frl_slab_pcalloc(b2_pool);
 			rec->max = 4;
 		}
 		if (rec->chd[b2] == 0)
@@ -164,7 +164,7 @@ void* nqrdbget(NQRDB* rdb, char* kstr)
 #if APR_HAS_THREADS
 	apr_thread_rwlock_rdlock(rdb->rwlock);
 #endif
-	NQRDBREC* rec = rdb->head;
+	NQRDBDATUM* rec = rdb->head;
 	uint32_t b16 = (*kp)>>16;
 	if (rec->chd[b16] == 0)
 	{
@@ -237,7 +237,7 @@ bool nqrdbout(NQRDB* rdb, char* kstr)
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(rdb->rwlock);
 #endif
-	NQRDBREC* rec = rdb->head;
+	NQRDBDATUM* rec = rdb->head;
 	uint32_t b16, b6, b2, i;
 	b16 = (*kp)>>16;
 	if (rec->chd[b16] == 0)
@@ -281,8 +281,8 @@ bool nqrdbout(NQRDB* rdb, char* kstr)
 		i = (i+30)&0x1F;
 	} while (kp < kint+4);
 RMPS:
-	NQRDBREC* lrec = rec;
-	NQRDBREC* nrec;
+	NQRDBDATUM* lrec = rec;
+	NQRDBDATUM* nrec;
 	while (lrec->rnum > 0)
 	{
 		nrec = 0;
@@ -318,6 +318,8 @@ RMPS:
 	}
 	lrec->prev->next = lrec->next;
 	lrec->next->prev = lrec->prev;
+	if (lrec->chd != 0)
+		frl_slab_pfree(lrec->chd);
 	frl_slab_pfree(lrec);
 	rdb->rnum--;
 #if APR_HAS_THREADS
@@ -326,14 +328,31 @@ RMPS:
 	return 1;
 }
 
+bool nqrdbforeach(NQRDB* rdb, NQFOREACH op, void* ud)
+{
+#if APR_HAS_THREADS
+	apr_thread_rwlock_rdlock(rdb->rwlock);
+#endif
+	NQRDBDATUM* cur = rdb->head;
+	for (cur = cur->next; cur != rdb->head; cur = cur->next)
+		op((char*)cur->kint, cur->vbuf, ud);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+}
+
 void nqrdbdel(NQRDB* rdb)
 {
 #if APR_HAS_THREADS
 	apr_thread_rwlock_destroy(rdb->rwlock);
 #endif
-	NQRDBREC* cur = rdb->head;
+	NQRDBDATUM* cur = rdb->head;
 	frl_slab_pfree(cur);
 	for (cur = cur->next; cur != rdb->head; cur = cur->next)
+	{
+		if (cur->chd != 0)
+			frl_slab_pfree(cur->chd);
 		frl_slab_pfree(cur);
+	}
 	frl_slab_pfree(rdb);
 }

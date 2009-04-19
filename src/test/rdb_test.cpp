@@ -3,6 +3,12 @@
 
 apr_pool_t* mempool;
 
+void sumup(char* kstr, void* data, void* ud)
+{
+	int* t = (int*)ud;
+	*t += *((int*)data);
+}
+
 int main()
 {
 	apr_initialize();
@@ -48,6 +54,12 @@ int main()
 	}
 	time = apr_time_now()-time;
 	printf("look up 250,000 null key-value pairs and 250,000 key-value pairs in rdb in %d microsecond(s).\n", time);
+	uint64_t t = 0;
+	time = apr_time_now();
+	nqrdbforeach(rdb, sumup, &t);
+	time = apr_time_now()-time;
+	printf("foreach test: total sum is %d in %d microsecond(s).\n", t, time);
+	nqrdbdel(rdb);
 	apr_terminate();
 	return 0;
 }
