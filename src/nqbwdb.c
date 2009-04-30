@@ -152,12 +152,15 @@ static void nqbwfwm(char* kstr, void* vbuf, void* ud)
 	int* iptr = nqud->idx->data.i;
 	double* dptr = nqud->dist->data.db;
 	int co = 0;
+	double d = 0;
 	int i;
 	for (i = 0; i < nqud->dist->rows; i++, dptr += 2, iptr += 2)
 		if ((iptr[0] >= 0 && iptr[1] >= 0)&&
-			((dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match)||
-			 (dptr[1] < dptr[0] && dptr[1] < dptr[0] * nqud->match)))
+			(dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match))
+		{
+			d += dptr[0];
 			co++;
+		}
 	float likeness = (float)(co) / (float)(nqud->bwm->rows);
 	if (likeness > nqud->data->likeness)
 	{
