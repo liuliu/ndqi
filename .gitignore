@@ -1,0 +1,11 @@
+src/*.[oa]
+src/*.~
+src/*.swp
+src/lib/*.[oa]
+src/lib/*.~
+src/lib/*.swp
+src/test/*.[oa]
+src/test/*.~
+src/test/*.swp
+testdata/*
+build/*
