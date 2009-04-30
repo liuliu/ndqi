@@ -10,8 +10,39 @@ APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_create
 APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_destroy(frl_slab_pool_t* pool)$/;"	f
 APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_safe(frl_slab_pool_t* pool)$/;"	f
 APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(frl_mem_stat_t) frl_slab_pool_stat(frl_slab_pool_t* pool)$/;"	f
-COMPFLAG	test/makefile	/^COMPFLAG=-O3$/;"	m
+COMPFLAG	test/makefile	/^COMPFLAG=-ffunction-sections -DNDEBUG -fomit-frame-pointer -O3 -ffast-math -mmmx $/;"	m
+CV_TYPE_NAME_ML_APCLUSTER	lib/mlapcluster.h	6;"	d
 CXXFLAGS	test/makefile	/^CXXFLAGS=-I"\/opt\/apr\/include" -I"\/opt\/apr-util\/include" -I"$(OPENCV)\/include\/opencv"$/;"	m
+CvAPCParams	lib/mlapcluster.h	/^	CvAPCParams( int _maxiteration, int _stopcriterion, double _lambda )$/;"	f	struct:CvAPCParams	access:public	signature:( int _maxiteration, int _stopcriterion, double _lambda )
+CvAPCParams	lib/mlapcluster.h	/^	CvAPCParams()$/;"	f	struct:CvAPCParams	access:public	signature:()
+CvAPCParams	lib/mlapcluster.h	/^struct CV_EXPORTS CvAPCParams$/;"	s
+CvAPCParams::CvAPCParams	lib/mlapcluster.h	/^	CvAPCParams( int _maxiteration, int _stopcriterion, double _lambda )$/;"	f	struct:CvAPCParams	access:public	signature:( int _maxiteration, int _stopcriterion, double _lambda )
+CvAPCParams::CvAPCParams	lib/mlapcluster.h	/^	CvAPCParams()$/;"	f	struct:CvAPCParams	access:public	signature:()
+CvAPCParams::lambda	lib/mlapcluster.h	/^	double lambda;$/;"	m	struct:CvAPCParams	access:public
+CvAPCParams::maxiteration	lib/mlapcluster.h	/^	int maxiteration;$/;"	m	struct:CvAPCParams	access:public
+CvAPCParams::stopcriterion	lib/mlapcluster.h	/^	int stopcriterion;$/;"	m	struct:CvAPCParams	access:public
+CvAPCluster	lib/mlapcluster.cpp	/^CvAPCluster::CvAPCluster( CvAPCParams _params )$/;"	f	class:CvAPCluster	signature:( CvAPCParams _params )
+CvAPCluster	lib/mlapcluster.h	/^		CvAPCluster( CvAPCParams _params );$/;"	p	class:CvAPCluster	access:public	signature:( CvAPCParams _params )
+CvAPCluster	lib/mlapcluster.h	/^class CV_EXPORTS CvAPCluster : public CvStatModel$/;"	c	inherits:CvStatModel
+CvAPCluster::CvAPCluster	lib/mlapcluster.cpp	/^CvAPCluster::CvAPCluster( CvAPCParams _params )$/;"	f	class:CvAPCluster	signature:( CvAPCParams _params )
+CvAPCluster::CvAPCluster	lib/mlapcluster.h	/^		CvAPCluster( CvAPCParams _params );$/;"	p	class:CvAPCluster	access:public	signature:( CvAPCParams _params )
+CvAPCluster::clear	lib/mlapcluster.cpp	/^CvAPCluster::clear()$/;"	f	class:CvAPCluster	signature:()
+CvAPCluster::clear	lib/mlapcluster.h	/^		virtual void clear();$/;"	p	class:CvAPCluster	access:public	signature:()
+CvAPCluster::params	lib/mlapcluster.h	/^		CvAPCParams params;$/;"	m	class:CvAPCluster	access:private
+CvAPCluster::read	lib/mlapcluster.cpp	/^CvAPCluster::read( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, CvFileNode* root_node )
+CvAPCluster::read	lib/mlapcluster.h	/^		virtual void read( CvFileStorage* fs, CvFileNode* root_node );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, CvFileNode* root_node )
+CvAPCluster::train	lib/mlapcluster.cpp	/^CvAPCluster::train( const CvSparseMat* similarity,$/;"	f	class:CvAPCluster	signature:( const CvSparseMat* similarity, const CvMat* labels )
+CvAPCluster::train	lib/mlapcluster.cpp	/^bool CvAPCluster::train( const CvMat* similarity,$/;"	f	class:CvAPCluster	signature:( const CvMat* similarity, const CvMat* labels )
+CvAPCluster::train	lib/mlapcluster.h	/^		virtual bool train( const CvMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvMat* _train_data, const CvMat* _response )
+CvAPCluster::train	lib/mlapcluster.h	/^		virtual bool train( const CvSparseMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvSparseMat* _train_data, const CvMat* _response )
+CvAPCluster::write	lib/mlapcluster.cpp	/^CvAPCluster::write( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, const char* name )
+CvAPCluster::write	lib/mlapcluster.h	/^		virtual void write( CvFileStorage* fs, const char* name );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, const char* name )
+CvAPCluster::~CvAPCluster	lib/mlapcluster.cpp	/^CvAPCluster::~CvAPCluster()$/;"	f	class:CvAPCluster	signature:()
+CvAPCluster::~CvAPCluster	lib/mlapcluster.h	/^		virtual ~CvAPCluster();$/;"	p	class:CvAPCluster	access:public	signature:()
+CvSparseNode2D	lib/mlapcluster.cpp	/^struct CvSparseNode2D$/;"	s	file:
+CvSparseNode2D::i	lib/mlapcluster.cpp	/^	int i;$/;"	m	struct:CvSparseNode2D	file:	access:public
+CvSparseNode2D::k	lib/mlapcluster.cpp	/^	int k;$/;"	m	struct:CvSparseNode2D	file:	access:public
+CvSparseNode2D::val	lib/mlapcluster.cpp	/^	double val;$/;"	m	struct:CvSparseNode2D	file:	access:public
 DCAS_BUSY_VAL	lib/frl_slab_pool.c	54;"	d	file:
 FRL_INSERT_AFTER	lib/frl_base.h	/^	FRL_INSERT_AFTER$/;"	e	enum:frl_insert_u
 FRL_INSERT_BEFORE	lib/frl_base.h	/^	FRL_INSERT_BEFORE,$/;"	e	enum:frl_insert_u
@@ -40,6 +71,7 @@ FRL_THREAD_LEADER_FOLLOWER	lib/frl_base.h	/^	FRL_THREAD_LEADER_FOLLOWER,$/;"	e	e
 GUARD_frl_base_h	lib/frl_base.h	2;"	d
 GUARD_frl_slab_pool_h	lib/frl_slab_pool.h	8;"	d
 GUARD_frl_util_md5_h	lib/frl_util_md5.h	2;"	d
+GUARD_mlapcluster_h	lib/mlapcluster.h	2;"	d
 LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui$/;"	m
 LINKLIB	test/makefile	/^LINKLIB=-L"$(OPENCV)\/lib"$/;"	m
 NQDPDB	nqdpdb.h	/^} NQDPDB;$/;"	t	typeref:struct:__anon5
@@ -47,7 +79,11 @@ NQDPDBDATUM	nqdpdb.h	/^} NQDPDBDATUM;$/;"	t	typeref:struct:__anon4
 NQDPPAIR	nqdpdb.c	/^} NQDPPAIR;$/;"	t	typeref:struct:__anon2	file:
 NQDPUSERDATA	nqdpdb.c	/^} NQDPUSERDATA;$/;"	t	typeref:struct:__anon3	file:
 NQFOREACH	nqutil.h	/^typedef void (*NQFOREACH) (char*, void*, void*);$/;"	t
-NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon6
+NQIRDB	nqirdb.h	/^} NQIRDB;$/;"	t	typeref:struct:__anon9
+NQIRDBDATUM	nqirdb.h	/^} NQIRDBDATUM;$/;"	t	typeref:struct:__anon8
+NQIRPAIR	nqirdb.c	/^} NQIRPAIR;$/;"	t	typeref:struct:__anon6	file:
+NQIRUSERDATA	nqirdb.c	/^} NQIRUSERDATA;$/;"	t	typeref:struct:__anon7	file:
+NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon10
 NQRDBDATUM	nqrdb.h	/^typedef struct NQRDBDATUM {$/;"	s
 NQRDBDATUM	nqrdb.h	/^} NQRDBDATUM;$/;"	t	typeref:struct:NQRDBDATUM
 NQRDBDATUM::chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
@@ -69,8 +105,12 @@ SIZEOF_FRL_SLAB_BLOCK_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_SLAB
 SIZEOF_FRL_SLAB_POOL_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_SLAB_POOL_T = sizeof(frl_slab_pool_t);$/;"	v
 SIZEOF_POINTER	lib/frl_base.h	/^const apr_uint32_t SIZEOF_POINTER = sizeof(void*);$/;"	v
 _GUARD_NQDPDB_	nqdpdb.h	7;"	d
+_GUARD_NQIRDB_	nqirdb.h	7;"	d
 _GUARD_NQRDB_	nqrdb.h	7;"	d
 _GUARD_NQUTIL_	nqutil.h	2;"	d
+__anon10::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon10	access:public
+__anon10::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon10	access:public
+__anon10::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon10	access:public
 __anon2::kstr	nqdpdb.c	/^	char* kstr;$/;"	m	struct:__anon2	file:	access:public
 __anon2::likeness	nqdpdb.c	/^	float likeness;$/;"	m	struct:__anon2	file:	access:public
 __anon3::data	nqdpdb.c	/^	NQDPPAIR data[0];$/;"	m	struct:__anon3	file:	access:public
@@ -83,12 +123,16 @@ __anon3::siz	nqdpdb.c	/^	uint32_t siz;$/;"	m	struct:__anon3	file:	access:public
 __anon4::dp	nqdpdb.h	/^	CvMat* dp;$/;"	m	struct:__anon4	access:public
 __anon4::dpft	nqdpdb.h	/^	CvFeatureTree* dpft;$/;"	m	struct:__anon4	access:public
 __anon5::emax	nqdpdb.h	/^	uint32_t emax;$/;"	m	struct:__anon5	access:public
-__anon5::kmax	nqdpdb.h	/^	uint32_t kmax;$/;"	m	struct:__anon5	access:public
 __anon5::match	nqdpdb.h	/^	float match;$/;"	m	struct:__anon5	access:public
 __anon5::rdb	nqdpdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon5	access:public
-__anon6::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon6	access:public
-__anon6::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon6	access:public
-__anon6::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon6	access:public
+__anon6::kstr	nqirdb.c	/^	char* kstr;$/;"	m	struct:__anon6	file:	access:public
+__anon6::likeness	nqirdb.c	/^	float likeness;$/;"	m	struct:__anon6	file:	access:public
+__anon8::ir	nqirdb.h	/^	CvMat* ir;$/;"	m	struct:__anon8	access:public
+__anon8::irft	nqirdb.h	/^	CvFeatureTree* irft;$/;"	m	struct:__anon8	access:public
+__anon9::emax	nqirdb.h	/^	uint32_t emax;$/;"	m	struct:__anon9	access:public
+__anon9::match	nqirdb.h	/^	float match;$/;"	m	struct:__anon9	access:public
+__anon9::rdb	nqirdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon9	access:public
+_dispatch_mat_ptr	nqutil.c	4;"	d	file:
 arena	lib/frl_slab_pool.h	/^	apr_byte_t* arena;$/;"	m	struct:frl_slab_block_t	access:public
 b16_pool	nqrdb.c	/^static frl_slab_pool_t* b16_pool = 0;$/;"	v	file:
 b2_pool	nqrdb.c	/^static frl_slab_pool_t* b2_pool = 0;$/;"	v	file:
@@ -105,8 +149,11 @@ block_size	lib/frl_slab_pool.h	/^	apr_uint32_t block_size;$/;"	m	struct:frl_mem_
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_mem_stat_t	access:public
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_slab_block_t	access:public
 chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
+clear	lib/mlapcluster.cpp	/^CvAPCluster::clear()$/;"	f	class:CvAPCluster	signature:()
+clear	lib/mlapcluster.h	/^		virtual void clear();$/;"	p	class:CvAPCluster	access:public	signature:()
 data	nqdpdb.c	/^	NQDPPAIR data[0];$/;"	m	struct:__anon3	file:	access:public
 db_pool	nqdpdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
+db_pool	nqirdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
 db_pool	nqrdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
 digest	lib/frl_util_md5.h	/^			apr_byte_t digest[16];$/;"	m	union:frl_md5::__anon1	access:public
 dist	nqdpdb.c	/^	CvMat* dist;$/;"	m	struct:__anon3	file:	access:public
@@ -114,8 +161,10 @@ dp	nqdpdb.h	/^	CvMat* dp;$/;"	m	struct:__anon4	access:public
 dpft	nqdpdb.h	/^	CvFeatureTree* dpft;$/;"	m	struct:__anon4	access:public
 dpm	nqdpdb.c	/^	CvMat* dpm;$/;"	m	struct:__anon3	file:	access:public
 dt_pool	nqdpdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
+dt_pool	nqirdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
 emax	nqdpdb.c	/^	uint32_t emax;$/;"	m	struct:__anon3	file:	access:public
 emax	nqdpdb.h	/^	uint32_t emax;$/;"	m	struct:__anon5	access:public
+emax	nqirdb.h	/^	uint32_t emax;$/;"	m	struct:__anon9	access:public
 flag	lib/frl_slab_pool.h	/^	apr_uint32_t flag;$/;"	m	struct:frl_mem_safe_t	access:public
 frl_insert_u	lib/frl_base.h	/^enum frl_insert_u$/;"	g
 frl_level_u	lib/frl_base.h	/^enum frl_level_u$/;"	g
@@ -171,25 +220,35 @@ frl_slab_pool_t::per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	st
 frl_thread_model_u	lib/frl_base.h	/^enum frl_thread_model_u$/;"	g
 hash	lib/frl_util_md5.cpp	/^int frl_md5::hash(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	signature:(const void* s, const apr_size_t size)
 hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	p	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
-head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon6	access:public
+head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon10	access:public
 ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:NQRDBDATUM	access:public
+i	lib/mlapcluster.cpp	/^	int i;$/;"	m	struct:CvSparseNode2D	file:	access:public
 id	lib/frl_slab_pool.h	/^	apr_uint32_t id;$/;"	m	struct:frl_mem_t	access:public
 idx	nqdpdb.c	/^	CvMat* idx;$/;"	m	struct:__anon3	file:	access:public
+ir	nqirdb.h	/^	CvMat* ir;$/;"	m	struct:__anon8	access:public
+irft	nqirdb.h	/^	CvFeatureTree* irft;$/;"	m	struct:__anon8	access:public
+k	lib/mlapcluster.cpp	/^	int k;$/;"	m	struct:CvSparseNode2D	file:	access:public
 kint	nqrdb.h	/^	uint32_t kint[4];$/;"	m	struct:NQRDBDATUM	access:public
 kmatch	nqrdb.c	/^inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)$/;"	f	signature:(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
-kmax	nqdpdb.h	/^	uint32_t kmax;$/;"	m	struct:__anon5	access:public
 kstr	nqdpdb.c	/^	char* kstr;$/;"	m	struct:__anon2	file:	access:public
+kstr	nqirdb.c	/^	char* kstr;$/;"	m	struct:__anon6	file:	access:public
+lambda	lib/mlapcluster.h	/^	double lambda;$/;"	m	struct:CvAPCParams	access:public
 likeness	nqdpdb.c	/^	float likeness;$/;"	m	struct:__anon2	file:	access:public
+likeness	nqirdb.c	/^	float likeness;$/;"	m	struct:__anon6	file:	access:public
 lock	lib/frl_slab_pool.h	/^	frl_lock_u lock;$/;"	m	struct:frl_slab_pool_t	access:public
 main	test/dpdb_test.cpp	/^int main()$/;"	f	signature:()
+main	test/eplr_test.cpp	/^int main()$/;"	f	signature:()
 main	test/rdb_test.cpp	/^int main()$/;"	f	signature:()
 match	nqdpdb.c	/^	float match;$/;"	m	struct:__anon3	file:	access:public
 match	nqdpdb.h	/^	float match;$/;"	m	struct:__anon5	access:public
+match	nqirdb.h	/^	float match;$/;"	m	struct:__anon9	access:public
 max	nqrdb.h	/^	uint32_t max;$/;"	m	struct:NQRDBDATUM	access:public
 max_capacity	lib/frl_slab_pool.h	/^	apr_uint32_t max_capacity;$/;"	m	struct:frl_slab_pool_t	access:public
+maxiteration	lib/mlapcluster.h	/^	int maxiteration;$/;"	m	struct:CvAPCParams	access:public
 mempool	test/dpdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/rdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mtx_pool	nqdpdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
+mtx_pool	nqirdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mtx_pool	nqrdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mutex	lib/frl_slab_pool.h	/^	apr_thread_mutex_t* mutex;$/;"	m	struct:frl_slab_pool_t	access:public
 next	lib/frl_slab_pool.h	/^	frl_slab_block_t* next;$/;"	m	struct:frl_slab_block_t	access:public
@@ -206,12 +265,32 @@ nqdpdbout	nqdpdb.c	/^bool nqdpdbout(NQDPDB* dpdb, char* kstr) $/;"	f	signature:(
 nqdpdbout	nqdpdb.h	/^bool nqdpdbout(NQDPDB* dpdb, char* kstr);$/;"	p	signature:(NQDPDB* dpdb, char* kstr)
 nqdpdbput	nqdpdb.c	/^bool nqdpdbput(NQDPDB* dpdb, char* kstr, CvMat* dpm)$/;"	f	signature:(NQDPDB* dpdb, char* kstr, CvMat* dpm)
 nqdpdbput	nqdpdb.h	/^bool nqdpdbput(NQDPDB* dpdb, char* kstr, CvMat* dpm);$/;"	p	signature:(NQDPDB* dpdb, char* kstr, CvMat* dpm)
-nqdpdel	nqdpdb.c	/^void nqdpdel(CvMat* dp)$/;"	f	signature:(CvMat* dp)
-nqdpdel	nqdpdb.h	/^void nqdpdel(CvMat* dp);$/;"	p	signature:(CvMat* dp)
+nqdpeplr	nqdpdb.c	/^CvMat* nqdpeplr(CvMat* data, int e, int emax)$/;"	f	signature:(CvMat* data, int e, int emax)
+nqdpeplr	nqdpdb.h	/^CvMat* nqdpeplr(CvMat* data, int e = 5, int emax = 50);$/;"	p	signature:(CvMat* data, int e = 5, int emax = 50)
 nqdpfwm	nqdpdb.c	/^static void nqdpfwm(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqdphpf	nqdpdb.c	/^static void nqdphpf(NQDPPAIR* pr, uint32_t i, uint32_t siz)$/;"	f	file:	signature:(NQDPPAIR* pr, uint32_t i, uint32_t siz)
 nqdpnew	nqdpdb.c	/^CvMat* nqdpnew(CvArr* image, CvSURFParams params)$/;"	f	signature:(CvArr* image, CvSURFParams params)
 nqdpnew	nqdpdb.h	/^CvMat* nqdpnew(CvArr* image, CvSURFParams params);$/;"	p	signature:(CvArr* image, CvSURFParams params)
+nqdpnuk	nqdpdb.c	/^static void nqdpnuk(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
+nqeplr	nqutil.c	/^int nqeplr(CvMat* data, int* ki, int k)$/;"	f	signature:(CvMat* data, int* ki, int k)
+nqeplr	nqutil.c	/^int nqeplr(CvSparseMat* sim, int* ki, int t, int k)$/;"	f	signature:(CvSparseMat* sim, int* ki, int t, int k)
+nqeplr	nqutil.h	/^int nqeplr(CvMat* data, int* ki, int k = 0);$/;"	p	signature:(CvMat* data, int* ki, int k = 0)
+nqeplr	nqutil.h	/^int nqeplr(CvSparseMat* sim, int* ki, int t, int k);$/;"	p	signature:(CvSparseMat* sim, int* ki, int t, int k)
+nqirdbdel	nqirdb.c	/^void nqirdbdel(NQIRDB* irdb)$/;"	f	signature:(NQIRDB* irdb)
+nqirdbdel	nqirdb.h	/^void nqirdbdel(NQIRDB* irdb);$/;"	p	signature:(NQIRDB* irdb)
+nqirdbget	nqirdb.c	/^CvMat* nqirdbget(NQIRDB* irdb, char* kstr)$/;"	f	signature:(NQIRDB* irdb, char* kstr)
+nqirdbget	nqirdb.h	/^CvMat* nqirdbget(NQIRDB* irdb, char* kstr);$/;"	p	signature:(NQIRDB* irdb, char* kstr)
+nqirdblike	nqirdb.c	/^int nqirdblike(NQIRDB* irdb, CvMat* irm, char** kstr, int lmt, bool ordered, float* likeness = 0)$/;"	f	signature:(NQIRDB* irdb, CvMat* irm, char** kstr, int lmt, bool ordered, float* likeness = 0)
+nqirdblike	nqirdb.h	/^int nqirdblike(NQIRDB* irdb, CvMat* irm, char** kstr, int lmt, bool ordered, float* likeness = 0);$/;"	p	signature:(NQIRDB* irdb, CvMat* irm, char** kstr, int lmt, bool ordered, float* likeness = 0)
+nqirdbnew	nqirdb.c	/^NQIRDB* nqirdbnew(void)$/;"	f	signature:(void)
+nqirdbnew	nqirdb.h	/^NQIRDB* nqirdbnew(void);$/;"	p	signature:(void)
+nqirdbout	nqirdb.c	/^bool nqirdbout(NQIRDB* irdb, char* kstr)$/;"	f	signature:(NQIRDB* irdb, char* kstr)
+nqirdbout	nqirdb.h	/^bool nqirdbout(NQIRDB* irdb, char* kstr);$/;"	p	signature:(NQIRDB* irdb, char* kstr)
+nqirdbput	nqirdb.c	/^bool nqirdbput(NQIRDB* irdb, char* kstr, CvMat* irm)$/;"	f	signature:(NQIRDB* irdb, char* kstr, CvMat* irm)
+nqirdbput	nqirdb.h	/^bool nqirdbput(NQIRDB* irdb, char* kstr, CvMat* irm);$/;"	p	signature:(NQIRDB* irdb, char* kstr, CvMat* irm)
+nqirfwm	nqirdb.c	/^static void nqirfwm(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
+nqirnew	nqirdb.c	/^CvMat* nqirnew(CvArr* image, CvMSERParams params)$/;"	f	signature:(CvArr* image, CvMSERParams params)
+nqirnew	nqirdb.h	/^CvMat* nqirnew(CvArr* image, CvMSERParams params);$/;"	p	signature:(CvArr* image, CvMSERParams params)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb)$/;"	f	file:	signature:(NQRDB* rdb)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb);$/;"	p	file:	signature:(NQRDB* rdb)
 nqrdbdel	nqrdb.c	/^void nqrdbdel(NQRDB* rdb)$/;"	f	signature:(NQRDB* rdb)
@@ -233,6 +312,7 @@ operator <=	lib/frl_util_md5.h	/^inline bool operator<=(const frl_md5& x, const 
 operator ==	lib/frl_util_md5.h	/^inline bool operator==(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator >	lib/frl_util_md5.h	/^inline bool operator>(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator >=	lib/frl_util_md5.h	/^inline bool operator>=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+params	lib/mlapcluster.h	/^		CvAPCParams params;$/;"	m	class:CvAPCluster	access:private
 per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_mem_stat_t	access:public
 per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_slab_pool_t	access:public
 pointer	lib/frl_slab_pool.h	/^	void* pointer;$/;"	m	struct:frl_mem_t	access:public
@@ -246,15 +326,29 @@ pool	lib/frl_slab_pool.h	/^APR_DECLARE(void*) frl_slab_pcalloc(frl_slab_pool_t* 
 pr	nqrdb.h	/^	NQRDBDATUM* pr;$/;"	m	struct:NQRDBDATUM	access:public
 prev	nqrdb.h	/^	NQRDBDATUM* prev;$/;"	m	struct:NQRDBDATUM	access:public
 rdb	nqdpdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon5	access:public
+rdb	nqirdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon9	access:public
+read	lib/mlapcluster.cpp	/^CvAPCluster::read( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, CvFileNode* root_node )
+read	lib/mlapcluster.h	/^		virtual void read( CvFileStorage* fs, CvFileNode* root_node );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, CvFileNode* root_node )
 rec_pool	nqrdb.c	/^static frl_slab_pool_t* rec_pool = 0;$/;"	v	file:
 rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
-rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon6	access:public
-rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon6	access:public
+rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon10	access:public
+rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon10	access:public
 siz	nqdpdb.c	/^	uint32_t siz;$/;"	m	struct:__anon3	file:	access:public
 stack_pointer	lib/frl_slab_pool.h	/^	apr_byte_t** stack_pointer;$/;"	m	struct:frl_slab_block_t	access:public
+stopcriterion	lib/mlapcluster.h	/^	int stopcriterion;$/;"	m	struct:CvAPCParams	access:public
 storage	nqdpdb.c	/^static CvMemStorage* storage = 0;$/;"	v	file:
+storage	nqirdb.c	/^static CvMemStorage* storage = 0;$/;"	v	file:
 sumup	test/rdb_test.cpp	/^void sumup(char* kstr, void* data, void* ud)$/;"	f	signature:(char* kstr, void* data, void* ud)
+train	lib/mlapcluster.cpp	/^CvAPCluster::train( const CvSparseMat* similarity,$/;"	f	class:CvAPCluster	signature:( const CvSparseMat* similarity, const CvMat* labels )
+train	lib/mlapcluster.cpp	/^bool CvAPCluster::train( const CvMat* similarity,$/;"	f	class:CvAPCluster	signature:( const CvMat* similarity, const CvMat* labels )
+train	lib/mlapcluster.h	/^		virtual bool train( const CvMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvMat* _train_data, const CvMat* _response )
+train	lib/mlapcluster.h	/^		virtual bool train( const CvSparseMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvSparseMat* _train_data, const CvMat* _response )
 uid	lib/frl_util_md5.h	/^			apr_uint64_t uid[2];$/;"	m	union:frl_md5::__anon1	access:public
 usage	lib/frl_slab_pool.h	/^	apr_size_t usage;$/;"	m	struct:frl_mem_stat_t	access:public
 usage_stack	lib/frl_slab_pool.h	/^	apr_byte_t** usage_stack;$/;"	m	struct:frl_slab_block_t	access:public
+val	lib/mlapcluster.cpp	/^	double val;$/;"	m	struct:CvSparseNode2D	file:	access:public
 vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:NQRDBDATUM	access:public
+write	lib/mlapcluster.cpp	/^CvAPCluster::write( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, const char* name )
+write	lib/mlapcluster.h	/^		virtual void write( CvFileStorage* fs, const char* name );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, const char* name )
+~CvAPCluster	lib/mlapcluster.cpp	/^CvAPCluster::~CvAPCluster()$/;"	f	class:CvAPCluster	signature:()
+~CvAPCluster	lib/mlapcluster.h	/^		virtual ~CvAPCluster();$/;"	p	class:CvAPCluster	access:public	signature:()
