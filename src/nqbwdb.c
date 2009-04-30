@@ -21,7 +21,6 @@ NQBWDB* nqbwdbnew(void)
 	NQBWDB* bwdb = (NQBWDB*)frl_slab_palloc(db_pool);
 	bwdb->rdb = nqrdbnew();
 	bwdb->emax = 20;
-	bwdb->match = .6;
 	return bwdb;
 }
 
@@ -115,7 +114,7 @@ typedef struct {
 typedef struct {
 	uint32_t siz;
 	uint32_t emax;
-	float match;
+	double match;
 	CvMat* bwm;
 	CvMat* idx;
 	CvMat* dist;
@@ -142,7 +141,7 @@ static void nqbwhpf(NQBWPAIR* pr, uint32_t i, uint32_t siz)
 	} while (largest != i);
 }
 
-static void nqbwfwm(char* kstr, void* vbuf, void* ud)
+static void nqbwfwmc(char* kstr, void* vbuf, void* ud)
 {
 	NQBWUSERDATA* nqud = (NQBWUSERDATA*)ud;
 	NQBWDBDATUM* datum = (NQBWDBDATUM*)vbuf;
@@ -152,16 +151,13 @@ static void nqbwfwm(char* kstr, void* vbuf, void* ud)
 	int* iptr = nqud->idx->data.i;
 	double* dptr = nqud->dist->data.db;
 	int co = 0;
-	double d = 0;
 	int i;
 	for (i = 0; i < nqud->dist->rows; i++, dptr += 2, iptr += 2)
 		if ((iptr[0] >= 0 && iptr[1] >= 0)&&
-			(dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match))
-		{
-			d += dptr[0];
+			((dptr[1] < dptr[0] && dptr[1] < dptr[0] * nqud->match)||
+			 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match)))
 			co++;
-		}
-	float likeness = (float)(co) / (float)(nqud->bwm->rows);
+	float likeness = (float)co / (float)(nqud->bwm->rows);
 	if (likeness > nqud->data->likeness)
 	{
 		nqud->data->likeness = likeness;
@@ -170,7 +166,57 @@ static void nqbwfwm(char* kstr, void* vbuf, void* ud)
 	}
 }
 
-int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, float* likeness)
+static void nqbwfwms(char* kstr, void* vbuf, void* ud)
+{
+	NQBWUSERDATA* nqud = (NQBWUSERDATA*)ud;
+	NQBWDBDATUM* datum = (NQBWDBDATUM*)vbuf;
+	if (datum->bwft == 0)
+		datum->bwft = cvCreateKDTree(datum->bw);
+	cvFindFeatures(datum->bwft, nqud->bwm, nqud->idx, nqud->dist, 2, nqud->emax);
+	int* iptr = nqud->idx->data.i;
+	double* dptr = nqud->dist->data.db;
+	int co = 0;
+	int i;
+	for (i = 0; i < nqud->dist->rows; i++, dptr += 2, iptr += 2)
+		if ((iptr[0] >= 0 && iptr[1] >= 0)&&
+			((dptr[1] < dptr[0] && dptr[1] < dptr[0] * nqud->match)||
+			 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match)))
+			co++;
+	float likeness = (float)co / (float)(nqud->bwm->rows);
+	if (likeness > nqud->data->likeness)
+	{
+		nqud->data->likeness = likeness;
+		nqud->data->kstr = kstr;
+		nqbwhpf(nqud->data, 0, nqud->siz);
+	}
+}
+
+static void nqbwfwmm(char* kstr, void* vbuf, void* ud)
+{
+	NQBWUSERDATA* nqud = (NQBWUSERDATA*)ud;
+	NQBWDBDATUM* datum = (NQBWDBDATUM*)vbuf;
+	if (datum->bwft == 0)
+		datum->bwft = cvCreateKDTree(datum->bw);
+	cvFindFeatures(datum->bwft, nqud->bwm, nqud->idx, nqud->dist, 2, nqud->emax);
+	int* iptr = nqud->idx->data.i;
+	double* dptr = nqud->dist->data.db;
+	int co = 0;
+	int i;
+	for (i = 0; i < nqud->dist->rows; i++, dptr += 2, iptr += 2)
+		if ((iptr[0] >= 0 && iptr[1] >= 0)&&
+			((dptr[1] < dptr[0] && dptr[1] < dptr[0] * nqud->match)||
+			 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match)))
+			co++;
+	float likeness = (float)co / (float)(nqud->bwm->rows);
+	if (likeness > nqud->data->likeness)
+	{
+		nqud->data->likeness = likeness;
+		nqud->data->kstr = kstr;
+		nqbwhpf(nqud->data, 0, nqud->siz);
+	}
+}
+
+int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)
 {
 	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
 	memset(ud, 0, sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));

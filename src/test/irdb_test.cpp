@@ -19,7 +19,7 @@ int main()
 	NQBWDB* bwdb = nqbwdbnew();
 
 	/* string to hold directory name */
-	char *dirname = "./../../testdata/dpdb/";
+	char *dirname = "./../testdata/dpdb/";
 
 	/* Pointers needed for functions to iterating directory entries. */
 	DIR *dir;

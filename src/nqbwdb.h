@@ -9,6 +9,9 @@
 #include <cv.h>
 #include "nqrdb.h"
 
+#define NQBW_LIKE_BEST_MATCH_COUNT (0x1)
+#define NQBW_LIKE_BEST_MATCH_SCORE (0x2)
+
 typedef struct {
 	CvMat* bw;
 	CvFeatureTree* bwft;
@@ -17,14 +20,13 @@ typedef struct {
 typedef struct {
 	NQRDB* rdb;
 	uint32_t emax;
-	float match;
 } NQBWDB;
 
 NQBWDB* nqbwdbnew(void);
 CvMat* nqbweplr(CvMat* data, int e = 5, int emax = 50);
 bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm);
 CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);
-int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, float* likeness = 0);
+int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = 0, float* likeness = 0);
 bool nqbwdbout(NQBWDB* bwdb, char* kstr);
 void nqbwdbdel(NQBWDB* bwdb);
 
