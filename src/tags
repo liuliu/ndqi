@@ -74,14 +74,29 @@ GUARD_frl_util_md5_h	lib/frl_util_md5.h	2;"	d
 GUARD_mlapcluster_h	lib/mlapcluster.h	2;"	d
 LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui$/;"	m
 LINKLIB	test/makefile	/^LINKLIB=-L"$(OPENCV)\/lib"$/;"	m
-NQBWDB	nqbwdb.h	/^} NQBWDB;$/;"	t	typeref:struct:__anon5
-NQBWDBDATUM	nqbwdb.h	/^} NQBWDBDATUM;$/;"	t	typeref:struct:__anon4
+NQBWDB	nqbwdb.h	/^} NQBWDB;$/;"	t	typeref:struct:__anon6
+NQBWDBDATUM	nqbwdb.h	/^} NQBWDBDATUM;$/;"	t	typeref:struct:__anon5
+NQBWDBIDX	nqbwdb.h	/^typedef struct NQBWDBIDX {$/;"	s
+NQBWDBIDX	nqbwdb.h	/^} NQBWDBIDX;$/;"	t	typeref:struct:NQBWDBIDX
+NQBWDBIDX::next	nqbwdb.h	/^	struct NQBWDBIDX* next;$/;"	m	struct:NQBWDBIDX	typeref:struct:NQBWDBIDX::NQBWDBIDX	access:public
+NQBWDBIDX::prev	nqbwdb.h	/^	struct NQBWDBIDX* prev;$/;"	m	struct:NQBWDBIDX	typeref:struct:NQBWDBIDX::NQBWDBIDX	access:public
+NQBWDBIDX::rnum	nqbwdb.h	/^	uint32_t rnum;$/;"	m	struct:NQBWDBIDX	access:public
+NQBWDBIDX::smft	nqbwdb.h	/^	CvFeatureTree* smft;$/;"	m	struct:NQBWDBIDX	access:public
+NQBWDBIDX::smmat	nqbwdb.h	/^	CvMat* smmat;$/;"	m	struct:NQBWDBIDX	access:public
+NQBWDBIDX::stem	nqbwdb.h	/^	NQBWDBSTEM* stem;$/;"	m	struct:NQBWDBIDX	access:public
+NQBWDBSTEM	nqbwdb.h	/^} NQBWDBSTEM;$/;"	t	typeref:struct:__anon4
+NQBWDBUNIDX	nqbwdb.h	/^typedef struct NQBWDBUNIDX {$/;"	s
+NQBWDBUNIDX	nqbwdb.h	/^} NQBWDBUNIDX;$/;"	t	typeref:struct:NQBWDBUNIDX
+NQBWDBUNIDX::datum	nqbwdb.h	/^	NQBWDBDATUM* datum;$/;"	m	struct:NQBWDBUNIDX	access:public
+NQBWDBUNIDX::kstr	nqbwdb.h	/^	char* kstr;$/;"	m	struct:NQBWDBUNIDX	access:public
+NQBWDBUNIDX::next	nqbwdb.h	/^	struct NQBWDBUNIDX* next;$/;"	m	struct:NQBWDBUNIDX	typeref:struct:NQBWDBUNIDX::NQBWDBUNIDX	access:public
+NQBWDBUNIDX::prev	nqbwdb.h	/^	struct NQBWDBUNIDX* prev;$/;"	m	struct:NQBWDBUNIDX	typeref:struct:NQBWDBUNIDX::NQBWDBUNIDX	access:public
 NQBWPAIR	nqbwdb.c	/^} NQBWPAIR;$/;"	t	typeref:struct:__anon2	file:
 NQBWUSERDATA	nqbwdb.c	/^} NQBWUSERDATA;$/;"	t	typeref:struct:__anon3	file:
 NQBW_LIKE_BEST_MATCH_COUNT	nqbwdb.h	12;"	d
 NQBW_LIKE_BEST_MATCH_SCORE	nqbwdb.h	13;"	d
 NQFOREACH	nqutil.h	/^typedef void (*NQFOREACH) (char*, void*, void*);$/;"	t
-NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon6
+NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon7
 NQRDBDATUM	nqrdb.h	/^typedef struct NQRDBDATUM {$/;"	s
 NQRDBDATUM	nqrdb.h	/^} NQRDBDATUM;$/;"	t	typeref:struct:NQRDBDATUM
 NQRDBDATUM::chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
@@ -117,13 +132,18 @@ __anon3::emax	nqbwdb.c	/^	uint32_t emax;$/;"	m	struct:__anon3	file:	access:publi
 __anon3::idx	nqbwdb.c	/^	CvMat* idx;$/;"	m	struct:__anon3	file:	access:public
 __anon3::match	nqbwdb.c	/^	double match;$/;"	m	struct:__anon3	file:	access:public
 __anon3::siz	nqbwdb.c	/^	uint32_t siz;$/;"	m	struct:__anon3	file:	access:public
-__anon4::bw	nqbwdb.h	/^	CvMat* bw;$/;"	m	struct:__anon4	access:public
-__anon4::bwft	nqbwdb.h	/^	CvFeatureTree* bwft;$/;"	m	struct:__anon4	access:public
-__anon5::emax	nqbwdb.h	/^	uint32_t emax;$/;"	m	struct:__anon5	access:public
-__anon5::rdb	nqbwdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon5	access:public
-__anon6::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon6	access:public
-__anon6::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon6	access:public
-__anon6::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon6	access:public
+__anon4::desc	nqbwdb.h	/^	CvMat* desc;$/;"	m	struct:__anon4	access:public
+__anon4::kstr	nqbwdb.h	/^	char** kstr;$/;"	m	struct:__anon4	access:public
+__anon4::rnum	nqbwdb.h	/^	uint32_t rnum;$/;"	m	struct:__anon4	access:public
+__anon5::bw	nqbwdb.h	/^	CvMat* bw;$/;"	m	struct:__anon5	access:public
+__anon5::bwft	nqbwdb.h	/^	CvFeatureTree* bwft;$/;"	m	struct:__anon5	access:public
+__anon6::emax	nqbwdb.h	/^	uint32_t emax;$/;"	m	struct:__anon6	access:public
+__anon6::idx	nqbwdb.h	/^	NQBWDBIDX* idx;$/;"	m	struct:__anon6	access:public
+__anon6::rdb	nqbwdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon6	access:public
+__anon6::unidx	nqbwdb.h	/^	NQBWDBUNIDX* unidx;$/;"	m	struct:__anon6	access:public
+__anon7::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon7	access:public
+__anon7::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon7	access:public
+__anon7::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon7	access:public
 _dispatch_mat_ptr	nqutil.c	4;"	d	file:
 arena	lib/frl_slab_pool.h	/^	apr_byte_t* arena;$/;"	m	struct:frl_slab_block_t	access:public
 b16_pool	nqrdb.c	/^static frl_slab_pool_t* b16_pool = 0;$/;"	v	file:
@@ -138,8 +158,8 @@ base64table	lib/frl_util_md5.cpp	/^const apr_byte_t base64table[] = "ABCDEFGHIJK
 block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_mem_t	access:public
 block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_slab_pool_t	access:public
 block_size	lib/frl_slab_pool.h	/^	apr_uint32_t block_size;$/;"	m	struct:frl_mem_stat_t	access:public
-bw	nqbwdb.h	/^	CvMat* bw;$/;"	m	struct:__anon4	access:public
-bwft	nqbwdb.h	/^	CvFeatureTree* bwft;$/;"	m	struct:__anon4	access:public
+bw	nqbwdb.h	/^	CvMat* bw;$/;"	m	struct:__anon5	access:public
+bwft	nqbwdb.h	/^	CvFeatureTree* bwft;$/;"	m	struct:__anon5	access:public
 bwm	nqbwdb.c	/^	CvMat* bwm;$/;"	m	struct:__anon3	file:	access:public
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_mem_stat_t	access:public
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_slab_block_t	access:public
@@ -147,13 +167,15 @@ chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
 clear	lib/mlapcluster.cpp	/^CvAPCluster::clear()$/;"	f	class:CvAPCluster	signature:()
 clear	lib/mlapcluster.h	/^		virtual void clear();$/;"	p	class:CvAPCluster	access:public	signature:()
 data	nqbwdb.c	/^	NQBWPAIR data[0];$/;"	m	struct:__anon3	file:	access:public
+datum	nqbwdb.h	/^	NQBWDBDATUM* datum;$/;"	m	struct:NQBWDBUNIDX	access:public
 db_pool	nqbwdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
 db_pool	nqrdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
+desc	nqbwdb.h	/^	CvMat* desc;$/;"	m	struct:__anon4	access:public
 digest	lib/frl_util_md5.h	/^			apr_byte_t digest[16];$/;"	m	union:frl_md5::__anon1	access:public
 dist	nqbwdb.c	/^	CvMat* dist;$/;"	m	struct:__anon3	file:	access:public
 dt_pool	nqbwdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
 emax	nqbwdb.c	/^	uint32_t emax;$/;"	m	struct:__anon3	file:	access:public
-emax	nqbwdb.h	/^	uint32_t emax;$/;"	m	struct:__anon5	access:public
+emax	nqbwdb.h	/^	uint32_t emax;$/;"	m	struct:__anon6	access:public
 flag	lib/frl_slab_pool.h	/^	apr_uint32_t flag;$/;"	m	struct:frl_mem_safe_t	access:public
 frl_insert_u	lib/frl_base.h	/^enum frl_insert_u$/;"	g
 frl_level_u	lib/frl_base.h	/^enum frl_level_u$/;"	g
@@ -209,15 +231,18 @@ frl_slab_pool_t::per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	st
 frl_thread_model_u	lib/frl_base.h	/^enum frl_thread_model_u$/;"	g
 hash	lib/frl_util_md5.cpp	/^int frl_md5::hash(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	signature:(const void* s, const apr_size_t size)
 hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	p	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
-head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon6	access:public
+head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon7	access:public
 ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:NQRDBDATUM	access:public
 i	lib/mlapcluster.cpp	/^	int i;$/;"	m	struct:CvSparseNode2D	file:	access:public
 id	lib/frl_slab_pool.h	/^	apr_uint32_t id;$/;"	m	struct:frl_mem_t	access:public
 idx	nqbwdb.c	/^	CvMat* idx;$/;"	m	struct:__anon3	file:	access:public
+idx	nqbwdb.h	/^	NQBWDBIDX* idx;$/;"	m	struct:__anon6	access:public
 k	lib/mlapcluster.cpp	/^	int k;$/;"	m	struct:CvSparseNode2D	file:	access:public
 kint	nqrdb.h	/^	uint32_t kint[4];$/;"	m	struct:NQRDBDATUM	access:public
 kmatch	nqrdb.c	/^inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)$/;"	f	signature:(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
 kstr	nqbwdb.c	/^	char* kstr;$/;"	m	struct:__anon2	file:	access:public
+kstr	nqbwdb.h	/^	char* kstr;$/;"	m	struct:NQBWDBUNIDX	access:public
+kstr	nqbwdb.h	/^	char** kstr;$/;"	m	struct:__anon4	access:public
 lambda	lib/mlapcluster.h	/^	double lambda;$/;"	m	struct:CvAPCParams	access:public
 likeness	nqbwdb.c	/^	float likeness;$/;"	m	struct:__anon2	file:	access:public
 lock	lib/frl_slab_pool.h	/^	frl_lock_u lock;$/;"	m	struct:frl_slab_pool_t	access:public
@@ -236,11 +261,14 @@ mtx_pool	nqbwdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mtx_pool	nqrdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mutex	lib/frl_slab_pool.h	/^	apr_thread_mutex_t* mutex;$/;"	m	struct:frl_slab_pool_t	access:public
 next	lib/frl_slab_pool.h	/^	frl_slab_block_t* next;$/;"	m	struct:frl_slab_block_t	access:public
+next	nqbwdb.h	/^	struct NQBWDBIDX* next;$/;"	m	struct:NQBWDBIDX	typeref:struct:NQBWDBIDX::NQBWDBIDX	access:public
+next	nqbwdb.h	/^	struct NQBWDBUNIDX* next;$/;"	m	struct:NQBWDBUNIDX	typeref:struct:NQBWDBUNIDX::NQBWDBUNIDX	access:public
 next	nqrdb.h	/^	NQRDBDATUM* next;$/;"	m	struct:NQRDBDATUM	access:public
 nqbwdbdel	nqbwdb.c	/^void nqbwdbdel(NQBWDB* bwdb)$/;"	f	signature:(NQBWDB* bwdb)
 nqbwdbdel	nqbwdb.h	/^void nqbwdbdel(NQBWDB* bwdb);$/;"	p	signature:(NQBWDB* bwdb)
 nqbwdbget	nqbwdb.c	/^CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr)$/;"	f	signature:(NQBWDB* bwdb, char* kstr)
 nqbwdbget	nqbwdb.h	/^CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);$/;"	p	signature:(NQBWDB* bwdb, char* kstr)
+nqbwdbidx	nqbwdb.c	/^bool nqbwdbidx(NQBWDB* bwdb)$/;"	f	signature:(NQBWDB* bwdb)
 nqbwdblike	nqbwdb.c	/^int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)$/;"	f	signature:(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)
 nqbwdblike	nqbwdb.h	/^int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = 0, float* likeness = 0);$/;"	p	signature:(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = 0, float* likeness = 0)
 nqbwdbnew	nqbwdb.c	/^NQBWDB* nqbwdbnew(void)$/;"	f	signature:(void)
@@ -249,10 +277,10 @@ nqbwdbout	nqbwdb.c	/^bool nqbwdbout(NQBWDB* bwdb, char* kstr)$/;"	f	signature:(N
 nqbwdbout	nqbwdb.h	/^bool nqbwdbout(NQBWDB* bwdb, char* kstr);$/;"	p	signature:(NQBWDB* bwdb, char* kstr)
 nqbwdbput	nqbwdb.c	/^bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm)$/;"	f	signature:(NQBWDB* bwdb, char* kstr, CvMat* bwm)
 nqbwdbput	nqbwdb.h	/^bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm);$/;"	p	signature:(NQBWDB* bwdb, char* kstr, CvMat* bwm)
+nqbwdbreidx	nqbwdb.h	/^bool nqbwdbreidx(NQBWDB* bwdb);$/;"	p	signature:(NQBWDB* bwdb)
 nqbweplr	nqbwdb.c	/^CvMat* nqbweplr(CvMat* data, int e, int emax)$/;"	f	signature:(CvMat* data, int e, int emax)
 nqbweplr	nqbwdb.h	/^CvMat* nqbweplr(CvMat* data, int e = 5, int emax = 50);$/;"	p	signature:(CvMat* data, int e = 5, int emax = 50)
 nqbwfwmc	nqbwdb.c	/^static void nqbwfwmc(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
-nqbwfwmm	nqbwdb.c	/^static void nqbwfwmm(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqbwfwms	nqbwdb.c	/^static void nqbwfwms(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqbwhpf	nqbwdb.c	/^static void nqbwhpf(NQBWPAIR* pr, uint32_t i, uint32_t siz)$/;"	f	file:	signature:(NQBWPAIR* pr, uint32_t i, uint32_t siz)
 nqbwnuk	nqbwdb.c	/^static void nqbwnuk(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
@@ -297,16 +325,23 @@ pool	lib/frl_slab_pool.h	/^APR_DECLARE(void) frl_slab_pool_clear(frl_slab_pool_t
 pool	lib/frl_slab_pool.h	/^APR_DECLARE(void*) frl_slab_palloc(frl_slab_pool_t* pool);$/;"	v
 pool	lib/frl_slab_pool.h	/^APR_DECLARE(void*) frl_slab_pcalloc(frl_slab_pool_t* pool);$/;"	v
 pr	nqrdb.h	/^	NQRDBDATUM* pr;$/;"	m	struct:NQRDBDATUM	access:public
+prev	nqbwdb.h	/^	struct NQBWDBIDX* prev;$/;"	m	struct:NQBWDBIDX	typeref:struct:NQBWDBIDX::NQBWDBIDX	access:public
+prev	nqbwdb.h	/^	struct NQBWDBUNIDX* prev;$/;"	m	struct:NQBWDBUNIDX	typeref:struct:NQBWDBUNIDX::NQBWDBUNIDX	access:public
 prev	nqrdb.h	/^	NQRDBDATUM* prev;$/;"	m	struct:NQRDBDATUM	access:public
-rdb	nqbwdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon5	access:public
+rdb	nqbwdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon6	access:public
 read	lib/mlapcluster.cpp	/^CvAPCluster::read( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, CvFileNode* root_node )
 read	lib/mlapcluster.h	/^		virtual void read( CvFileStorage* fs, CvFileNode* root_node );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, CvFileNode* root_node )
 rec_pool	nqrdb.c	/^static frl_slab_pool_t* rec_pool = 0;$/;"	v	file:
+rnum	nqbwdb.h	/^	uint32_t rnum;$/;"	m	struct:NQBWDBIDX	access:public
+rnum	nqbwdb.h	/^	uint32_t rnum;$/;"	m	struct:__anon4	access:public
 rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
-rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon6	access:public
-rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon6	access:public
+rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon7	access:public
+rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon7	access:public
 siz	nqbwdb.c	/^	uint32_t siz;$/;"	m	struct:__anon3	file:	access:public
+smft	nqbwdb.h	/^	CvFeatureTree* smft;$/;"	m	struct:NQBWDBIDX	access:public
+smmat	nqbwdb.h	/^	CvMat* smmat;$/;"	m	struct:NQBWDBIDX	access:public
 stack_pointer	lib/frl_slab_pool.h	/^	apr_byte_t** stack_pointer;$/;"	m	struct:frl_slab_block_t	access:public
+stem	nqbwdb.h	/^	NQBWDBSTEM* stem;$/;"	m	struct:NQBWDBIDX	access:public
 stopcriterion	lib/mlapcluster.h	/^	int stopcriterion;$/;"	m	struct:CvAPCParams	access:public
 storage	nqdp.c	/^static CvMemStorage* storage = 0;$/;"	v	file:
 storage	nqir.c	/^static CvMemStorage* storage = 0;$/;"	v	file:
@@ -316,6 +351,8 @@ train	lib/mlapcluster.cpp	/^bool CvAPCluster::train( const CvMat* similarity,$/;
 train	lib/mlapcluster.h	/^		virtual bool train( const CvMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvMat* _train_data, const CvMat* _response )
 train	lib/mlapcluster.h	/^		virtual bool train( const CvSparseMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvSparseMat* _train_data, const CvMat* _response )
 uid	lib/frl_util_md5.h	/^			apr_uint64_t uid[2];$/;"	m	union:frl_md5::__anon1	access:public
+unidx	nqbwdb.h	/^	NQBWDBUNIDX* unidx;$/;"	m	struct:__anon6	access:public
+unidx_pool	nqbwdb.c	/^static frl_slab_pool_t* unidx_pool = 0;$/;"	v	file:
 usage	lib/frl_slab_pool.h	/^	apr_size_t usage;$/;"	m	struct:frl_mem_stat_t	access:public
 usage_stack	lib/frl_slab_pool.h	/^	apr_byte_t** usage_stack;$/;"	m	struct:frl_slab_block_t	access:public
 val	lib/mlapcluster.cpp	/^	double val;$/;"	m	struct:CvSparseNode2D	file:	access:public

@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct NQBWDBIDX {
 	NQBWDBSTEM* stem;
+	CvMat* smmat;
 	CvFeatureTree* smft;
 	uint32_t rnum;
 	struct NQBWDBIDX* prev;
@@ -31,10 +32,18 @@ typedef struct {
 	CvFeatureTree* bwft;
 } NQBWDBDATUM;
 
+typedef struct NQBWDBUNIDX {
+	char* kstr;
+	NQBWDBDATUM* datum;
+	struct NQBWDBUNIDX* prev;
+	struct NQBWDBUNIDX* next;
+} NQBWDBUNIDX;
+
 typedef struct {
 	NQRDB* rdb;
 	uint32_t emax;
 	NQBWDBIDX* idx;
+	NQBWDBUNIDX* unidx;
 } NQBWDB;
 
 NQBWDB* nqbwdbnew(void);
@@ -42,7 +51,7 @@ CvMat* nqbweplr(CvMat* data, int e = 5, int emax = 50);
 bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm);
 CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);
 int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = 0, float* likeness = 0);
-bool nqbwdbreidx(NQBWDB* bwdb);
+bool nqbwdbidx(NQBWDB* bwdb);
 bool nqbwdbout(NQBWDB* bwdb, char* kstr);
 void nqbwdbdel(NQBWDB* bwdb);
 

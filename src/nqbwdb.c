@@ -9,6 +9,7 @@
 static apr_pool_t* mtx_pool = 0;
 static frl_slab_pool_t* db_pool = 0;
 static frl_slab_pool_t* dt_pool = 0;
+static frl_slab_pool_t* unidx_pool = 0;
 
 NQBWDB* nqbwdbnew(void)
 {
@@ -18,6 +19,8 @@ NQBWDB* nqbwdbnew(void)
 		frl_slab_pool_create(&db_pool, mtx_pool, 64, sizeof(NQBWDB), FRL_LOCK_WITH);
 	if (dt_pool == 0)
 		frl_slab_pool_create(&dt_pool, mtx_pool, 1024, sizeof(NQBWDBDATUM), FRL_LOCK_WITH);
+	if (unidx_pool == 0)
+		frl_slab_pool_create(&unidx_pool, mtx_pool, 1024, sizeof(NQBWDBUNIDX), FRL_LOCK_WITH);
 	NQBWDB* bwdb = (NQBWDB*)frl_slab_palloc(db_pool);
 	bwdb->rdb = nqrdbnew();
 	bwdb->emax = 20;
@@ -95,6 +98,11 @@ CvMat* nqbweplr(CvMat* data, int e, int emax)
 bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm)
 {
 	NQBWDBDATUM* dt = (NQBWDBDATUM*)frl_slab_palloc(dt_pool);
+	NQBWDBUNIDX* unidx = (NQBWDBUNIDX*)frl_slab_palloc(unidx_pool);
+	unidx->kstr = kstr;
+	unidx->datum = dt;
+	bwdb->unidx->next = unidx;
+	unidx->prev = bwdb->unidx;
 	dt->bw = bwm;
 	dt->bwft = 0;
 	nqrdbput(bwdb->rdb, kstr, dt);
@@ -260,7 +268,7 @@ int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double 
 	return k;
 }
 
-bool nqbwdbreidx(NQBWDB* bwdb)
+bool nqbwdbidx(NQBWDB* bwdb)
 {
 
 }
