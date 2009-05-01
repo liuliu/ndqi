@@ -78,7 +78,7 @@ int main()
 	char** kstr = (char**)malloc(sizeof(kstr[0])*10);
 	float* likeness = (float*)malloc(sizeof(likeness[0])*10);
 	double tt = (double)cvGetTickCount();
-	int k = nqbwdblike(bwdb, dpe, kstr, 10, 1, likeness);
+	int k = nqbwdblike(bwdb, dpe, kstr, 10, NQBW_LIKE_BEST_MATCH_COUNT, 0.6, 1, likeness);
 	tt = (double)cvGetTickCount()-tt;
 	printf( "search time = %gms\n", tt/(cvGetTickFrequency()*1000.));
 	for (int i = 0; i < k; i++)

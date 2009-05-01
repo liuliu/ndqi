@@ -172,41 +172,14 @@ static void nqbwfwms(char* kstr, void* vbuf, void* ud)
 	NQBWDBDATUM* datum = (NQBWDBDATUM*)vbuf;
 	if (datum->bwft == 0)
 		datum->bwft = cvCreateKDTree(datum->bw);
-	cvFindFeatures(datum->bwft, nqud->bwm, nqud->idx, nqud->dist, 2, nqud->emax);
+	cvFindFeatures(datum->bwft, nqud->bwm, nqud->idx, nqud->dist, 1, nqud->emax);
 	int* iptr = nqud->idx->data.i;
 	double* dptr = nqud->dist->data.db;
-	int co = 0;
+	double co = 0;
 	int i;
-	for (i = 0; i < nqud->dist->rows; i++, dptr += 2, iptr += 2)
-		if ((iptr[0] >= 0 && iptr[1] >= 0)&&
-			((dptr[1] < dptr[0] && dptr[1] < dptr[0] * nqud->match)||
-			 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match)))
-			co++;
-	float likeness = (float)co / (float)(nqud->bwm->rows);
-	if (likeness > nqud->data->likeness)
-	{
-		nqud->data->likeness = likeness;
-		nqud->data->kstr = kstr;
-		nqbwhpf(nqud->data, 0, nqud->siz);
-	}
-}
-
-static void nqbwfwmm(char* kstr, void* vbuf, void* ud)
-{
-	NQBWUSERDATA* nqud = (NQBWUSERDATA*)ud;
-	NQBWDBDATUM* datum = (NQBWDBDATUM*)vbuf;
-	if (datum->bwft == 0)
-		datum->bwft = cvCreateKDTree(datum->bw);
-	cvFindFeatures(datum->bwft, nqud->bwm, nqud->idx, nqud->dist, 2, nqud->emax);
-	int* iptr = nqud->idx->data.i;
-	double* dptr = nqud->dist->data.db;
-	int co = 0;
-	int i;
-	for (i = 0; i < nqud->dist->rows; i++, dptr += 2, iptr += 2)
-		if ((iptr[0] >= 0 && iptr[1] >= 0)&&
-			((dptr[1] < dptr[0] && dptr[1] < dptr[0] * nqud->match)||
-			 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * nqud->match)))
-			co++;
+	for (i = 0; i < nqud->dist->rows; i++, dptr++, iptr++)
+		if (iptr[0] >= 0 && dptr[0] < nqud->match)
+			co += 1. / (1e-4 + dptr[0]);
 	float likeness = (float)co / (float)(nqud->bwm->rows);
 	if (likeness > nqud->data->likeness)
 	{
@@ -221,15 +194,24 @@ int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double 
 	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
 	memset(ud, 0, sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
 	ud->emax = bwdb->emax;
-	ud->match = bwdb->match;
+	ud->match = match;
 	ud->siz = lmt;
 	ud->bwm = bwm;
-	ud->idx = cvCreateMat(bwm->rows, 2, CV_32SC1);
-	ud->dist = cvCreateMat(bwm->rows, 2, CV_64FC1);
 	ud->data->likeness = 0;
 
-	nqrdbforeach(bwdb->rdb, nqbwfwm, ud);
-
+	switch (mode)
+	{
+		case NQBW_LIKE_BEST_MATCH_COUNT:
+			ud->idx = cvCreateMat(bwm->rows, 2, CV_32SC1);
+			ud->dist = cvCreateMat(bwm->rows, 2, CV_64FC1);
+			nqrdbforeach(bwdb->rdb, nqbwfwmc, ud);
+			break;
+		case NQBW_LIKE_BEST_MATCH_SCORE:
+			ud->idx = cvCreateMat(bwm->rows, 1, CV_32SC1);
+			ud->dist = cvCreateMat(bwm->rows, 1, CV_64FC1);
+			nqrdbforeach(bwdb->rdb, nqbwfwms, ud);
+			break;
+	}
 	int i;
 	if (ordered)
 	{
@@ -276,6 +258,11 @@ int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double 
 	free(ud);
 
 	return k;
+}
+
+bool nqbwdbreidx(NQBWDB* bwdb)
+{
+
 }
 
 bool nqbwdbout(NQBWDB* bwdb, char* kstr)
