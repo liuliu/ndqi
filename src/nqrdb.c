@@ -92,6 +92,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 		rec = rec->chd[b16];
 		if (kmatch(rec->kint, kint, 0))
 		{
+			rec->vbuf = vbuf; // replace
 #if APR_HAS_THREADS
 			apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
@@ -115,6 +116,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 		rec = rec->chd[b6];
 		if (kmatch(rec->kint, kint, 0))
 		{
+			rec->vbuf = vbuf; // replace
 #if APR_HAS_THREADS
 			apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
@@ -141,6 +143,7 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 			rec = rec->chd[b2];
 			if (kmatch(rec->kint, kint, 0))
 			{
+				rec->vbuf = vbuf; // replace
 #if APR_HAS_THREADS
 				apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
