@@ -321,27 +321,57 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 #endif
 	CvMat* idx = cvCreateMat(bwm->rows, 1, CV_32SC1);
 	CvMat* dist = cvCreateMat(bwm->rows, 1, CV_64FC1);
+	double* odist = (double*)malloc(bwm->rows * sizeof(double));
+	int i;
+	for (i = 0; i < bwm->rows; i++)
+		odist[i] = 1e30;
+	NQBWDBSTEM** selected = (NQBWDBSTEM**)malloc(bwm->rows * sizeof(NQBWDBSTEM*));
+	memset(selected, 0, bwm->rows * sizeof(NQBWDBSTEM*));
 	NQBWDBIDX* idx_x;
 	NQRDB* tdb = nqrdbnew();
 	for (idx_x = bwdb->idx->next; idx_x != bwdb->idx; idx_x = idx_x->next)
 	{
 		cvFindFeatures(idx_x->smft, bwm, idx, dist, 1, bwdb->emax);
+		double* dptr = dist->data.db;
+		double* odptr = odist;
+		NQBWDBSTEM** sptr = selected;
 		int i, j, *iptr = idx->data.i;
-		for (i = 0; i < bwm->rows; i++, iptr++)
-		{
-			NQBWDBSTEM* stem = idx_x->stem + *iptr;
-			char** kstr = stem->kstr;
-			for (j = 0; j < stem->rnum; j++, kstr++)
+		for (i = 0; i < bwm->rows; i++, iptr++, dptr++, odptr++, sptr++)
+			if (*dptr < *odptr)
 			{
-				void* void_cast = nqrdbget(tdb, *kstr);
-				float float_cast;
-				memcpy(&float_cast, &void_cast, sizeof(float));
-				float_cast += stem->idf;
-				memcpy(&void_cast, &float_cast, sizeof(float));
-				nqrdbput(tdb, *kstr, void_cast);
+				NQBWDBSTEM* stem;
+				char** kstr;
+				if (*sptr != 0)
+				{
+					stem = *sptr;
+					kstr = stem->kstr;
+					for (j = 0; j < stem->rnum; j++, kstr++)
+					{
+						void* void_cast = nqrdbget(tdb, *kstr);
+						float float_cast;
+						memcpy(&float_cast, &void_cast, sizeof(float));
+						float_cast -= stem->idf;
+						memcpy(&void_cast, &float_cast, sizeof(float));
+						nqrdbput(tdb, *kstr, void_cast);
+					}
+				}
+				stem = idx_x->stem + *iptr;
+				kstr = stem->kstr;
+				for (j = 0; j < stem->rnum; j++, kstr++)
+				{
+					void* void_cast = nqrdbget(tdb, *kstr);
+					float float_cast;
+					memcpy(&float_cast, &void_cast, sizeof(float));
+					float_cast += stem->idf;
+					memcpy(&void_cast, &float_cast, sizeof(float));
+					nqrdbput(tdb, *kstr, void_cast);
+				}
+				*odptr = *dptr;
+				*sptr = stem;
 			}
-		}
 	}
+	free(odist);
+	free(selected);
 	cvReleaseMat(&idx);
 	cvReleaseMat(&dist);
 	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
@@ -349,7 +379,6 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 	ud->siz = lmt;
 	ud->data->likeness = 0;
 	nqrdbforeach(tdb, nqbwsort, ud);
-	int i;
 	if (ordered)
 	{
 		for (i = lmt-1; i > 0; i--)
@@ -402,7 +431,7 @@ bool nqbwdbidx(NQBWDB* bwdb, double match)
 #if APR_HAS_THREADS
 	apr_thread_mutex_lock(bwdb->unidxmutex);
 #endif
-	int i, t = 0, tt = 0, kmax = 0, cols = 0;
+	int i, c = 0, t = 0, tt = 0, kmax = 0, cols = 0;
 	NQBWDBUNIDX* unidx_x;
 	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next)
 	{
@@ -411,6 +440,14 @@ bool nqbwdbidx(NQBWDB* bwdb, double match)
 		if (unidx_x->datum->bw->cols > cols)
 			cols = unidx_x->datum->bw->cols;
 		t += unidx_x->datum->bw->rows;
+		c++;
+	}
+	if (t <= 0)
+	{
+#if APR_HAS_THREADS
+		apr_thread_mutex_unlock(bwdb->unidxmutex);
+#endif
+		return false;
 	}
 	int sizes[] = {t, t};
 	CvSparseMat* sim = cvCreateSparseMat(2, sizes, CV_64FC1);
@@ -482,6 +519,7 @@ bool nqbwdbidx(NQBWDB* bwdb, double match)
 	}
 	NQBWDBIDX* dbidx = (NQBWDBIDX*)frl_slab_palloc(idx_pool);
 	dbidx->rnum = r;
+	dbidx->inum = c;
 	dbidx->stem = (NQBWDBSTEM*)malloc(r * sizeof(NQBWDBSTEM));
 	dbidx->smmat = cvCreateMat(r, cols, CV_32FC1);
 	cptr = count;
@@ -499,7 +537,8 @@ bool nqbwdbidx(NQBWDB* bwdb, double match)
 	stemptr = dbidx->stem;
 	float* smmptr = dbidx->smmat->data.fl;
 	rspptr = rsp->data.i;
-	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next)
+	char** dbkstr = dbidx->kstr = (char**)malloc(c * sizeof(char*));
+	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next, dbkstr++)
 	{
 		for (i = 0; i < unidx_x->datum->bw->rows; i++)
 		{
@@ -516,6 +555,7 @@ bool nqbwdbidx(NQBWDB* bwdb, double match)
 			cptr++;
 		}
 		x_offset += unidx_x->datum->bw->rows;
+		*dbkstr = unidx_x->kstr;
 	}
 	cvReleaseMat(&rsp);
 	cvReleaseSparseMat(&sim);
@@ -550,6 +590,63 @@ bool nqbwdbidx(NQBWDB* bwdb, double match)
 	apr_thread_rwlock_unlock(bwdb->rwidxlock);
 #endif
 	return true;
+}
+
+static void nqbwrefr(char* kstr, void* vbuf, void* ud)
+{
+	NQBWDB* bwdb = (NQBWDB*)ud;
+	NQBWDBUNIDX* unidx = (NQBWDBUNIDX*)frl_slab_palloc(unidx_pool);
+	unidx->kstr = (char*)frl_slab_palloc(kstr_pool);
+	memcpy(unidx->kstr, kstr, 16);
+	unidx->datum = (NQBWDBDATUM*)vbuf;
+	unidx->prev = bwdb->unidx->prev;
+	unidx->next = bwdb->unidx;
+	bwdb->unidx->prev->next = unidx;
+	bwdb->unidx->prev = unidx;
+}
+
+bool nqbwdbreidx(NQBWDB* bwdb, double match)
+{
+#if APR_HAS_THREADS
+	apr_thread_mutex_lock(bwdb->unidxmutex);
+#endif
+	NQBWDBUNIDX* unidx = bwdb->unidx->next;
+	while (unidx != bwdb->unidx)
+	{
+		NQBWDBUNIDX* next = unidx->next;
+		frl_slab_pfree(unidx->kstr);
+		frl_slab_pfree(unidx);
+		unidx = next;
+	}
+	bwdb->unidx->prev = bwdb->unidx->next = bwdb->unidx;
+	nqrdbforeach(bwdb->rdb, nqbwrefr, bwdb);
+#if APR_HAS_THREADS
+	apr_thread_mutex_unlock(bwdb->unidxmutex);
+	apr_thread_rwlock_wrlock(bwdb->rwidxlock);
+#endif
+	NQBWDBIDX* idx = bwdb->idx->next;
+	while (idx != bwdb->idx)
+	{
+		NQBWDBIDX* next = idx->next;
+		NQBWDBSTEM* stem = idx->stem;
+		int i;
+		for (i = 0; i < idx->rnum; i++, stem++)
+			free(stem->kstr);
+		free(idx->stem);
+		char** kstr = idx->kstr;
+		for (i = 0; i < idx->inum; i++, kstr++)
+			frl_slab_pfree(*kstr);
+		free(idx->kstr);
+		cvReleaseMat(&idx->smmat);
+		cvReleaseFeatureTree(idx->smft);
+		frl_slab_pfree(idx);
+		idx = next;
+	}
+	bwdb->idx->prev = bwdb->idx->next = bwdb->idx;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(bwdb->rwidxlock);
+#endif
+	nqbwdbidx(bwdb, match);
 }
 
 bool nqbwdbout(NQBWDB* bwdb, char* kstr)

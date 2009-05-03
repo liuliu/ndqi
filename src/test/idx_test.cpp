@@ -63,13 +63,14 @@ int main()
 						memcpy(todel, entry->d_name, 32);
 					printf("file: %s loaded\n", entry->d_name);
 					i++;
-					//if (i % 50 == 0)
-					//	nqbwdbidx(bwdb);
+					if (i % 50 == 0)
+						nqbwdbidx(bwdb);
 				}
 			}
 		}
 	}
 
+	nqbwdbreidx(bwdb);
 	nqbwdbidx(bwdb);
 
 	IplImage* timage = cvLoadImage("../dpdb.jpg", CV_LOAD_IMAGE_GRAYSCALE);
