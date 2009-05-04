@@ -46,6 +46,8 @@ typedef struct {
 	NQRDB* rdb;
 	uint32_t emax;
 	uint32_t wnum;
+	uint32_t inum;
+	uint32_t unum;
 	NQBWDBIDX* idx;
 	NQBWDBUNIDX* unidx;
 #if APR_HAS_THREADS
@@ -58,10 +60,10 @@ NQBWDB* nqbwdbnew(void);
 CvMat* nqbweplr(CvMat* data, int e = 5, int emax = 50);
 bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm);
 CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);
-int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = 0, float* likeness = 0);
-int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered = 0, float* likeness = 0);
-bool nqbwdbidx(NQBWDB* bwdb, double match = 0.6);
-bool nqbwdbreidx(NQBWDB* bwdb, double match = 0.6);
+int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = false, float* likeness = 0);
+int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);
+bool nqbwdbidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
+bool nqbwdbreidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
 bool nqbwdbout(NQBWDB* bwdb, char* kstr);
 void nqbwdbdel(NQBWDB* bwdb);
 

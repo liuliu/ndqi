@@ -228,7 +228,7 @@ void* nqrdbget(NQRDB* rdb, char* kstr)
 		i = (i+30)&0x1F;
 	} while (kp < kint+4);
 #if APR_HAS_THREADS
-		apr_thread_rwlock_unlock(rdb->rwlock);
+	apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
 	return 0;
 }

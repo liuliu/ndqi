@@ -70,8 +70,7 @@ int main()
 		}
 	}
 
-	nqbwdbreidx(bwdb);
-	nqbwdbidx(bwdb);
+	nqbwdbreidx(bwdb, 2);
 
 	IplImage* timage = cvLoadImage("../dpdb.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	IplImage* tsmall = cvCreateImage(cvSize(640, 480), 8, 1);
