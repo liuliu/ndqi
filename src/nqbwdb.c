@@ -36,6 +36,7 @@ NQBWDB* nqbwdbnew(void)
 	bwdb->idx->stem = 0;
 	bwdb->idx->smmat = 0;
 	bwdb->idx->smft = 0;
+	bwdb->idx->kstr = 0;
 	bwdb->idx->prev = bwdb->idx->next = bwdb->idx;
 	bwdb->unidx = (NQBWDBUNIDX*)frl_slab_palloc(unidx_pool);
 	bwdb->unidx->kstr = 0;
@@ -432,35 +433,38 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 #if APR_HAS_THREADS
 	apr_thread_mutex_lock(bwdb->unidxmutex);
 #endif
+	int unum = bwdb->unum;
 	int i, t = 0, tt = 0, kmax = 0, cols = 0;
+	NQBWDBUNIDX* unidx_array = (NQBWDBUNIDX*)malloc(unum * sizeof(NQBWDBUNIDX));
+	NQBWDBUNIDX* unidx_array_end = unidx_array + unum;
 	NQBWDBUNIDX* unidx_x;
+	NQBWDBUNIDX* unidx_y = unidx_array;
 	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next)
 	{
 		if (unidx_x->datum->bw->rows > kmax)
 			kmax = unidx_x->datum->bw->rows;
 		if (unidx_x->datum->bw->cols > cols)
 			cols = unidx_x->datum->bw->cols;
+		*unidx_y = *unidx_x;
 		t += unidx_x->datum->bw->rows;
+		unidx_y++;
 	}
-	if (t <= 0)
-	{
 #if APR_HAS_THREADS
-		apr_thread_mutex_unlock(bwdb->unidxmutex);
+	apr_thread_mutex_unlock(bwdb->unidxmutex);
 #endif
+	if (t <= 0)
 		return false;
-	}
 	int sizes[] = {t, t};
 	CvSparseMat* sim = cvCreateSparseMat(2, sizes, CV_64FC1);
 	CvMat* idx = cvCreateMat(kmax, 2, CV_32SC1);
 	CvMat* dist = cvCreateMat(kmax, 2, CV_64FC1);
 	double tpref = 0;
 	int x_offset = 0;
-	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next)
+	for (unidx_x = unidx_array; unidx_x != unidx_array_end; unidx_x++)
 	{
-		NQBWDBUNIDX* unidx_y;
 		int y_offset = 0;
 		idx->rows = dist->rows = unidx_x->datum->bw->rows;
-		for (unidx_y = bwdb->unidx->next; unidx_y != bwdb->unidx; unidx_y = unidx_y->next)
+		for (unidx_y = unidx_array; unidx_y != unidx_array_end; unidx_y++)
 		{
 			if (unidx_x != unidx_y)
 			{
@@ -512,11 +516,9 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	{
 		cvReleaseMat(&rsp);
 		cvReleaseSparseMat(&sim);
+		free(unidx_array);
 		free(bookmark);
 		free(count);
-#if APR_HAS_THREADS
-		apr_thread_mutex_unlock(bwdb->unidxmutex);
-#endif
 		return false;
 	}
 	NQBWDBIDX* dbidx = (NQBWDBIDX*)frl_slab_palloc(idx_pool);
@@ -540,7 +542,7 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	float* smmptr = dbidx->smmat->data.fl;
 	rspptr = rsp->data.i;
 	char** dbkstr = dbidx->kstr = (char**)malloc(dbidx->inum * sizeof(char*));
-	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next, dbkstr++)
+	for (unidx_x = unidx_array; unidx_x != unidx_array_end; unidx_x++, dbkstr++)
 	{
 		for (i = 0; i < unidx_x->datum->bw->rows; i++)
 		{
@@ -568,17 +570,29 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	free(bookmark);
 	free(count);
 	dbidx->smft = cvCreateKDTree(dbidx->smmat);
+#if APR_HAS_THREADS
+	apr_thread_mutex_lock(bwdb->unidxmutex);
+#endif
 	unidx_x = bwdb->unidx->next;
-	while (unidx_x != bwdb->unidx)
+	if (unidx_x->datum == unidx_array->datum)
 	{
-		NQBWDBUNIDX* next = unidx_x->next;
-		frl_slab_pfree(unidx_x);
-		unidx_x = next;
+		i = 0;
+		while (unidx_x != bwdb->unidx && i < unum)
+		{
+			NQBWDBUNIDX* next = unidx_x->next;
+			unidx_x->prev->next = next;
+			next->prev = unidx_x->prev;
+			frl_slab_pfree(unidx_x);
+			unidx_x = next;
+			i++;
+		}
 	}
-	bwdb->unum = 0;
-	bwdb->unidx->prev = bwdb->unidx->next = bwdb->unidx;
+	bwdb->unum -= unum;
 #if APR_HAS_THREADS
 	apr_thread_mutex_unlock(bwdb->unidxmutex);
+#endif
+	free(unidx_array);
+#if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(bwdb->rwidxlock);
 #endif
 	bwdb->wnum += dbidx->rnum;
@@ -688,6 +702,7 @@ static void nqbwnuk(char* kstr, void* vbuf, void* ud)
 	NQBWDBDATUM* dt = (NQBWDBDATUM*)vbuf;
 	if (dt->bwft != 0) cvReleaseFeatureTree(dt->bwft);
 	if (dt->bw != 0) cvReleaseMat(&dt->bw);
+	frl_slab_pfree(dt);
 }
 
 void nqbwdbdel(NQBWDB* bwdb)

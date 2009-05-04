@@ -26,13 +26,57 @@ NQFDB* nqfdbnew(void)
 		frl_slab_pool_create(&unidx_pool, mtx_pool, 1024, sizeof(NQFDBUNIDX), FRL_LOCK_WITH);
 	if (kstr_pool == 0)
 		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, 16, FRL_LOCK_WITH);
+	NQFDB* fdb = (NQFDB*)frl_slab_palloc(db_pool);
+	fdb->rdb = nqrdbnew();
+	fdb->inum = fdb->unum = 0;
+	fdb->idx = (NQFDBIDX*)frl_slab_palloc(idx_pool);
+	fdb->idx->inum = 0;
+	fdb->idx->ft = 0;
+	fdb->idx->kstr = 0;
+	fdb->idx->prev = fdb->idx->next = fdb->idx;
+	fdb->unidx = (NQFDBUNIDX*)frl_slab_palloc(idx_pool);
+	fdb->unidx->kstr = 0;
+	fdb->unidx->datum = 0;
+	fdb->unidx->prev = fdb->unidx->next = fdb->unidx;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_create(&fdb->rwidxlock, mtx_pool);
+	apr_thread_rwlock_create(&fdb->rwunidxlock, mtx_pool);
+#endif
 }
 
 bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm)
 {
+	NQFDBDATUM* dt = (NQFDBDATUM*)frl_slab_palloc(dt_pool);
+	NQFDBUNIDX* unidx = (NQFDBUNIDX*)frl_slab_palloc(unidx_pool);
+	dt->f = fm;
+	if (nqrdbput(fdb->rdb, kstr, dt))
+	{
+		unidx->kstr = (char*)frl_slab_palloc(kstr_pool);
+		memcpy(unidx->kstr, kstr, 16);
+		unidx->datum = dt;
+#if APR_HAS_THREADS
+		apr_thread_rwlock_wrlock(fdb->rwunidxlock);
+#endif
+		unidx->prev = fdb->unidx->prev;
+		unidx->next = fdb->unidx;
+		fdb->unidx->prev->next = unidx;
+		fdb->unidx->prev = unidx;
+		fdb->unum++;
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(fdb->rwunidxlock);
+#endif
+		return true;
+	}
+	return false;
 }
 
 CvMat* nqfdbget(NQFDB* fdb, char* kstr)
+{
+	NQFDBDATUM* dt = (NQFDBDATUM*)nqrdbget(fdb->rdb, kstr);
+	return dt->f;
+}
+
+static void nqffwm(char* kstr, void* vbuf, void* ud)
 {
 }
 
@@ -54,6 +98,14 @@ bool nqfdbreidx(NQFDB* fdb)
 
 bool nqfdbout(NQFDB* fdb, char* kstr)
 {
+	NQFDBDATUM* dt = (NQFDBDATUM*)nqrdbget(fdb, kstr);
+	if (dt != NULL)
+	{
+		if (dt->f != 0) cvReleaseMat(&dt->f);
+		frl_slab_pfree(dt);
+		return nqrdbout(fdb, kstr);
+	}
+	return false;
 }
 
 void nqfdbdel(NQFDB* fdb)
