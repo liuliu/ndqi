@@ -26,7 +26,7 @@ NQBWDB* nqbwdbnew(void)
 	if (unidx_pool == 0)
 		frl_slab_pool_create(&unidx_pool, mtx_pool, 1024, sizeof(NQBWDBUNIDX), FRL_LOCK_WITH);
 	if (kstr_pool == 0)
-		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, sizeof(16), FRL_LOCK_WITH);
+		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, 16, FRL_LOCK_WITH);
 	NQBWDB* bwdb = (NQBWDB*)frl_slab_palloc(db_pool);
 	bwdb->rdb = nqrdbnew();
 	bwdb->emax = 20;

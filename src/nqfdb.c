@@ -14,6 +14,18 @@ static frl_slab_pool_t* kstr_pool = 0;
 
 NQFDB* nqfdbnew(void)
 {
+	if (mtx_pool == 0)
+		apr_pool_create(&mtx_pool, NULL);
+	if (db_pool == 0)
+		flr_slab_pool_create(&db_pool, mtx_pool, 64, sizeof(NQFDB), FRL_LOCK_WITH);
+	if (dt_pool == 0)
+		frl_slab_pool_create(&dt_pool, mtx_pool, 1024, sizeof(NQFDBDATUM), FRL_LOCK_WITH);
+	if (idx_pool == 0)
+		frl_slab_pool_create(&idx_pool, mtx_pool, 128, sizeof(NQFDBIDX), FRL_LOCK_WITH);
+	if (unidx_pool == 0)
+		frl_slab_pool_create(&unidx_pool, mtx_pool, 1024, sizeof(NQFDBUNIDX), FRL_LOCK_WITH);
+	if (kstr_pool == 0)
+		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, 16, FRL_LOCK_WITH);
 }
 
 bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm)
