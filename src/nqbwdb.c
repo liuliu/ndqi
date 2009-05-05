@@ -622,6 +622,8 @@ static void nqbwunidxclr(NQBWDB* bwdb)
 		frl_slab_pfree(unidx);
 		unidx = next;
 	}
+	bwdb->unum = 0;
+	bwdb->unidx->prev = bwdb->unidx->next = bwdb->unidx;
 }
 
 static void nqbwidxclr(NQBWDB* bwdb)
@@ -644,6 +646,8 @@ static void nqbwidxclr(NQBWDB* bwdb)
 		frl_slab_pfree(idx);
 		idx = next;
 	}
+	bwdb->inum = 0;
+	bwdb->idx->prev = bwdb->idx->next = bwdb->idx;
 }
 
 bool nqbwdbreidx(NQBWDB* bwdb, int min, double match)
@@ -652,7 +656,6 @@ bool nqbwdbreidx(NQBWDB* bwdb, int min, double match)
 	apr_thread_mutex_lock(bwdb->unidxmutex);
 #endif
 	nqbwunidxclr(bwdb);
-	bwdb->unidx->prev = bwdb->unidx->next = bwdb->unidx;
 	nqrdbforeach(bwdb->rdb, nqbwrefr, bwdb);
 	bwdb->unum = bwdb->rdb->rnum;
 #if APR_HAS_THREADS
@@ -660,8 +663,6 @@ bool nqbwdbreidx(NQBWDB* bwdb, int min, double match)
 	apr_thread_rwlock_wrlock(bwdb->rwidxlock);
 #endif
 	nqbwidxclr(bwdb);
-	bwdb->inum = 0;
-	bwdb->idx->prev = bwdb->idx->next = bwdb->idx;
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(bwdb->rwidxlock);
 #endif

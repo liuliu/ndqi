@@ -349,11 +349,64 @@ static void nqfrefr(char* kstr, void* vbuf, void* ud)
 {
 	NQFDB* fdb = (NQFDB*)ud;
 	NQFDBUNIDX* unidx = (NQFDBUNIDX*)frl_slab_palloc(unidx_pool);
+	unidx->kstr = (char*)frl_slab_palloc(kstr_pool);
+	memcpy(unidx->kstr, kstr, 16);
+	unidx->datum = (NQFDBDATUM*)vbuf;
+	unidx->prev = fdb->unidx->prev;
+	unidx->next = fdb->unidx;
+	fdb->unidx->prev->next = unidx;
+	fdb->unidx->prev = unidx;
+}
 
+static void nqfunidxclr(NQFDB* fdb)
+{
+	NQFDBUNIDX* unidx = fdb->unidx->next;
+	while (unidx != fdb->unidx)
+	{
+		NQFDBUNIDX* next = unidx->next;
+		frl_slab_pfree(unidx->kstr);
+		frl_slab_pfree(unidx);
+		unidx = next;
+	}
+	fdb->unum = 0;
+	fdb->unidx->prev = fdb->unidx->next = fdb->unidx;
+}
+
+static void nqfidxclr(NQFDB* fdb)
+{
+	NQFDBIDX* idx = fdb->idx->next;
+	while (idx != fdb->idx)
+	{
+		NQFDBIDX* next = idx->next;
+		if (idx->p != 0)
+			cvReleaseMat(&idx->p);
+		cvReleaseMat(&idx->f);
+		cvReleaseFeatureTree(idx->ft);
+		free(idx->kstr);
+		free(idx->data);
+		idx = next;
+	}
+	fdb->inum = 0;
+	fdb->idx->prev = fdb->idx->next = fdb->idx;
 }
 
 bool nqfdbreidx(NQFDB* fdb)
 {
+#if APR_HAS_THREADS
+	apr_thread_rwlock_wrlock(fdb->rwunidxlock);
+#endif
+	nqfunidxclr(fdb);
+	nqrdbforeach(fdb->rdb, nqfrefr, fdb);
+	fdb->unum = fdb->rdb->rnum;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(fdb->rwunidxlock);
+	apr_thread_rwlock_wrlock(fdb->rwidxlock);
+#endif
+	nqfidxclr(fdb);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(fdb->rwidxlock);
+#endif
+	return nqfdbidx(fdb);
 }
 
 bool nqfdbout(NQFDB* fdb, char* kstr)
@@ -368,6 +421,24 @@ bool nqfdbout(NQFDB* fdb, char* kstr)
 	return false;
 }
 
+static void nqfnuk(char* kstr, void* vbuf, void* ud)
+{
+	NQFDBDATUM* dt = (NQFDBDATUM*)vbuf;
+	if (dt->f != 0) cvReleaseMat(&dt->f);
+	frl_slab_pfree(dt);
+}
+
 void nqfdbdel(NQFDB* fdb)
 {
+	nqrdbforeach(fdb->rdb, nqfnuk, 0);
+	nqfunidxclr(fdb);
+	nqfidxclr(fdb);
+	frl_slab_pfree(fdb->unidx);
+	frl_slab_pfree(fdb->idx);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_destroy(fdb->rwidxlock);
+	apr_thread_rwlock_destroy(fdb->rwunidxlock);
+#endif
+	nqrdbdel(fdb->rdb);
+	frl_slab_pfree(fdb);
 }
