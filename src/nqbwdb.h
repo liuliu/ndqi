@@ -26,6 +26,7 @@ typedef struct NQBWDBIDX {
 	uint32_t rnum;
 	char** kstr;
 	uint32_t inum;
+	double match;
 	struct NQBWDBIDX* prev;
 	struct NQBWDBIDX* next;
 } NQBWDBIDX;
@@ -51,8 +52,8 @@ typedef struct {
 	NQBWDBIDX* idx;
 	NQBWDBUNIDX* unidx;
 #if APR_HAS_THREADS
-	apr_thread_mutex_t* unidxmutex;
 	apr_thread_rwlock_t* rwidxlock;
+	apr_thread_rwlock_t* rwunidxlock;
 #endif
 } NQBWDB;
 

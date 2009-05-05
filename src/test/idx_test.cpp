@@ -64,13 +64,16 @@ int main()
 					printf("file: %s loaded\n", entry->d_name);
 					i++;
 					if (i % 50 == 0)
+					{
+						printf("start indexing...\n");
 						nqbwdbidx(bwdb);
+					}
 				}
 			}
 		}
 	}
 
-	nqbwdbreidx(bwdb, 2);
+	//nqbwdbreidx(bwdb, 2);
 
 	IplImage* timage = cvLoadImage("../dpdb.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	IplImage* tsmall = cvCreateImage(cvSize(640, 480), 8, 1);
