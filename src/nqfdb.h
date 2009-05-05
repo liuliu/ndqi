@@ -9,17 +9,20 @@
 #include <cv.h>
 #include "nqrdb.h"
 
-typedef struct NQFDBIDX {
-	CvFeatureTree* ft;
-	uint32_t inum;
-	char** kstr;
-	struct NQFDBIDX* prev;
-	struct NQFDBIDX* next;
-} NQFDBIDX;
-
 typedef struct {
 	CvMat* f;
 } NQFDBDATUM;
+
+typedef struct NQFDBIDX {
+	CvMat* f;
+	CvMat* p;
+	CvFeatureTree* ft;
+	uint32_t inum;
+	char** kstr;
+	NQFDBDATUM** data;
+	struct NQFDBIDX* prev;
+	struct NQFDBIDX* next;
+} NQFDBIDX;
 
 typedef struct NQFDBUNIDX {
 	char* kstr;

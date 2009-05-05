@@ -234,8 +234,8 @@ static void nqbwfwms(char* kstr, void* vbuf, void* ud)
 
 int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)
 {
-	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
-	memset(ud, 0, sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
+	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA) + lmt * sizeof(NQBWPAIR));
+	memset(ud, 0, sizeof(NQBWUSERDATA) + lmt * sizeof(NQBWPAIR));
 	ud->emax = bwdb->emax;
 	ud->match = match;
 	ud->siz = lmt;
@@ -437,18 +437,23 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	int i, t = 0, tt = 0, kmax = 0, cols = 0;
 	NQBWDBUNIDX* unidx_array = (NQBWDBUNIDX*)malloc(unum * sizeof(NQBWDBUNIDX));
 	NQBWDBUNIDX* unidx_array_end = unidx_array + unum;
-	NQBWDBUNIDX* unidx_x;
 	NQBWDBUNIDX* unidx_y = unidx_array;
-	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next)
+	NQBWDBUNIDX* unidx_x = bwdb->unidx->next;
+	while (unidx_x != bwdb->unidx)
 	{
+		NQBWDBUNIDX* next = unidx_x->next;
 		if (unidx_x->datum->bw->rows > kmax)
 			kmax = unidx_x->datum->bw->rows;
 		if (unidx_x->datum->bw->cols > cols)
 			cols = unidx_x->datum->bw->cols;
 		*unidx_y = *unidx_x;
 		t += unidx_x->datum->bw->rows;
+		frl_slab_pfree(unidx_x);
+		unidx_x = next;
 		unidx_y++;
 	}
+	bwdb->unum = 0;
+	bwdb->unidx->next = bwdb->unidx->prev = bwdb->unidx;
 #if APR_HAS_THREADS
 	apr_thread_mutex_unlock(bwdb->unidxmutex);
 #endif
@@ -570,38 +575,17 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	free(bookmark);
 	free(count);
 	dbidx->smft = cvCreateKDTree(dbidx->smmat);
-#if APR_HAS_THREADS
-	apr_thread_mutex_lock(bwdb->unidxmutex);
-#endif
-	unidx_x = bwdb->unidx->next;
-	if (unidx_x->datum == unidx_array->datum)
-	{
-		i = 0;
-		while (unidx_x != bwdb->unidx && i < unum)
-		{
-			NQBWDBUNIDX* next = unidx_x->next;
-			unidx_x->prev->next = next;
-			next->prev = unidx_x->prev;
-			frl_slab_pfree(unidx_x);
-			unidx_x = next;
-			i++;
-		}
-	}
-	bwdb->unum -= unum;
-#if APR_HAS_THREADS
-	apr_thread_mutex_unlock(bwdb->unidxmutex);
-#endif
 	free(unidx_array);
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(bwdb->rwidxlock);
 #endif
 	bwdb->wnum += dbidx->rnum;
+	bwdb->inum += dbidx->inum;
 	dbidx->prev = bwdb->idx->prev;
 	dbidx->next = bwdb->idx;
 	bwdb->idx->prev->next = dbidx;
 	bwdb->idx->prev = dbidx;
 	dbidx = bwdb->idx->next;
-	bwdb->inum += dbidx->inum;
 	for (dbidx = bwdb->idx->next; dbidx != bwdb->idx; dbidx = dbidx->next)
 	{
 		NQBWDBSTEM* stem = dbidx->stem;

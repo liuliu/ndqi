@@ -76,20 +76,280 @@ CvMat* nqfdbget(NQFDB* fdb, char* kstr)
 	return dt->f;
 }
 
+typedef struct {
+	char* kstr;
+	float likeness;
+} NQFPAIR;
+
+typedef struct {
+	uint32_t siz;
+	CvMat* fm;
+	NQFPAIR data[0];
+} NQFUSERDATA;
+
+static void nqfhpf(NQFPAIR* pr, uint32_t i, uint32_t siz)
+{
+	uint32_t l, r, largest = i;
+	do {
+		i = largest;
+		r = (i+1)<<1;
+		l = r-1;
+		if (l < siz && pr[l].likeness < pr[i].likeness)
+			largest = l;
+		if (r < siz && pr[r].likeness < pr[largest].likeness)
+			largest = r;
+		if (largest != i)
+		{
+			NQBWPAIR sw = pr[largest];
+			pr[largest] = pr[i];
+			pr[i] = sw;
+		}
+	} while (largest != i);
+}
+
 static void nqffwm(char* kstr, void* vbuf, void* ud)
 {
+	NQFUSERDATA* nqud = (NQFUSERDATA*)ud;
+	NQFDBDATUM* datum = (NQFDBDATUM*)vbuf;
+	double norm = cvNorm(nqud->fm, datum->f);
+	float likeness = 1. / (1. + norm);
+	if (likeness > nqud->data->likeness)
+	{
+		nqud->data->likeness = likeness;
+		nqud->data->kstr = kstr;
+		nqfhpf(nqud->data, 0, nqud->siz);
+	}
 }
 
 int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 {
+	NQFUSERDATA* ud = (NQFUSERDATA*)malloc(sizeof(NQFUSERDATA) + lmt * sizeof(NQFPAIR));
+	memset(ud, 0, sizeof(NQFUSERDATA) + lmt * sizeof(NQFPAIR));
+	ud->siz = lmt;
+	ud->fm = fm;
+	ud->data->likeness = 0;
+	nqrdbforeach(fdb->rdb, nqffwm, ud);
+
+	int i;
+	if (ordered)
+	{
+		for (i = lmt-1; i > 0; i--)
+		{
+			NQFPAIR sw = ud->data[i];
+			ud->data[i] = ud->data[0];
+			ud->data[0] = sw;
+			nqfhpf(ud->data, 0, i);
+		}
+	}
+
+	NQFPAIR* dptr = ud->data;
+	int k = 0;
+	if (likeness == 0)
+	{
+		for (i = 0; i < lmt; i++)
+		{
+			if (dptr->kstr != 0)
+			{
+				*kstr = dptr->kstr;
+				kstr++;
+				k++;
+			}
+			dptr++;
+		}
+	} else {
+		for (i = 0; i < lmt; i++)
+		{
+			if (dptr->kstr != 0)
+			{
+				*kstr = dptr->kstr;
+				*likeness = dptr->likeness;
+				kstr++;
+				likeness++;
+				k++;
+			}
+			dptr++;
+		}
+	}
+
+	free(ud);
+
+	return k;
 }
 
 int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 {
+	NQFUSERDATA* ud = (NQFUSERDATA*)malloc(sizeof(NQFUSERDATA) + lmt * sizeof(NQFPAIR));
+	memset(ud, 0, sizeof(NQFUSERDATA) + lmt * sizeof(NQFPAIR));
+	ud->siz = lmt;
+	ud->fm = fm;
+	ud->data->likeness = 0;
+	int slmt = lmt * 2;
+	CvMat* idx = cvCreateMat(fm->rows, slmt, CV_32SC1);
+	CvMat* dist = cvCreateMat(fm->rows, slmt, CV_64FC1);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_rdlock(fdb->rwidxlock);
+#endif
+	NQFDBIDX* idx_x;
+	CvMat* fp = fm->cols > 32 ? cvCreateMat(1, 32, CV_32FC1) : 0;
+	for (idx_x = fdb->idx->next; idx_x != fdb->idx; idx_x = idx_x->next)
+	{
+		if (fp != 0)
+		{
+			cvMatMul(fm, idx_x->p, fp);
+			cvFindFeatures(idx_x->ft, fp, idx, dist, slmt);
+		} else
+			cvFindFeatures(idx_x->ft, fm, idx, dist, slmt);
+		double* dptr = dist->data.db;
+		int i, *iptr = idx->data.i;
+		for (i = 0; i < slmt; i++, iptr++, dptr++)
+		{
+			double norm = *dptr;
+			if (fp != 0)
+				norm = cvNorm(fm, idx_x->data[*iptr]->f);
+			float likeness = 1. / (1. + norm);
+			if (likeness > ud->data->likeness)
+			{
+				ud->data->likeness = likeness;
+				ud->data->kstr = idx_x->kstr[*iptr];
+				nqfhpf(ud->data, 0, ud->siz);
+			}
+		}
+	}
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(fdb->rwidxlock);
+#endif
+	cvReleaseMat(&idx);
+	cvReleaseMat(&dist);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_rdlock(fdb->rwunidxlock);
+#endif
+	NQFDBUNIDX* unidx_x;
+	for (unidx_x = fdb->unidx->next; unidx_x != fdb->unidx; unidx_x = unidx_x->next)
+	{
+		double norm = cvNorm(fm, unidx_x->datum->f);
+		float likeness = 1. / (1. + norm);
+		if (likeness > ud->data->likeness)
+		{
+			ud->data->likeness = likeness;
+			ud->data->kstr = unidx_x->kstr;
+			nqfhpf(ud->data, 0, ud->siz);
+		}
+	}
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(fdb->rwunidxlock);
+#endif
+	int i;
+	if (ordered)
+	{
+		for (i = lmt-1; i > 0; i--)
+		{
+			NQFPAIR sw = ud->data[i];
+			ud->data[i] = ud->data[0];
+			ud->data[0] = sw;
+			nqfhpf(ud->data, 0, i);
+		}
+	}
+
+	NQFPAIR* dptr = ud->data;
+	int k = 0;
+	if (likeness == 0)
+	{
+		for (i = 0; i < lmt; i++)
+		{
+			if (dptr->kstr != 0)
+			{
+				*kstr = dptr->kstr;
+				kstr++;
+				k++;
+			}
+			dptr++;
+		}
+	} else {
+		for (i = 0; i < lmt; i++)
+		{
+			if (dptr->kstr != 0)
+			{
+				*kstr = dptr->kstr;
+				*likeness = dptr->likeness;
+				kstr++;
+				likeness++;
+				k++;
+			}
+			dptr++;
+		}
+	}
+
+	free(ud);
+
+	return k;
 }
 
 bool nqfdbidx(NQFDB* fdb)
 {
+	NQFDBIDX* idx = (NQFDBIDX*)frl_slab_palloc(idx_pool);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_wrlock(fdb->rwunidxlock);
+#endif
+	int unum = fdb->unum;
+	int cols = fdb->unidx->next->datum->f->cols;
+	idx->p = 0;
+	if (cols > 32)
+	{
+		idx->p = cvCreateMat(cols, 32, CV_64FC1);
+		CvRNG rng_state = cvRNG((int)(&fdb->unidx->next));
+		cvRandArr(&rng_state, idx->p, CV_RAND_NORMAL, cvRealScalar(-.1), cvRealScalar(.1));
+		cols = 32;
+	}
+	idx->f = cvCreateMat(unum, cols, CV_32FC1);
+	char** kstr = idx->kstr = (char**)malloc(unum * sizeof(char*));
+	NQFDBDATUM** data = idx->data = (NQFDBDATUM**)malloc(unum * sizeof(NQFDBDATUM*));
+	float* fptr = idx->f->data.fl;
+	NQFDBUNIDX* unidx_x;
+	if (idx->p == 0)
+	{
+		for (unidx_x = fdb->unidx->next; unidx_x != fdb->unidx; unidx_x = unidx_x->next)
+		{
+			memcpy(fptr, unidx_x->datum->f->data.fl, sizeof(float) * cols);
+			*kstr = unidx_x->kstr;
+			*data = unidx_x->datum;
+			fptr += cols;
+			kstr++;
+			data++;
+		}
+	} else {
+		for (unidx_x = fdb->unidx->next; unidx_x != fdb->unidx; unidx_x = unidx_x->next)
+		{
+			CvMat tmp = cvMat(1, cols, CV_32FC1, fptr);
+			cvMatMul(unidx_x->datum->f, idx->p, &tmp);
+			*kstr = unidx_x->kstr;
+			fptr += cols;
+			kstr++;
+		}
+	}
+	fdb->unum = 0;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(fdb->rwunidxlock);
+#endif
+	idx->inum = unum;
+	idx->ft = cvCreateSpillTree(idx->f);
+#if APR_HAS_THREADS
+	apr_thread_rwlock_wrlock(fdb->rwidxlock);
+#endif
+	fdb->inum += idx->inum;
+	idx->prev = fdb->idx->prev;
+	idx->next = fdb->idx;
+	fdb->idx->prev->next = idx;
+	fdb->idx->prev = idx;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(fdb->rwidxlock);
+#endif
+}
+
+static void nqfrefr(char* kstr, void* vbuf, void* ud)
+{
+	NQFDB* fdb = (NQFDB*)ud;
+	NQFDBUNIDX* unidx = (NQFDBUNIDX*)frl_slab_palloc(unidx_pool);
+
 }
 
 bool nqfdbreidx(NQFDB* fdb)
