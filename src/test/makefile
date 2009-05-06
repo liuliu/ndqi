@@ -22,7 +22,7 @@ $(OUTDIR)/irdb_test: irdb_test.o ../nqbwdb.o ../nqir.o ../nqrdb.o ../lib/mlapclu
 $(OUTDIR)/eplr_test: eplr_test.o ../nqutil.o ../nqdp.o ../lib/mlapcluster.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o $(OPENCV)/src/ml/ml_inner_functions.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
-$(OUTDIR)/lh_test: lh_test.o ../nqlh.o ../lib/cvlocalhist.o
+$(OUTDIR)/lh_test: lh_test.o ../nqlh.o ../lib/cvlocalhist.o ../nqfdb.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o $(OPENCV)/src/ml/ml_inner_functions.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
 clean:

@@ -48,8 +48,8 @@ bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm);
 CvMat* nqfdbget(NQFDB* fdb, char* kstr);
 int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);
 int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);
-bool nqfdbidx(NQFDB* fdb);
-bool nqfdbreidx(NQFDB* fdb);
+bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2);
+bool nqfdbreidx(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2);
 bool nqfdbout(NQFDB* fdb, char* kstr);
 void nqfdbdel(NQFDB* fdb);
 
