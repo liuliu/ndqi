@@ -8,6 +8,6 @@
 
 #include <cv.h>
 
-CvMat* nqlhnew(CvArr* image);
+CvMat* nqlhnew(CvArr* image, int bins);
 
 #endif
