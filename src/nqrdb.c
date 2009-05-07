@@ -57,6 +57,7 @@ static void nqrdbclear(NQRDB* rdb)
 static NQRDBDATUM* nqrdbirt(NQRDB* rdb, NQRDBDATUM* rec, uint8_t ht, uint32_t i, uint32_t* kint, void* vbuf)
 {
 	NQRDBDATUM* nrec = (NQRDBDATUM*)frl_slab_palloc(rec_pool);
+	nrec->chd = 0;
 	nrec->rnum = 0;
 	memcpy(nrec->kint, kint, 16);
 	nrec->vbuf = vbuf;

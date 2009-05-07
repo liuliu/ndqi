@@ -57,8 +57,8 @@ NQFDB* nqfdbjoin(NQFDB* fdb, char** kstr, int len)
 	ndb->idx = fdb->idx;
 	ndb->unidx = fdb->unidx;
 #if APR_HAS_THREADS
-	apr_thread_rwlock_create(&ndb->rwidxlock, mtx_pool);
-	apr_thread_rwlock_create(&ndb->rwunidxlock, mtx_pool);
+	ndb->rwidxlock = fdb->rwidxlock;
+	ndb->rwunidxlock = fdb->rwunidxlock;
 #endif
 	for (i = 0; i < len; i++, kstr++)
 	{
@@ -90,8 +90,8 @@ NQFDB* nqfdbjoin(NQFDB* fdb, NQRDB* rdb)
 	ndb->idx = fdb->idx;
 	ndb->unidx = fdb->unidx;
 #if APR_HAS_THREADS
-	apr_thread_rwlock_create(&ndb->rwidxlock, mtx_pool);
-	apr_thread_rwlock_create(&ndb->rwunidxlock, mtx_pool);
+	ndb->rwidxlock = fdb->rwidxlock;
+	ndb->rwunidxlock = fdb->rwunidxlock;
 #endif
 	void* dbs[] = {fdb, ndb};
 	nqrdbforeach(rdb, nqfcx, dbs);
@@ -516,11 +516,11 @@ void nqfdbdel(NQFDB* fdb)
 		nqfidxclr(fdb);
 		frl_slab_pfree(fdb->unidx);
 		frl_slab_pfree(fdb->idx);
-	}
 #if APR_HAS_THREADS
-	apr_thread_rwlock_destroy(fdb->rwidxlock);
-	apr_thread_rwlock_destroy(fdb->rwunidxlock);
+		apr_thread_rwlock_destroy(fdb->rwidxlock);
+		apr_thread_rwlock_destroy(fdb->rwunidxlock);
 #endif
+	}
 	nqrdbdel(fdb->rdb);
 	frl_slab_pfree(fdb);
 }
