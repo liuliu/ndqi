@@ -196,7 +196,7 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float
 	{
 		if (fp != 0)
 		{
-			cvMatMul(fm, idx_x->p, fp);
+			cvGEMM(fm, idx_x->p, 1, 0, 1, fp, CV_GEMM_B_T);
 			cvFindFeatures(idx_x->ft, fp, idx, dist, slmt);
 		} else
 			cvFindFeatures(idx_x->ft, fm, idx, dist, slmt);
@@ -303,9 +303,16 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 	NQFDBDATUM** data;
 	if (cols > 32)
 	{
-		idx->p = cvCreateMat(cols, 32, CV_32FC1);
+		idx->p = cvCreateMat(32, cols, CV_32FC1);
 		CvRNG rng_state = cvRNG((int)(&fdb->unidx->next));
 		cvRandArr(&rng_state, idx->p, CV_RAND_NORMAL, cvRealScalar(-1.), cvRealScalar(1.));
+		int i;
+		float* pptr = idx->p->data.fl;
+		for (i = 0; i < 32; i++, pptr += cols)
+		{
+			CvMat pc = cvMat(1, cols, CV_32FC1, pptr);
+			cvNormalize(&pc, &pc);
+		}
 		cols = 32;
 		data = idx->data = (NQFDBDATUM**)malloc(unum * sizeof(NQFDBDATUM*));
 	}
@@ -330,7 +337,7 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 		{
 			NQFDBUNIDX* next = unidx_x->next;
 			CvMat tmp = cvMat(1, cols, CV_32FC1, fptr);
-			cvMatMul(unidx_x->datum->f, idx->p, &tmp);
+			cvGEMM(unidx_x->datum->f, idx->p, 1, 0, 1, &tmp, CV_GEMM_B_T);
 			*kstr = unidx_x->kstr;
 			*data = unidx_x->datum;
 			fptr += cols;
