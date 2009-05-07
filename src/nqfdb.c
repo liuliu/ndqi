@@ -205,15 +205,19 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float
 		for (i = 0; i < slmt; i++, iptr++, dptr++)
 			if (*iptr >= 0)
 			{
-				double norm = *dptr;
-				if (fp != 0)
-					norm = cvNorm(fm, idx_x->data[*iptr]->f);
-				float likeness = 1. / (1. + norm);
-				if (likeness > ud->data->likeness)
+				char* kstr = idx_x->kstr[*iptr];
+				if (nqrdbget(fdb->rdb, kstr) != 0)
 				{
-					ud->data->likeness = likeness;
-					ud->data->kstr = idx_x->kstr[*iptr];
-					nqfhpf(ud->data, 0, ud->siz);
+					double norm = *dptr;
+					if (fp != 0)
+						norm = cvNorm(fm, idx_x->data[*iptr]->f);
+					float likeness = 1. / (1. + norm);
+					if (likeness > ud->data->likeness)
+					{
+						ud->data->likeness = likeness;
+						ud->data->kstr = kstr;
+						nqfhpf(ud->data, 0, ud->siz);
+					}
 				}
 			}
 	}
@@ -227,16 +231,17 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float
 #endif
 	NQFDBUNIDX* unidx_x;
 	for (unidx_x = fdb->unidx->next; unidx_x != fdb->unidx; unidx_x = unidx_x->next)
-	{
-		double norm = cvNorm(fm, unidx_x->datum->f);
-		float likeness = 1. / (1. + norm);
-		if (likeness > ud->data->likeness)
+		if (nqrdbget(fdb->rdb, unidx_x->kstr) != 0)
 		{
-			ud->data->likeness = likeness;
-			ud->data->kstr = unidx_x->kstr;
-			nqfhpf(ud->data, 0, ud->siz);
+			double norm = cvNorm(fm, unidx_x->datum->f);
+			float likeness = 1. / (1. + norm);
+			if (likeness > ud->data->likeness)
+			{
+				ud->data->likeness = likeness;
+				ud->data->kstr = unidx_x->kstr;
+				nqfhpf(ud->data, 0, ud->siz);
+			}
 		}
-	}
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(fdb->rwunidxlock);
 #endif
@@ -300,7 +305,7 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 	{
 		idx->p = cvCreateMat(cols, 32, CV_32FC1);
 		CvRNG rng_state = cvRNG((int)(&fdb->unidx->next));
-		cvRandArr(&rng_state, idx->p, CV_RAND_NORMAL, cvRealScalar(-.1), cvRealScalar(.1));
+		cvRandArr(&rng_state, idx->p, CV_RAND_NORMAL, cvRealScalar(-1.), cvRealScalar(1.));
 		cols = 32;
 		data = idx->data = (NQFDBDATUM**)malloc(unum * sizeof(NQFDBDATUM*));
 	}

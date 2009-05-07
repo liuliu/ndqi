@@ -53,7 +53,7 @@ int main()
 			cvReleaseImage(&image);
 			cvReleaseImage(&small);
 			nqfdbput(fdb, entry->d_name, fm);
-			if (entry->d_name[5] == '7' && entry->d_name[6] == '8' && entry->d_name[7] == '6')
+			if (entry->d_name[5] == '2' && entry->d_name[6] == '4' && entry->d_name[7] == '4')
 				memcpy(todel, entry->d_name, 32);
 			printf("file: %s loaded\n", entry->d_name);
 			i++;
