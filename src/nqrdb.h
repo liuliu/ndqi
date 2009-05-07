@@ -30,6 +30,7 @@ typedef struct {
 
 NQRDB* nqrdbnew(void);
 bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf);
+int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len);
 void* nqrdbget(NQRDB* rdb, char* kstr);
 bool nqrdbout(NQRDB* rdb, char* kstr);
 bool nqrdbforeach(NQRDB* rdb, NQFOREACH op, void* ud);

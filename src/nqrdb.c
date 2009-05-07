@@ -160,6 +160,18 @@ bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)
 	return 0;
 }
 
+int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len)
+{
+	int i, t = 0;
+	if (vbuf != 0)
+		for (i = 0; i < len; i++, kstr++, vbuf++)
+			t += nqrdbput(rdb, *kstr, *vbuf);
+	else
+		for (i = 0; i < len; i++, kstr++)
+			t += nqrdbput(rdb, *kstr, 0);
+	return t;
+}
+
 void* nqrdbget(NQRDB* rdb, char* kstr)
 {
 	uint32_t* kint = (uint32_t*)kstr;

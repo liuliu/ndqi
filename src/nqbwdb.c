@@ -29,6 +29,7 @@ NQBWDB* nqbwdbnew(void)
 		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, 16, FRL_LOCK_WITH);
 	NQBWDB* bwdb = (NQBWDB*)frl_slab_palloc(db_pool);
 	bwdb->rdb = nqrdbnew();
+	bwdb->shadow = false;
 	bwdb->emax = 20;
 	bwdb->wnum = bwdb->inum = bwdb->unum = 0;
 	bwdb->idx = (NQBWDBIDX*)frl_slab_palloc(idx_pool);
@@ -47,6 +48,61 @@ NQBWDB* nqbwdbnew(void)
 	apr_thread_rwlock_create(&bwdb->rwunidxlock, mtx_pool);
 #endif
 	return bwdb;
+}
+
+NQBWDB* nqbwdbjoin(NQBWDB* bwdb, char** kstr, int len)
+{
+	int i;
+	NQBWDB* ndb = (NQBWDB*)frl_slab_palloc(db_pool);
+	ndb->rdb = nqrdbnew();
+	ndb->shadow = true;
+	ndb->emax = bwdb->emax;
+	ndb->wnum = bwdb->wnum;
+	ndb->inum = bwdb->inum;
+	ndb->unum = bwdb->unum;
+	ndb->idx = bwdb->idx;
+	ndb->unidx = bwdb->unidx;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_create(&ndb->rwidxlock, mtx_pool);
+	apr_thread_rwlock_create(&ndb->rwunidxlock, mtx_pool);
+#endif
+	for (i = 0; i < len; i++, kstr++)
+	{
+		NQBWDBDATUM* dt = (NQBWDBDATUM*)nqrdbget(bwdb->rdb, *kstr);
+		if (dt != 0)
+			nqrdbput(ndb->rdb, *kstr, dt);
+	}
+	return ndb;
+}
+
+static void nqbwcx(char* kstr, void* vbuf, void* ud)
+{
+	void** dbs = (void**)ud;
+	NQBWDB* bwdb = (NQBWDB*)dbs[0];
+	NQBWDB* ndb = (NQBWDB*)dbs[1];
+	NQBWDBDATUM* dt = (NQBWDBDATUM*)nqrdbget(bwdb->rdb, kstr);
+	if (dt != 0)
+		nqrdbput(ndb->rdb, kstr, dt);
+}
+
+NQBWDB* nqbwdbjoin(NQBWDB* bwdb, NQRDB* rdb)
+{
+	NQBWDB* ndb = (NQBWDB*)frl_slab_palloc(db_pool);
+	ndb->rdb = nqrdbnew();
+	ndb->shadow = true;
+	ndb->emax = bwdb->emax;
+	ndb->wnum = bwdb->wnum;
+	ndb->inum = bwdb->inum;
+	ndb->unum = bwdb->unum;
+	ndb->idx = bwdb->idx;
+	ndb->unidx = bwdb->unidx;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_create(&ndb->rwidxlock, mtx_pool);
+	apr_thread_rwlock_create(&ndb->rwunidxlock, mtx_pool);
+#endif
+	void* dbs[] = {bwdb, ndb};
+	nqrdbforeach(rdb, nqbwcx, dbs);
+	return ndb;
 }
 
 CvMat* nqbweplr(CvMat* data, int e, int emax)
@@ -803,11 +859,14 @@ static void nqbwnuk(char* kstr, void* vbuf, void* ud)
 
 void nqbwdbdel(NQBWDB* bwdb)
 {
-	nqrdbforeach(bwdb->rdb, nqbwnuk, 0);
-	nqbwunidxclr(bwdb);
-	nqbwidxclr(bwdb);
-	frl_slab_pfree(bwdb->unidx);
-	frl_slab_pfree(bwdb->idx);
+	if (!bwdb->shadow)
+	{
+		nqrdbforeach(bwdb->rdb, nqbwnuk, 0);
+		nqbwunidxclr(bwdb);
+		nqbwidxclr(bwdb);
+		frl_slab_pfree(bwdb->unidx);
+		frl_slab_pfree(bwdb->idx);
+	}
 #if APR_HAS_THREADS
 	apr_thread_rwlock_destroy(bwdb->rwidxlock);
 	apr_thread_rwlock_destroy(bwdb->rwunidxlock);

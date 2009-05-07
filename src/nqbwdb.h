@@ -45,6 +45,7 @@ typedef struct NQBWDBUNIDX {
 
 typedef struct {
 	NQRDB* rdb;
+	bool shadow;
 	uint32_t emax;
 	uint32_t wnum;
 	uint32_t inum;
@@ -58,6 +59,8 @@ typedef struct {
 } NQBWDB;
 
 NQBWDB* nqbwdbnew(void);
+NQBWDB* nqbwdbjoin(NQBWDB* bwdb, char** kstr, int len);
+NQBWDB* nqbwdbjoin(NQBWDB* bwdb, NQRDB* rdb);
 CvMat* nqbweplr(CvMat* data, int e = 5, int emax = 50);
 bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm);
 CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);

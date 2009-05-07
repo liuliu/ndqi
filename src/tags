@@ -163,6 +163,7 @@ __anon10::inum	nqfdb.h	/^	uint32_t inum;$/;"	m	struct:__anon10	access:public
 __anon10::rdb	nqfdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon10	access:public
 __anon10::rwidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwidxlock;$/;"	m	struct:__anon10	access:public
 __anon10::rwunidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon10	access:public
+__anon10::shadow	nqfdb.h	/^	bool shadow;$/;"	m	struct:__anon10	access:public
 __anon10::unidx	nqfdb.h	/^	NQFDBUNIDX* unidx;$/;"	m	struct:__anon10	access:public
 __anon10::unum	nqfdb.h	/^	uint32_t unum;$/;"	m	struct:__anon10	access:public
 __anon11::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon11	access:public
@@ -190,6 +191,7 @@ __anon6::inum	nqbwdb.h	/^	uint32_t inum;$/;"	m	struct:__anon6	access:public
 __anon6::rdb	nqbwdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon6	access:public
 __anon6::rwidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwidxlock;$/;"	m	struct:__anon6	access:public
 __anon6::rwunidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon6	access:public
+__anon6::shadow	nqbwdb.h	/^	bool shadow;$/;"	m	struct:__anon6	access:public
 __anon6::unidx	nqbwdb.h	/^	NQBWDBUNIDX* unidx;$/;"	m	struct:__anon6	access:public
 __anon6::unum	nqbwdb.h	/^	uint32_t unum;$/;"	m	struct:__anon6	access:public
 __anon6::wnum	nqbwdb.h	/^	uint32_t wnum;$/;"	m	struct:__anon6	access:public
@@ -379,6 +381,10 @@ nqbwdbget	nqbwdb.c	/^CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr)$/;"	f	signature:
 nqbwdbget	nqbwdb.h	/^CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);$/;"	p	signature:(NQBWDB* bwdb, char* kstr)
 nqbwdbidx	nqbwdb.c	/^bool nqbwdbidx(NQBWDB* bwdb, int min, double match)$/;"	f	signature:(NQBWDB* bwdb, int min, double match)
 nqbwdbidx	nqbwdb.h	/^bool nqbwdbidx(NQBWDB* bwdb, int min = 1, double match = 0.6);$/;"	p	signature:(NQBWDB* bwdb, int min = 1, double match = 0.6)
+nqbwdbjoin	nqbwdb.c	/^NQBWDB* nqbwdbjoin(NQBWDB* bwdb, NQRDB* rdb)$/;"	f	signature:(NQBWDB* bwdb, NQRDB* rdb)
+nqbwdbjoin	nqbwdb.c	/^NQBWDB* nqbwdbjoin(NQBWDB* bwdb, char** kstr, int len)$/;"	f	signature:(NQBWDB* bwdb, char** kstr, int len)
+nqbwdbjoin	nqbwdb.h	/^NQBWDB* nqbwdbjoin(NQBWDB* bwdb, NQRDB* rdb);$/;"	p	signature:(NQBWDB* bwdb, NQRDB* rdb)
+nqbwdbjoin	nqbwdb.h	/^NQBWDB* nqbwdbjoin(NQBWDB* bwdb, char** kstr, int len);$/;"	p	signature:(NQBWDB* bwdb, char** kstr, int len)
 nqbwdblike	nqbwdb.c	/^int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)$/;"	f	signature:(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)
 nqbwdblike	nqbwdb.h	/^int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = false, float* likeness = 0)
 nqbwdbmgidx	nqbwdb.c	/^bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min, double match)$/;"	f	signature:(NQBWDB* bwdb, int max, int min, double match)
@@ -414,7 +420,7 @@ nqfdbdel	nqfdb.h	/^void nqfdbdel(NQFDB* fdb);$/;"	p	signature:(NQFDB* fdb)
 nqfdbget	nqfdb.c	/^CvMat* nqfdbget(NQFDB* fdb, char* kstr)$/;"	f	signature:(NQFDB* fdb, char* kstr)
 nqfdbget	nqfdb.h	/^CvMat* nqfdbget(NQFDB* fdb, char* kstr);$/;"	p	signature:(NQFDB* fdb, char* kstr)
 nqfdbidx	nqfdb.c	/^bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)$/;"	f	signature:(NQFDB* fdb, int naive, double rho, double tau)
-nqfdbidx	nqfdb.h	/^bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2)
+nqfdbidx	nqfdb.h	/^bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2)
 nqfdblike	nqfdb.c	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)
 nqfdblike	nqfdb.h	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 nqfdbnew	nqfdb.c	/^NQFDB* nqfdbnew(void)$/;"	f	signature:(void)
@@ -424,7 +430,7 @@ nqfdbout	nqfdb.h	/^bool nqfdbout(NQFDB* fdb, char* kstr);$/;"	p	signature:(NQFDB
 nqfdbput	nqfdb.c	/^bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm)$/;"	f	signature:(NQFDB* fdb, char* kstr, CvMat* fm)
 nqfdbput	nqfdb.h	/^bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm);$/;"	p	signature:(NQFDB* fdb, char* kstr, CvMat* fm)
 nqfdbreidx	nqfdb.c	/^bool nqfdbreidx(NQFDB* fdb, int naive, double rho, double tau)$/;"	f	signature:(NQFDB* fdb, int naive, double rho, double tau)
-nqfdbreidx	nqfdb.h	/^bool nqfdbreidx(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2)
+nqfdbreidx	nqfdb.h	/^bool nqfdbreidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2)
 nqfdbsearch	nqfdb.c	/^int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)
 nqfdbsearch	nqfdb.h	/^int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 nqffwm	nqfdb.c	/^static void nqffwm(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
@@ -453,7 +459,9 @@ nqrdbnew	nqrdb.h	/^NQRDB* nqrdbnew(void);$/;"	p	signature:(void)
 nqrdbout	nqrdb.c	/^bool nqrdbout(NQRDB* rdb, char* kstr)$/;"	f	signature:(NQRDB* rdb, char* kstr)
 nqrdbout	nqrdb.h	/^bool nqrdbout(NQRDB* rdb, char* kstr);$/;"	p	signature:(NQRDB* rdb, char* kstr)
 nqrdbput	nqrdb.c	/^bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)$/;"	f	signature:(NQRDB* rdb, char* kstr, void* vbuf)
+nqrdbput	nqrdb.c	/^int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len)$/;"	f	signature:(NQRDB* rdb, char** kstr, void** vbuf, int len)
 nqrdbput	nqrdb.h	/^bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf);$/;"	p	signature:(NQRDB* rdb, char* kstr, void* vbuf)
+nqrdbput	nqrdb.h	/^int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len);$/;"	p	signature:(NQRDB* rdb, char** kstr, void** vbuf, int len)
 operator !=	lib/frl_util_md5.h	/^inline bool operator!=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator <	lib/frl_util_md5.h	/^inline bool operator<(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator <=	lib/frl_util_md5.h	/^inline bool operator<=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
@@ -494,6 +502,8 @@ rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon11	access:publ
 rwunidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon6	access:public
 rwunidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon10	access:public
 scale	lib/cvgist.h	/^	int scale;$/;"	m	struct:CvGaborFilter	access:public
+shadow	nqbwdb.h	/^	bool shadow;$/;"	m	struct:__anon6	access:public
+shadow	nqfdb.h	/^	bool shadow;$/;"	m	struct:__anon10	access:public
 siz	nqbwdb.c	/^	uint32_t siz;$/;"	m	struct:__anon3	file:	access:public
 siz	nqfdb.c	/^	uint32_t siz;$/;"	m	struct:__anon8	file:	access:public
 size	lib/cvgist.h	/^	int size;$/;"	m	struct:CvGaborFilter	access:public

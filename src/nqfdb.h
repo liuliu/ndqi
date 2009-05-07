@@ -33,6 +33,7 @@ typedef struct NQFDBUNIDX {
 
 typedef struct {
 	NQRDB* rdb;
+	bool shadow;
 	uint32_t inum;
 	uint32_t unum;
 	NQFDBIDX* idx;
@@ -44,6 +45,8 @@ typedef struct {
 } NQFDB;
 
 NQFDB* nqfdbnew(void);
+NQFDB* nqfdbjoin(NQFDB* fdb, char** kstr, int len);
+NQFDB* nqfdbjoin(NQFDB* fdb, NQRDB* rdb);
 bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm);
 CvMat* nqfdbget(NQFDB* fdb, char* kstr);
 int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);
