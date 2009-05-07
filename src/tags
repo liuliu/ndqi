@@ -153,6 +153,7 @@ SIZEOF_POINTER	lib/frl_base.h	/^const apr_uint32_t SIZEOF_POINTER = sizeof(void*
 _GUARD_NQBWDB_	nqbwdb.h	7;"	d
 _GUARD_NQDP_	nqdp.h	7;"	d
 _GUARD_NQFDB_	nqfdb.h	7;"	d
+_GUARD_NQGS_	nqgs.h	7;"	d
 _GUARD_NQIR_	nqir.h	7;"	d
 _GUARD_NQLH_	nqlh.h	7;"	d
 _GUARD_NQRDB_	nqrdb.h	7;"	d
@@ -169,6 +170,7 @@ __anon11::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon11	access:public
 __anon11::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon11	access:public
 __anon2::kstr	nqbwdb.c	/^	char* kstr;$/;"	m	struct:__anon2	file:	access:public
 __anon2::likeness	nqbwdb.c	/^	float likeness;$/;"	m	struct:__anon2	file:	access:public
+__anon3::bwdb	nqbwdb.c	/^	NQBWDB* bwdb;$/;"	m	struct:__anon3	file:	access:public
 __anon3::bwm	nqbwdb.c	/^	CvMat* bwm;$/;"	m	struct:__anon3	file:	access:public
 __anon3::data	nqbwdb.c	/^	NQBWPAIR data[0];$/;"	m	struct:__anon3	file:	access:public
 __anon3::dist	nqbwdb.c	/^	CvMat* dist;$/;"	m	struct:__anon3	file:	access:public
@@ -212,6 +214,7 @@ block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_mem_t	acc
 block	lib/frl_slab_pool.h	/^	frl_slab_block_t* block;$/;"	m	struct:frl_slab_pool_t	access:public
 block_size	lib/frl_slab_pool.h	/^	apr_uint32_t block_size;$/;"	m	struct:frl_mem_stat_t	access:public
 bw	nqbwdb.h	/^	CvMat* bw;$/;"	m	struct:__anon5	access:public
+bwdb	nqbwdb.c	/^	NQBWDB* bwdb;$/;"	m	struct:__anon3	file:	access:public
 bwft	nqbwdb.h	/^	CvFeatureTree* bwft;$/;"	m	struct:__anon5	access:public
 bwm	nqbwdb.c	/^	CvMat* bwm;$/;"	m	struct:__anon3	file:	access:public
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_mem_stat_t	access:public
@@ -305,6 +308,7 @@ frl_slab_pool_t::mutex	lib/frl_slab_pool.h	/^	apr_thread_mutex_t* mutex;$/;"	m	s
 frl_slab_pool_t::per_size	lib/frl_slab_pool.h	/^	apr_uint32_t per_size;$/;"	m	struct:frl_slab_pool_t	access:public
 frl_thread_model_u	lib/frl_base.h	/^enum frl_thread_model_u$/;"	g
 ft	nqfdb.h	/^	CvFeatureTree* ft;$/;"	m	struct:NQFDBIDX	access:public
+gabors	nqgs.c	/^static CvGaborFilter* gabors = cvCreateGaborFilters(6, 4, 48);$/;"	v	file:
 hash	lib/frl_util_md5.cpp	/^int frl_md5::hash(const void* s, const apr_size_t size)$/;"	f	class:frl_md5	signature:(const void* s, const apr_size_t size)
 hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	p	class:frl_md5	access:public	signature:(const void* s, const apr_size_t size)
 head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon11	access:public
@@ -343,8 +347,10 @@ likeness	nqfdb.c	/^	float likeness;$/;"	m	struct:__anon7	file:	access:public
 lock	lib/frl_slab_pool.h	/^	frl_lock_u lock;$/;"	m	struct:frl_slab_pool_t	access:public
 main	test/dpdb_test.cpp	/^int main()$/;"	f	signature:()
 main	test/eplr_test.cpp	/^int main()$/;"	f	signature:()
+main	test/gs_test.cpp	/^int main()$/;"	f	signature:()
 main	test/idx_test.cpp	/^int main()$/;"	f	signature:()
 main	test/irdb_test.cpp	/^int main()$/;"	f	signature:()
+main	test/lh_test.cpp	/^int main()$/;"	f	signature:()
 main	test/rdb_test.cpp	/^int main()$/;"	f	signature:()
 match	nqbwdb.c	/^	double match;$/;"	m	struct:__anon3	file:	access:public
 match	nqbwdb.h	/^	double match;$/;"	m	struct:NQBWDBIDX	access:public
@@ -352,8 +358,10 @@ max	nqrdb.h	/^	uint32_t max;$/;"	m	struct:NQRDBDATUM	access:public
 max_capacity	lib/frl_slab_pool.h	/^	apr_uint32_t max_capacity;$/;"	m	struct:frl_slab_pool_t	access:public
 maxiteration	lib/mlapcluster.h	/^	int maxiteration;$/;"	m	struct:CvAPCParams	access:public
 mempool	test/dpdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
+mempool	test/gs_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/idx_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/irdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
+mempool	test/lh_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/rdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mtx_pool	nqbwdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mtx_pool	nqfdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
@@ -373,6 +381,8 @@ nqbwdbidx	nqbwdb.c	/^bool nqbwdbidx(NQBWDB* bwdb, int min, double match)$/;"	f	s
 nqbwdbidx	nqbwdb.h	/^bool nqbwdbidx(NQBWDB* bwdb, int min = 1, double match = 0.6);$/;"	p	signature:(NQBWDB* bwdb, int min = 1, double match = 0.6)
 nqbwdblike	nqbwdb.c	/^int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)$/;"	f	signature:(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double match, bool ordered, float* likeness)
 nqbwdblike	nqbwdb.h	/^int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = false, float* likeness = 0)
+nqbwdbmgidx	nqbwdb.c	/^bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min, double match)$/;"	f	signature:(NQBWDB* bwdb, int max, int min, double match)
+nqbwdbmgidx	nqbwdb.h	/^bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min = 1, double match = 0.6);$/;"	p	signature:(NQBWDB* bwdb, int max, int min = 1, double match = 0.6)
 nqbwdbnew	nqbwdb.c	/^NQBWDB* nqbwdbnew(void)$/;"	f	signature:(void)
 nqbwdbnew	nqbwdb.h	/^NQBWDB* nqbwdbnew(void);$/;"	p	signature:(void)
 nqbwdbout	nqbwdb.c	/^bool nqbwdbout(NQBWDB* bwdb, char* kstr)$/;"	f	signature:(NQBWDB* bwdb, char* kstr)
@@ -403,9 +413,9 @@ nqfdbdel	nqfdb.c	/^void nqfdbdel(NQFDB* fdb)$/;"	f	signature:(NQFDB* fdb)
 nqfdbdel	nqfdb.h	/^void nqfdbdel(NQFDB* fdb);$/;"	p	signature:(NQFDB* fdb)
 nqfdbget	nqfdb.c	/^CvMat* nqfdbget(NQFDB* fdb, char* kstr)$/;"	f	signature:(NQFDB* fdb, char* kstr)
 nqfdbget	nqfdb.h	/^CvMat* nqfdbget(NQFDB* fdb, char* kstr);$/;"	p	signature:(NQFDB* fdb, char* kstr)
-nqfdbidx	nqfdb.c	/^bool nqfdbidx(NQFDB* fdb)$/;"	f	signature:(NQFDB* fdb)
-nqfdbidx	nqfdb.h	/^bool nqfdbidx(NQFDB* fdb);$/;"	p	signature:(NQFDB* fdb)
-nqfdblike	nqfdb.c	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
+nqfdbidx	nqfdb.c	/^bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)$/;"	f	signature:(NQFDB* fdb, int naive, double rho, double tau)
+nqfdbidx	nqfdb.h	/^bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2)
+nqfdblike	nqfdb.c	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)
 nqfdblike	nqfdb.h	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 nqfdbnew	nqfdb.c	/^NQFDB* nqfdbnew(void)$/;"	f	signature:(void)
 nqfdbnew	nqfdb.h	/^NQFDB* nqfdbnew(void);$/;"	p	signature:(void)
@@ -413,9 +423,9 @@ nqfdbout	nqfdb.c	/^bool nqfdbout(NQFDB* fdb, char* kstr)$/;"	f	signature:(NQFDB*
 nqfdbout	nqfdb.h	/^bool nqfdbout(NQFDB* fdb, char* kstr);$/;"	p	signature:(NQFDB* fdb, char* kstr)
 nqfdbput	nqfdb.c	/^bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm)$/;"	f	signature:(NQFDB* fdb, char* kstr, CvMat* fm)
 nqfdbput	nqfdb.h	/^bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm);$/;"	p	signature:(NQFDB* fdb, char* kstr, CvMat* fm)
-nqfdbreidx	nqfdb.c	/^bool nqfdbreidx(NQFDB* fdb)$/;"	f	signature:(NQFDB* fdb)
-nqfdbreidx	nqfdb.h	/^bool nqfdbreidx(NQFDB* fdb);$/;"	p	signature:(NQFDB* fdb)
-nqfdbsearch	nqfdb.c	/^int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
+nqfdbreidx	nqfdb.c	/^bool nqfdbreidx(NQFDB* fdb, int naive, double rho, double tau)$/;"	f	signature:(NQFDB* fdb, int naive, double rho, double tau)
+nqfdbreidx	nqfdb.h	/^bool nqfdbreidx(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.7, double tau = 0.2)
+nqfdbsearch	nqfdb.c	/^int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)
 nqfdbsearch	nqfdb.h	/^int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 nqffwm	nqfdb.c	/^static void nqffwm(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqfhpf	nqfdb.c	/^static void nqfhpf(NQFPAIR* pr, uint32_t i, uint32_t siz)$/;"	f	file:	signature:(NQFPAIR* pr, uint32_t i, uint32_t siz)
@@ -423,10 +433,12 @@ nqfidxclr	nqfdb.c	/^static void nqfidxclr(NQFDB* fdb)$/;"	f	file:	signature:(NQF
 nqfnuk	nqfdb.c	/^static void nqfnuk(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqfrefr	nqfdb.c	/^static void nqfrefr(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqfunidxclr	nqfdb.c	/^static void nqfunidxclr(NQFDB* fdb)$/;"	f	file:	signature:(NQFDB* fdb)
+nqgsnew	nqgs.c	/^CvMat* nqgsnew(CvArr* image, int n)$/;"	f	signature:(CvArr* image, int n)
+nqgsnew	nqgs.h	/^CvMat* nqgsnew(CvArr* image, int n);$/;"	p	signature:(CvArr* image, int n)
 nqirnew	nqir.c	/^CvMat* nqirnew(CvArr* image, CvMSERParams params)$/;"	f	signature:(CvArr* image, CvMSERParams params)
 nqirnew	nqir.h	/^CvMat* nqirnew(CvArr* image, CvMSERParams params);$/;"	p	signature:(CvArr* image, CvMSERParams params)
-nqlhnew	nqlh.c	/^CvMat* nqlhnew(CvArr* image)$/;"	f	signature:(CvArr* image)
-nqlhnew	nqlh.h	/^CvMat* nqlhnew(CvArr* image);$/;"	p	signature:(CvArr* image)
+nqlhnew	nqlh.c	/^CvMat* nqlhnew(CvArr* image, int bins)$/;"	f	signature:(CvArr* image, int bins)
+nqlhnew	nqlh.h	/^CvMat* nqlhnew(CvArr* image, int bins);$/;"	p	signature:(CvArr* image, int bins)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb)$/;"	f	file:	signature:(NQRDB* rdb)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb);$/;"	p	file:	signature:(NQRDB* rdb)
 nqrdbdel	nqrdb.c	/^void nqrdbdel(NQRDB* rdb)$/;"	f	signature:(NQRDB* rdb)

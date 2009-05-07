@@ -158,6 +158,7 @@ typedef struct {
 	uint32_t siz;
 	uint32_t emax;
 	double match;
+	NQBWDB* bwdb;
 	CvMat* bwm;
 	CvMat* idx;
 	CvMat* dist;
@@ -236,6 +237,7 @@ int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double 
 {
 	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA) + lmt * sizeof(NQBWPAIR));
 	memset(ud, 0, sizeof(NQBWUSERDATA) + lmt * sizeof(NQBWPAIR));
+	ud->bwdb = bwdb;
 	ud->emax = bwdb->emax;
 	ud->match = match;
 	ud->siz = lmt;
@@ -306,13 +308,16 @@ int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode, double 
 static void nqbwsort(char* kstr, void* vbuf, void* ud)
 {
 	NQBWUSERDATA* nqud = (NQBWUSERDATA*)ud;
-	float likeness;
-	memcpy(&likeness, &vbuf, sizeof(float));
-	if (likeness > nqud->data->likeness)
+	if (nqrdbget(nqud->bwdb->rdb, kstr) != 0)
 	{
-		nqud->data->likeness = likeness;
-		nqud->data->kstr = kstr;
-		nqbwhpf(nqud->data, 0, nqud->siz);
+		float likeness;
+		memcpy(&likeness, &vbuf, sizeof(float));
+		if (likeness > nqud->data->likeness)
+		{
+			nqud->data->likeness = likeness;
+			nqud->data->kstr = kstr;
+			nqbwhpf(nqud->data, 0, nqud->siz);
+		}
 	}
 }
 
@@ -420,6 +425,7 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 	cvReleaseMat(&dist);
 	NQBWUSERDATA* ud = (NQBWUSERDATA*)malloc(sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
 	memset(ud, 0, sizeof(NQBWUSERDATA)+lmt*sizeof(NQBWPAIR));
+	ud->bwdb = bwdb;
 	ud->siz = lmt;
 	ud->data->likeness = 0;
 	nqrdbforeach(tdb, nqbwsort, ud);
@@ -689,6 +695,70 @@ static void nqbwidxclr(NQBWDB* bwdb)
 	}
 	bwdb->inum = 0;
 	bwdb->idx->prev = bwdb->idx->next = bwdb->idx;
+}
+
+bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min, double match)
+{
+	bool mg, emg = false;
+	do {
+		mg = false;
+		if (bwdb->unum >= max)
+			nqbwdbidx(bwdb, min, match);
+#if APR_HAS_THREADS
+		apr_thread_rwlock_wrlock(bwdb->rwidxlock);
+#endif
+		NQBWDBIDX* idx = bwdb->idx->next;
+		while (idx != bwdb->idx)
+		{
+			NQBWDBIDX* next = idx->next;
+			if (idx->inum < max)
+			{
+				idx->prev->next = idx->next;
+				idx->next->prev = idx->prev;
+#if APR_HAS_THREADS
+				apr_thread_rwlock_wrlock(bwdb->rwunidxlock);
+#endif
+				int i, k = 0;
+				char** kstr = idx->kstr;
+				for (i = 0; i < idx->inum; i++, kstr++)
+				{
+					NQBWDBDATUM* datum = (NQBWDBDATUM*)nqrdbget(bwdb->rdb, *kstr);
+					if (datum != 0)
+					{
+						NQBWDBUNIDX* unidx = (NQBWDBUNIDX*)frl_slab_palloc(unidx_pool);
+						unidx->kstr = *kstr;
+						unidx->datum = datum;
+						unidx->prev = bwdb->unidx->prev;
+						unidx->next = bwdb->unidx;
+						bwdb->unidx->prev->next = unidx;
+						bwdb->unidx->prev = unidx;
+						k++;
+					}
+				}
+				bwdb->unum += k;
+#if APR_HAS_THREADS
+				apr_thread_rwlock_unlock(bwdb->rwunidxlock);
+#endif
+				bwdb->inum -= idx->inum;
+				NQBWDBSTEM* stem = idx->stem;
+				for (i = 0; i < idx->rnum; i++, stem++)
+					free(stem->kstr);
+				free(idx->stem);
+				free(idx->kstr);
+				cvReleaseMat(&idx->smmat);
+				cvReleaseFeatureTree(idx->smft);
+				frl_slab_pfree(idx);
+				emg = mg = true;
+			}
+			if (bwdb->unum > max)
+				break;
+			idx = next;
+		}
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(bwdb->rwidxlock);
+#endif
+	} while (mg);
+	return emg;
 }
 
 bool nqbwdbreidx(NQBWDB* bwdb, int min, double match)

@@ -64,6 +64,7 @@ CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr);
 int nqbwdblike(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, int mode = NQBW_LIKE_BEST_MATCH_COUNT, double match = 0.6, bool ordered = false, float* likeness = 0);
 int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);
 bool nqbwdbidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
+bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min = 1, double match = 0.6);
 bool nqbwdbreidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
 bool nqbwdbout(NQBWDB* bwdb, char* kstr);
 void nqbwdbdel(NQBWDB* bwdb);

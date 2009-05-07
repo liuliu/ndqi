@@ -59,11 +59,11 @@ int main()
 				if (dpe != NULL)
 				{
 					nqbwdbput(bwdb, entry->d_name, dpe);
-					if (entry->d_name[5] == '7' && entry->d_name[6] == '8' && entry->d_name[7] == '6')
+					if (entry->d_name[5] == '7' && entry->d_name[6] == '6' && entry->d_name[7] == '9')
 						memcpy(todel, entry->d_name, 32);
 					printf("file: %s loaded\n", entry->d_name);
 					i++;
-					if (i % 50 == 0)
+					if (i % 5 == 0)
 					{
 						printf("start indexing...\n");
 						nqbwdbidx(bwdb);
@@ -73,7 +73,8 @@ int main()
 		}
 	}
 
-	//nqbwdbreidx(bwdb, 2);
+	nqbwdbmgidx(bwdb, 15);
+	nqbwdbidx(bwdb);
 
 	IplImage* timage = cvLoadImage("../dpdb.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	IplImage* tsmall = cvCreateImage(cvSize(640, 480), 8, 1);
