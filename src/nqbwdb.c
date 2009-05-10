@@ -415,24 +415,20 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 					kstr = stem->kstr;
 					for (j = 0; j < stem->rnum; j++, kstr++)
 					{
-						void* void_cast = nqrdbget(tdb, *kstr);
-						float float_cast;
-						memcpy(&float_cast, &void_cast, sizeof(float));
-						float_cast -= stem->idf;
-						memcpy(&void_cast, &float_cast, sizeof(float));
-						nqrdbput(tdb, *kstr, void_cast);
+						union { float fl; void* ptr; } it;
+						it.ptr = nqrdbget(tdb, *kstr);
+						it.fl -= stem->idf;
+						nqrdbput(tdb, *kstr, it.ptr);
 					}
 				}
 				stem = idx_x->stem + *iptr;
 				kstr = stem->kstr;
 				for (j = 0; j < stem->rnum; j++, kstr++)
 				{
-					void* void_cast = nqrdbget(tdb, *kstr);
-					float float_cast;
-					memcpy(&float_cast, &void_cast, sizeof(float));
-					float_cast += stem->idf;
-					memcpy(&void_cast, &float_cast, sizeof(float));
-					nqrdbput(tdb, *kstr, void_cast);
+					union { float fl; void* ptr; } it;
+					it.ptr = nqrdbget(tdb, *kstr);
+					it.fl += stem->idf;
+					nqrdbput(tdb, *kstr, it.ptr);
 				}
 				*odptr = *dptr;
 				*sptr = stem;
