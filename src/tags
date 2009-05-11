@@ -10,6 +10,7 @@ APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_create
 APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_destroy(frl_slab_pool_t* pool)$/;"	f
 APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(apr_status_t) frl_slab_pool_safe(frl_slab_pool_t* pool)$/;"	f
 APR_DECLARE	lib/frl_slab_pool.c	/^APR_DECLARE(frl_mem_stat_t) frl_slab_pool_stat(frl_slab_pool_t* pool)$/;"	f
+BEGIN	parser/lex.yy.c	125;"	d	file:
 COMPFLAG	test/makefile	/^COMPFLAG=-O3$/;"	m
 CV_TYPE_NAME_ML_APCLUSTER	lib/mlapcluster.h	6;"	d
 CXXFLAGS	test/makefile	/^CXXFLAGS=-I"\/opt\/apr\/include" -I"\/opt\/apr-util\/include" -I"$(OPENCV)\/include\/opencv"$/;"	m
@@ -50,6 +51,13 @@ CvSparseNode2D::i	lib/mlapcluster.cpp	/^	int i;$/;"	m	struct:CvSparseNode2D	file
 CvSparseNode2D::k	lib/mlapcluster.cpp	/^	int k;$/;"	m	struct:CvSparseNode2D	file:	access:public
 CvSparseNode2D::val	lib/mlapcluster.cpp	/^	double val;$/;"	m	struct:CvSparseNode2D	file:	access:public
 DCAS_BUSY_VAL	lib/frl_slab_pool.c	54;"	d	file:
+ECHO	parser/lex.yy.c	558;"	d	file:
+EOB_ACT_CONTINUE_SCAN	parser/lex.yy.c	168;"	d	file:
+EOB_ACT_END_OF_FILE	parser/lex.yy.c	169;"	d	file:
+EOB_ACT_LAST_MATCH	parser/lex.yy.c	170;"	d	file:
+FLEXINT_H	parser/lex.yy.c	29;"	d	file:
+FLEX_BETA	parser/lex.yy.c	13;"	d	file:
+FLEX_SCANNER	parser/lex.yy.c	8;"	d	file:
 FRL_INSERT_AFTER	lib/frl_base.h	/^	FRL_INSERT_AFTER$/;"	e	enum:frl_insert_u
 FRL_INSERT_BEFORE	lib/frl_base.h	/^	FRL_INSERT_BEFORE,$/;"	e	enum:frl_insert_u
 FRL_LEVEL_ERROR	lib/frl_base.h	/^	FRL_LEVEL_ERROR,$/;"	e	enum:frl_level_u
@@ -81,6 +89,13 @@ GUARD_frl_base_h	lib/frl_base.h	2;"	d
 GUARD_frl_slab_pool_h	lib/frl_slab_pool.h	8;"	d
 GUARD_frl_util_md5_h	lib/frl_util_md5.h	2;"	d
 GUARD_mlapcluster_h	lib/mlapcluster.h	2;"	d
+INITIAL	parser/lex.yy.c	466;"	d	file:
+INT16_MAX	parser/lex.yy.c	71;"	d	file:
+INT16_MIN	parser/lex.yy.c	62;"	d	file:
+INT32_MAX	parser/lex.yy.c	74;"	d	file:
+INT32_MIN	parser/lex.yy.c	65;"	d	file:
+INT8_MAX	parser/lex.yy.c	68;"	d	file:
+INT8_MIN	parser/lex.yy.c	59;"	d	file:
 LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui$/;"	m
 LINKLIB	test/makefile	/^LINKLIB=-L"$(OPENCV)\/lib"$/;"	m
 NQBWDB	nqbwdb.h	/^} NQBWDB;$/;"	t	typeref:struct:__anon6
@@ -107,6 +122,9 @@ NQBWPAIR	nqbwdb.c	/^} NQBWPAIR;$/;"	t	typeref:struct:__anon2	file:
 NQBWUSERDATA	nqbwdb.c	/^} NQBWUSERDATA;$/;"	t	typeref:struct:__anon3	file:
 NQBW_LIKE_BEST_MATCH_COUNT	nqbwdb.h	12;"	d
 NQBW_LIKE_BEST_MATCH_SCORE	nqbwdb.h	13;"	d
+NQCOND	nqqry.h	/^} NQCOND;$/;"	t	typeref:struct:__anon12
+NQCTAND	nqqry.h	/^	NQCTAND,		\/* and conjunction *\/$/;"	e	enum:__anon16
+NQCTOR	nqqry.h	/^	NQCTOR			\/* or conjunction  *\/$/;"	e	enum:__anon16
 NQFDB	nqfdb.h	/^} NQFDB;$/;"	t	typeref:struct:__anon10
 NQFDBDATUM	nqfdb.h	/^} NQFDBDATUM;$/;"	t	typeref:struct:__anon9
 NQFDBIDX	nqfdb.h	/^typedef struct NQFDBIDX {$/;"	s
@@ -128,6 +146,15 @@ NQFDBUNIDX::prev	nqfdb.h	/^	struct NQFDBUNIDX* prev;$/;"	m	struct:NQFDBUNIDX	typ
 NQFOREACH	nqutil.h	/^typedef void (*NQFOREACH) (char*, void*, void*);$/;"	t
 NQFPAIR	nqfdb.c	/^} NQFPAIR;$/;"	t	typeref:struct:__anon7	file:
 NQFUSERDATA	nqfdb.c	/^} NQFUSERDATA;$/;"	t	typeref:struct:__anon8	file:
+NQOPELIKE	nqqry.h	/^	NQOPELIKE		\/* object is exact like (exhausted search) *\/$/;"	e	enum:__anon17
+NQOPLIKE	nqqry.h	/^	NQOPLIKE,		\/* object is like (index search)           *\/$/;"	e	enum:__anon17
+NQOPNUMEQ	nqqry.h	/^	NQOPNUMEQ,		\/* number is equal to                      *\/$/;"	e	enum:__anon17
+NQOPNUMGE	nqqry.h	/^	NQOPNUMGE,		\/* number is greater than or equal to      *\/$/;"	e	enum:__anon17
+NQOPNUMGT	nqqry.h	/^	NQOPNUMGT,		\/* number is greater than                  *\/$/;"	e	enum:__anon17
+NQOPNUMLE	nqqry.h	/^	NQOPNUMLE,		\/* number is less than or equal to         *\/$/;"	e	enum:__anon17
+NQOPNUMLT	nqqry.h	/^	NQOPNUMLT,		\/* number is less than                     *\/$/;"	e	enum:__anon17
+NQOPSTREQ	nqqry.h	/^	NQOPSTREQ,		\/* string is equal to                      *\/$/;"	e	enum:__anon17
+NQQRY	nqqry.h	/^} NQQRY;$/;"	t	typeref:struct:__anon14
 NQRDB	nqrdb.h	/^} NQRDB;$/;"	t	typeref:struct:__anon11
 NQRDBDATUM	nqrdb.h	/^typedef struct NQRDBDATUM {$/;"	s
 NQRDBDATUM	nqrdb.h	/^} NQRDBDATUM;$/;"	t	typeref:struct:NQRDBDATUM
@@ -140,8 +167,14 @@ NQRDBDATUM::pr	nqrdb.h	/^	NQRDBDATUM* pr;$/;"	m	struct:NQRDBDATUM	access:public
 NQRDBDATUM::prev	nqrdb.h	/^	NQRDBDATUM* prev;$/;"	m	struct:NQRDBDATUM	access:public
 NQRDBDATUM::rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
 NQRDBDATUM::vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:NQRDBDATUM	access:public
+NQSPHINX	nqqry.h	/^	NQSPHINX		\/* sphinx full-text search *\/$/;"	e	enum:__anon15
+NQTBWDB	nqqry.h	/^	NQTBWDB,		\/* bwdb type               *\/$/;"	e	enum:__anon15
+NQTFDB	nqqry.h	/^	NQTFDB,			\/* fdb type                *\/$/;"	e	enum:__anon15
+NQTRDB	nqqry.h	/^	NQTRDB,			\/* rdb type                *\/$/;"	e	enum:__anon15
+NQTTCADB	nqqry.h	/^	NQTTCADB,		\/* tokyo-cabinet adb       *\/$/;"	e	enum:__anon15
 OPENCV	test/makefile	/^OPENCV=\/opt\/opencv$/;"	m
 OUTDIR	test/makefile	/^OUTDIR=..\/..\/build$/;"	m
+REJECT	parser/lex.yy.c	456;"	d	file:
 SIZEOF_APR_UINT32_T	lib/frl_base.h	/^const apr_uint32_t SIZEOF_APR_UINT32_T = sizeof(apr_uint32_t);$/;"	v
 SIZEOF_FRL_MD5	lib/frl_util_md5.h	/^const unsigned int SIZEOF_FRL_MD5 = sizeof(frl_md5);$/;"	v
 SIZEOF_FRL_MEM_SAFE_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_MEM_SAFE_T = sizeof(frl_mem_safe_t);$/;"	v
@@ -150,14 +183,66 @@ SIZEOF_FRL_MEM_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_MEM_T = siz
 SIZEOF_FRL_SLAB_BLOCK_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_SLAB_BLOCK_T = sizeof(frl_slab_block_t);$/;"	v
 SIZEOF_FRL_SLAB_POOL_T	lib/frl_slab_pool.h	/^const apr_uint32_t SIZEOF_FRL_SLAB_POOL_T = sizeof(frl_slab_pool_t);$/;"	v
 SIZEOF_POINTER	lib/frl_base.h	/^const apr_uint32_t SIZEOF_POINTER = sizeof(void*);$/;"	v
+UINT16_MAX	parser/lex.yy.c	80;"	d	file:
+UINT32_MAX	parser/lex.yy.c	83;"	d	file:
+UINT8_MAX	parser/lex.yy.c	77;"	d	file:
+YYSTATE	parser/lex.yy.c	132;"	d	file:
+YYTABLES_NAME	parser/lex.yy.c	1753;"	d	file:
+YY_AT_BOL	parser/lex.yy.c	339;"	d	file:
+YY_BREAK	parser/lex.yy.c	637;"	d	file:
+YY_BUFFER_EOF_PENDING	parser/lex.yy.c	255;"	d	file:
+YY_BUFFER_NEW	parser/lex.yy.c	243;"	d	file:
+YY_BUFFER_NORMAL	parser/lex.yy.c	244;"	d	file:
+YY_BUFFER_STATE	parser/lex.yy.c	/^typedef struct yy_buffer_state *YY_BUFFER_STATE;$/;"	t	typeref:struct:yy_buffer_state	file:
+YY_BUF_SIZE	parser/lex.yy.c	149;"	d	file:
+YY_BUF_SIZE	parser/lex.yy.c	151;"	d	file:
+YY_CHAR	parser/lex.yy.c	/^typedef unsigned char YY_CHAR;$/;"	t	file:
+YY_CURRENT_BUFFER	parser/lex.yy.c	271;"	d	file:
+YY_CURRENT_BUFFER_LVALUE	parser/lex.yy.c	278;"	d	file:
+YY_DECL	parser/lex.yy.c	625;"	d	file:
+YY_DECL_IS_OURS	parser/lex.yy.c	621;"	d	file:
+YY_DO_BEFORE_ACTION	parser/lex.yy.c	364;"	d	file:
+YY_END_OF_BUFFER	parser/lex.yy.c	372;"	d	file:
+YY_END_OF_BUFFER_CHAR	parser/lex.yy.c	140;"	d	file:
+YY_EXIT_FAILURE	parser/lex.yy.c	1551;"	d	file:
+YY_EXTRA_TYPE	parser/lex.yy.c	477;"	d	file:
+YY_FATAL_ERROR	parser/lex.yy.c	612;"	d	file:
+YY_FLEX_MAJOR_VERSION	parser/lex.yy.c	9;"	d	file:
+YY_FLEX_MINOR_VERSION	parser/lex.yy.c	10;"	d	file:
+YY_FLEX_SUBMINOR_VERSION	parser/lex.yy.c	11;"	d	file:
+YY_FLUSH_BUFFER	parser/lex.yy.c	307;"	d	file:
+YY_INPUT	parser/lex.yy.c	565;"	d	file:
+YY_INT_ALIGNED	parser/lex.yy.c	4;"	d	file:
+YY_LESS_LINENO	parser/lex.yy.c	172;"	d	file:
+YY_MORE_ADJ	parser/lex.yy.c	458;"	d	file:
+YY_NEW_FILE	parser/lex.yy.c	138;"	d	file:
+YY_NULL	parser/lex.yy.c	112;"	d	file:
+YY_NUM_RULES	parser/lex.yy.c	371;"	d	file:
+YY_READ_BUF_SIZE	parser/lex.yy.c	547;"	d	file:
+YY_READ_BUF_SIZE	parser/lex.yy.c	549;"	d	file:
+YY_RESTORE_YY_MORE_OFFSET	parser/lex.yy.c	459;"	d	file:
+YY_RULE_SETUP	parser/lex.yy.c	640;"	d	file:
+YY_SC_TO_UI	parser/lex.yy.c	119;"	d	file:
+YY_START	parser/lex.yy.c	131;"	d	file:
+YY_START_STACK_INCR	parser/lex.yy.c	607;"	d	file:
+YY_STATE_BUF_SIZE	parser/lex.yy.c	157;"	d	file:
+YY_STATE_EOF	parser/lex.yy.c	135;"	d	file:
+YY_STRUCT_YY_BUFFER_STATE	parser/lex.yy.c	196;"	d	file:
+YY_TYPEDEF_YY_BUFFER_STATE	parser/lex.yy.c	160;"	d	file:
+YY_TYPEDEF_YY_SIZE_T	parser/lex.yy.c	191;"	d	file:
+YY_USER_ACTION	parser/lex.yy.c	632;"	d	file:
+YY_USE_CONST	parser/lex.yy.c	100;"	d	file:
+YY_USE_CONST	parser/lex.yy.c	93;"	d	file:
 _GUARD_NQBWDB_	nqbwdb.h	7;"	d
 _GUARD_NQDP_	nqdp.h	7;"	d
 _GUARD_NQFDB_	nqfdb.h	7;"	d
 _GUARD_NQGS_	nqgs.h	7;"	d
 _GUARD_NQIR_	nqir.h	7;"	d
 _GUARD_NQLH_	nqlh.h	7;"	d
+_GUARD_NQQRY_	nqqry.h	7;"	d
 _GUARD_NQRDB_	nqrdb.h	7;"	d
 _GUARD_NQUTIL_	nqutil.h	2;"	d
+__STDC_LIMIT_MACROS	parser/lex.yy.c	39;"	d	file:
 __anon10::idx	nqfdb.h	/^	NQFDBIDX* idx;$/;"	m	struct:__anon10	access:public
 __anon10::inum	nqfdb.h	/^	uint32_t inum;$/;"	m	struct:__anon10	access:public
 __anon10::rdb	nqfdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon10	access:public
@@ -169,6 +254,23 @@ __anon10::unum	nqfdb.h	/^	uint32_t unum;$/;"	m	struct:__anon10	access:public
 __anon11::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon11	access:public
 __anon11::rnum	nqrdb.h	/^	uint64_t rnum;$/;"	m	struct:__anon11	access:public
 __anon11::rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon11	access:public
+__anon12::__anon13::desc	nqqry.h	/^		CvMat* desc;$/;"	m	union:__anon12::__anon13	access:public
+__anon12::__anon13::fl	nqqry.h	/^		float fl;$/;"	m	union:__anon12::__anon13	access:public
+__anon12::__anon13::i	nqqry.h	/^		int i;$/;"	m	union:__anon12::__anon13	access:public
+__anon12::__anon13::str	nqqry.h	/^		char* str;$/;"	m	union:__anon12::__anon13	access:public
+__anon12::cfd	nqqry.h	/^	float cfd;$/;"	m	struct:__anon12	access:public
+__anon12::column	nqqry.h	/^	void* column;$/;"	m	struct:__anon12	access:public
+__anon12::ext	nqqry.h	/^	int ext;$/;"	m	struct:__anon12	access:public
+__anon12::lmt	nqqry.h	/^	int lmt;$/;"	m	struct:__anon12	access:public
+__anon12::op	nqqry.h	/^	int op;$/;"	m	struct:__anon12	access:public
+__anon12::sbj	nqqry.h	/^	} sbj;$/;"	m	struct:__anon12	typeref:union:__anon12::__anon13	access:public
+__anon12::type	nqqry.h	/^	int type;$/;"	m	struct:__anon12	access:public
+__anon14::cnum	nqqry.h	/^	int cnum;$/;"	m	struct:__anon14	access:public
+__anon14::conds	nqqry.h	/^	NQCOND* conds;$/;"	m	struct:__anon14	access:public
+__anon14::ct	nqqry.h	/^	int ct;$/;"	m	struct:__anon14	access:public
+__anon14::lmt	nqqry.h	/^	int lmt;$/;"	m	struct:__anon14	access:public
+__anon14::ordered	nqqry.h	/^	int ordered;$/;"	m	struct:__anon14	access:public
+__anon14::result	nqqry.h	/^	NQRDB* result;$/;"	m	struct:__anon14	access:public
 __anon2::kstr	nqbwdb.c	/^	char* kstr;$/;"	m	struct:__anon2	file:	access:public
 __anon2::likeness	nqbwdb.c	/^	float likeness;$/;"	m	struct:__anon2	file:	access:public
 __anon3::bwdb	nqbwdb.c	/^	NQBWDB* bwdb;$/;"	m	struct:__anon3	file:	access:public
@@ -221,11 +323,16 @@ bwft	nqbwdb.h	/^	CvFeatureTree* bwft;$/;"	m	struct:__anon5	access:public
 bwm	nqbwdb.c	/^	CvMat* bwm;$/;"	m	struct:__anon3	file:	access:public
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_mem_stat_t	access:public
 capacity	lib/frl_slab_pool.h	/^	apr_uint32_t capacity;$/;"	m	struct:frl_slab_block_t	access:public
+cfd	nqqry.h	/^	float cfd;$/;"	m	struct:__anon12	access:public
 chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
 clear	lib/mlapcluster.cpp	/^CvAPCluster::clear()$/;"	f	class:CvAPCluster	signature:()
 clear	lib/mlapcluster.h	/^		virtual void clear();$/;"	p	class:CvAPCluster	access:public	signature:()
+cnum	nqqry.h	/^	int cnum;$/;"	m	struct:__anon14	access:public
+column	nqqry.h	/^	void* column;$/;"	m	struct:__anon12	access:public
+conds	nqqry.h	/^	NQCOND* conds;$/;"	m	struct:__anon14	access:public
 conv_img	lib/cvgist.h	/^	CvMat* conv_img;$/;"	m	struct:CvGaborFilter	access:public
 conv_real	lib/cvgist.h	/^	CvMat* conv_real;$/;"	m	struct:CvGaborFilter	access:public
+ct	nqqry.h	/^	int ct;$/;"	m	struct:__anon14	access:public
 cvCalcGist	lib/cvgist.cpp	/^cvCalcGist( float* gist,$/;"	f	signature:( float* gist, const CvArr* _img, CvGaborFilter* gabors, int gabor_n )
 cvCalcGist	lib/cvgist.h	/^void cvCalcGist( float* gist, const CvArr* _img, CvGaborFilter* gabors, int gabor_n );$/;"	p	signature:( float* gist, const CvArr* _img, CvGaborFilter* gabors, int gabor_n )
 cvCalcLocalHist	lib/cvlocalhist.cpp	/^cvCalcLocalHist( CvArr* _img,$/;"	f	signature:( CvArr* _img, int* hists, const int bins )
@@ -247,15 +354,30 @@ db_pool	nqbwdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
 db_pool	nqfdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
 db_pool	nqrdb.c	/^static frl_slab_pool_t* db_pool = 0;$/;"	v	file:
 desc	nqbwdb.h	/^	CvMat desc;$/;"	m	struct:__anon4	access:public
+desc	nqqry.h	/^		CvMat* desc;$/;"	m	union:__anon12::__anon13	access:public
 digest	lib/frl_util_md5.h	/^			apr_byte_t digest[16];$/;"	m	union:frl_md5::__anon1	access:public
 dist	nqbwdb.c	/^	CvMat* dist;$/;"	m	struct:__anon3	file:	access:public
 dt_pool	nqbwdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
 dt_pool	nqfdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
 emax	nqbwdb.c	/^	uint32_t emax;$/;"	m	struct:__anon3	file:	access:public
 emax	nqbwdb.h	/^	uint32_t emax;$/;"	m	struct:__anon6	access:public
+ext	nqqry.h	/^	int ext;$/;"	m	struct:__anon12	access:public
 f	nqfdb.h	/^	CvMat* f;$/;"	m	struct:NQFDBIDX	access:public
 f	nqfdb.h	/^	CvMat* f;$/;"	m	struct:__anon9	access:public
+fl	nqqry.h	/^		float fl;$/;"	m	union:__anon12::__anon13	access:public
 flag	lib/frl_slab_pool.h	/^	apr_uint32_t flag;$/;"	m	struct:frl_mem_safe_t	access:public
+flex_int16_t	parser/lex.yy.c	/^typedef int16_t flex_int16_t;$/;"	t	file:
+flex_int16_t	parser/lex.yy.c	/^typedef short int flex_int16_t;$/;"	t	file:
+flex_int32_t	parser/lex.yy.c	/^typedef int flex_int32_t;$/;"	t	file:
+flex_int32_t	parser/lex.yy.c	/^typedef int32_t flex_int32_t;$/;"	t	file:
+flex_int8_t	parser/lex.yy.c	/^typedef int8_t flex_int8_t;$/;"	t	file:
+flex_int8_t	parser/lex.yy.c	/^typedef signed char flex_int8_t;$/;"	t	file:
+flex_uint16_t	parser/lex.yy.c	/^typedef uint16_t flex_uint16_t;$/;"	t	file:
+flex_uint16_t	parser/lex.yy.c	/^typedef unsigned short int flex_uint16_t;$/;"	t	file:
+flex_uint32_t	parser/lex.yy.c	/^typedef uint32_t flex_uint32_t;$/;"	t	file:
+flex_uint32_t	parser/lex.yy.c	/^typedef unsigned int flex_uint32_t;$/;"	t	file:
+flex_uint8_t	parser/lex.yy.c	/^typedef uint8_t flex_uint8_t;$/;"	t	file:
+flex_uint8_t	parser/lex.yy.c	/^typedef unsigned char flex_uint8_t; $/;"	t	file:
 fm	nqfdb.c	/^	CvMat* fm;$/;"	m	struct:__anon8	file:	access:public
 frl_insert_u	lib/frl_base.h	/^enum frl_insert_u$/;"	g
 frl_level_u	lib/frl_base.h	/^enum frl_level_u$/;"	g
@@ -316,6 +438,7 @@ hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	
 head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon11	access:public
 ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:NQRDBDATUM	access:public
 i	lib/mlapcluster.cpp	/^	int i;$/;"	m	struct:CvSparseNode2D	file:	access:public
+i	nqqry.h	/^		int i;$/;"	m	union:__anon12::__anon13	access:public
 icvCalcHist	lib/cvlocalhist.cpp	/^icvCalcHist( IplImage* img,$/;"	f	signature:( IplImage* img, int* hist, const int length, const CvRect rect )
 icvCompareHist	lib/cvlocalhist.cpp	/^icvCompareHist( int *hist1,$/;"	f	signature:( int *hist1, int *hist2, const int length )
 icvHistProjection	lib/cvlocalhist.cpp	/^icvHistProjection( CvArr* _img,$/;"	f	signature:( CvArr* _img, int bins, int* v_hist = NULL, int* h_hist = NULL )
@@ -327,10 +450,12 @@ idx	nqbwdb.h	/^	NQBWDBIDX* idx;$/;"	m	struct:__anon6	access:public
 idx	nqfdb.h	/^	NQFDBIDX* idx;$/;"	m	struct:__anon10	access:public
 idx_pool	nqbwdb.c	/^static frl_slab_pool_t* idx_pool = 0;$/;"	v	file:
 idx_pool	nqfdb.c	/^static frl_slab_pool_t* idx_pool = 0;$/;"	v	file:
+input	parser/lex.yy.c	/^static int input (void );$/;"	p	file:	signature:(void )
 inum	nqbwdb.h	/^	uint32_t inum;$/;"	m	struct:NQBWDBIDX	access:public
 inum	nqbwdb.h	/^	uint32_t inum;$/;"	m	struct:__anon6	access:public
 inum	nqfdb.h	/^	uint32_t inum;$/;"	m	struct:NQFDBIDX	access:public
 inum	nqfdb.h	/^	uint32_t inum;$/;"	m	struct:__anon10	access:public
+isatty	parser/lex.yy.c	/^extern int isatty (int );$/;"	p	file:	signature:(int )
 k	lib/mlapcluster.cpp	/^	int k;$/;"	m	struct:CvSparseNode2D	file:	access:public
 kint	nqrdb.h	/^	uint32_t kint[4];$/;"	m	struct:NQRDBDATUM	access:public
 kmatch	nqrdb.c	/^inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)$/;"	f	signature:(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
@@ -346,7 +471,11 @@ kstr_pool	nqfdb.c	/^static frl_slab_pool_t* kstr_pool = 0;$/;"	v	file:
 lambda	lib/mlapcluster.h	/^	double lambda;$/;"	m	struct:CvAPCParams	access:public
 likeness	nqbwdb.c	/^	float likeness;$/;"	m	struct:__anon2	file:	access:public
 likeness	nqfdb.c	/^	float likeness;$/;"	m	struct:__anon7	file:	access:public
+lmt	nqqry.h	/^	int lmt;$/;"	m	struct:__anon12	access:public
+lmt	nqqry.h	/^	int lmt;$/;"	m	struct:__anon14	access:public
 lock	lib/frl_slab_pool.h	/^	frl_lock_u lock;$/;"	m	struct:frl_slab_pool_t	access:public
+main	parser/lex.yy.c	/^int main()$/;"	f
+main	test/cx_test.cpp	/^int main()$/;"	f	signature:()
 main	test/dpdb_test.cpp	/^int main()$/;"	f	signature:()
 main	test/eplr_test.cpp	/^int main()$/;"	f	signature:()
 main	test/gs_test.cpp	/^int main()$/;"	f	signature:()
@@ -359,6 +488,7 @@ match	nqbwdb.h	/^	double match;$/;"	m	struct:NQBWDBIDX	access:public
 max	nqrdb.h	/^	uint32_t max;$/;"	m	struct:NQRDBDATUM	access:public
 max_capacity	lib/frl_slab_pool.h	/^	apr_uint32_t max_capacity;$/;"	m	struct:frl_slab_pool_t	access:public
 maxiteration	lib/mlapcluster.h	/^	int maxiteration;$/;"	m	struct:CvAPCParams	access:public
+mempool	test/cx_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/dpdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/gs_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/idx_test.cpp	/^apr_pool_t* mempool;$/;"	v
@@ -375,6 +505,7 @@ next	nqbwdb.h	/^	struct NQBWDBUNIDX* next;$/;"	m	struct:NQBWDBUNIDX	typeref:stru
 next	nqfdb.h	/^	struct NQFDBIDX* next;$/;"	m	struct:NQFDBIDX	typeref:struct:NQFDBIDX::NQFDBIDX	access:public
 next	nqfdb.h	/^	struct NQFDBUNIDX* next;$/;"	m	struct:NQFDBUNIDX	typeref:struct:NQFDBUNIDX::NQFDBUNIDX	access:public
 next	nqrdb.h	/^	NQRDBDATUM* next;$/;"	m	struct:NQRDBDATUM	access:public
+nqbwcx	nqbwdb.c	/^static void nqbwcx(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqbwdbdel	nqbwdb.c	/^void nqbwdbdel(NQBWDB* bwdb)$/;"	f	signature:(NQBWDB* bwdb)
 nqbwdbdel	nqbwdb.h	/^void nqbwdbdel(NQBWDB* bwdb);$/;"	p	signature:(NQBWDB* bwdb)
 nqbwdbget	nqbwdb.c	/^CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr)$/;"	f	signature:(NQBWDB* bwdb, char* kstr)
@@ -415,12 +546,17 @@ nqeplr	nqutil.c	/^int nqeplr(CvMat* data, int* ki, int k)$/;"	f	signature:(CvMat
 nqeplr	nqutil.c	/^int nqeplr(CvSparseMat* sim, int* ki, int t, int k)$/;"	f	signature:(CvSparseMat* sim, int* ki, int t, int k)
 nqeplr	nqutil.h	/^int nqeplr(CvMat* data, int* ki, int k = 0);$/;"	p	signature:(CvMat* data, int* ki, int k = 0)
 nqeplr	nqutil.h	/^int nqeplr(CvSparseMat* sim, int* ki, int t, int k);$/;"	p	signature:(CvSparseMat* sim, int* ki, int t, int k)
+nqfcx	nqfdb.c	/^static void nqfcx(char* kstr, void* vbuf, void* ud)$/;"	f	file:	signature:(char* kstr, void* vbuf, void* ud)
 nqfdbdel	nqfdb.c	/^void nqfdbdel(NQFDB* fdb)$/;"	f	signature:(NQFDB* fdb)
 nqfdbdel	nqfdb.h	/^void nqfdbdel(NQFDB* fdb);$/;"	p	signature:(NQFDB* fdb)
 nqfdbget	nqfdb.c	/^CvMat* nqfdbget(NQFDB* fdb, char* kstr)$/;"	f	signature:(NQFDB* fdb, char* kstr)
 nqfdbget	nqfdb.h	/^CvMat* nqfdbget(NQFDB* fdb, char* kstr);$/;"	p	signature:(NQFDB* fdb, char* kstr)
 nqfdbidx	nqfdb.c	/^bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)$/;"	f	signature:(NQFDB* fdb, int naive, double rho, double tau)
 nqfdbidx	nqfdb.h	/^bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);$/;"	p	signature:(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2)
+nqfdbjoin	nqfdb.c	/^NQFDB* nqfdbjoin(NQFDB* fdb, NQRDB* rdb)$/;"	f	signature:(NQFDB* fdb, NQRDB* rdb)
+nqfdbjoin	nqfdb.c	/^NQFDB* nqfdbjoin(NQFDB* fdb, char** kstr, int len)$/;"	f	signature:(NQFDB* fdb, char** kstr, int len)
+nqfdbjoin	nqfdb.h	/^NQFDB* nqfdbjoin(NQFDB* fdb, NQRDB* rdb);$/;"	p	signature:(NQFDB* fdb, NQRDB* rdb)
+nqfdbjoin	nqfdb.h	/^NQFDB* nqfdbjoin(NQFDB* fdb, char** kstr, int len);$/;"	p	signature:(NQFDB* fdb, char** kstr, int len)
 nqfdblike	nqfdb.c	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)$/;"	f	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float* likeness)
 nqfdblike	nqfdb.h	/^int nqfdblike(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0);$/;"	p	signature:(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = false, float* likeness = 0)
 nqfdbnew	nqfdb.c	/^NQFDB* nqfdbnew(void)$/;"	f	signature:(void)
@@ -445,6 +581,8 @@ nqirnew	nqir.c	/^CvMat* nqirnew(CvArr* image, CvMSERParams params)$/;"	f	signatu
 nqirnew	nqir.h	/^CvMat* nqirnew(CvArr* image, CvMSERParams params);$/;"	p	signature:(CvArr* image, CvMSERParams params)
 nqlhnew	nqlh.c	/^CvMat* nqlhnew(CvArr* image, int bins)$/;"	f	signature:(CvArr* image, int bins)
 nqlhnew	nqlh.h	/^CvMat* nqlhnew(CvArr* image, int bins);$/;"	p	signature:(CvArr* image, int bins)
+nqqrysearch	nqqry.c	/^NQRDB* nqqrysearch(NQQRY* qry)$/;"	f	signature:(NQQRY* qry)
+nqqrysearch	nqqry.h	/^NQRDB* nqqrysearch(NQQRY* qry);$/;"	p	signature:(NQQRY* qry)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb)$/;"	f	file:	signature:(NQRDB* rdb)
 nqrdbclear	nqrdb.c	/^static void nqrdbclear(NQRDB* rdb);$/;"	p	file:	signature:(NQRDB* rdb)
 nqrdbdel	nqrdb.c	/^void nqrdbdel(NQRDB* rdb)$/;"	f	signature:(NQRDB* rdb)
@@ -462,12 +600,14 @@ nqrdbput	nqrdb.c	/^bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf)$/;"	f	signa
 nqrdbput	nqrdb.c	/^int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len)$/;"	f	signature:(NQRDB* rdb, char** kstr, void** vbuf, int len)
 nqrdbput	nqrdb.h	/^bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf);$/;"	p	signature:(NQRDB* rdb, char* kstr, void* vbuf)
 nqrdbput	nqrdb.h	/^int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len);$/;"	p	signature:(NQRDB* rdb, char** kstr, void** vbuf, int len)
+op	nqqry.h	/^	int op;$/;"	m	struct:__anon12	access:public
 operator !=	lib/frl_util_md5.h	/^inline bool operator!=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator <	lib/frl_util_md5.h	/^inline bool operator<(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator <=	lib/frl_util_md5.h	/^inline bool operator<=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator ==	lib/frl_util_md5.h	/^inline bool operator==(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator >	lib/frl_util_md5.h	/^inline bool operator>(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
 operator >=	lib/frl_util_md5.h	/^inline bool operator>=(const frl_md5& x, const frl_md5& y)$/;"	f	signature:(const frl_md5& x, const frl_md5& y)
+ordered	nqqry.h	/^	int ordered;$/;"	m	struct:__anon14	access:public
 orientation	lib/cvgist.h	/^	int orientation;$/;"	m	struct:CvGaborFilter	access:public
 p	nqfdb.h	/^	CvMat* p;$/;"	m	struct:NQFDBIDX	access:public
 params	lib/mlapcluster.h	/^		CvAPCParams params;$/;"	m	class:CvAPCluster	access:private
@@ -492,6 +632,7 @@ rdb	nqfdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon10	access:public
 read	lib/mlapcluster.cpp	/^CvAPCluster::read( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, CvFileNode* root_node )
 read	lib/mlapcluster.h	/^		virtual void read( CvFileStorage* fs, CvFileNode* root_node );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, CvFileNode* root_node )
 rec_pool	nqrdb.c	/^static frl_slab_pool_t* rec_pool = 0;$/;"	v	file:
+result	nqqry.h	/^	NQRDB* result;$/;"	m	struct:__anon14	access:public
 rnum	nqbwdb.h	/^	uint32_t rnum;$/;"	m	struct:NQBWDBIDX	access:public
 rnum	nqbwdb.h	/^	uint32_t rnum;$/;"	m	struct:__anon4	access:public
 rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
@@ -501,6 +642,7 @@ rwidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwidxlock;$/;"	m	struct:__anon10	acces
 rwlock	nqrdb.h	/^	apr_thread_rwlock_t* rwlock;$/;"	m	struct:__anon11	access:public
 rwunidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon6	access:public
 rwunidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon10	access:public
+sbj	nqqry.h	/^	} sbj;$/;"	m	struct:__anon12	typeref:union:__anon12::__anon13	access:public
 scale	lib/cvgist.h	/^	int scale;$/;"	m	struct:CvGaborFilter	access:public
 shadow	nqbwdb.h	/^	bool shadow;$/;"	m	struct:__anon6	access:public
 shadow	nqfdb.h	/^	bool shadow;$/;"	m	struct:__anon10	access:public
@@ -514,17 +656,20 @@ stem	nqbwdb.h	/^	NQBWDBSTEM* stem;$/;"	m	struct:NQBWDBIDX	access:public
 stopcriterion	lib/mlapcluster.h	/^	int stopcriterion;$/;"	m	struct:CvAPCParams	access:public
 storage	nqdp.c	/^static CvMemStorage* storage = 0;$/;"	v	file:
 storage	nqir.c	/^static CvMemStorage* storage = 0;$/;"	v	file:
+str	nqqry.h	/^		char* str;$/;"	m	union:__anon12::__anon13	access:public
 sumup	test/rdb_test.cpp	/^void sumup(char* kstr, void* data, void* ud)$/;"	f	signature:(char* kstr, void* data, void* ud)
 tabid	lib/cvlocalhist.cpp	/^int tabid[256];$/;"	v
 train	lib/mlapcluster.cpp	/^CvAPCluster::train( const CvSparseMat* similarity,$/;"	f	class:CvAPCluster	signature:( const CvSparseMat* similarity, const CvMat* labels )
 train	lib/mlapcluster.cpp	/^bool CvAPCluster::train( const CvMat* similarity,$/;"	f	class:CvAPCluster	signature:( const CvMat* similarity, const CvMat* labels )
 train	lib/mlapcluster.h	/^		virtual bool train( const CvMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvMat* _train_data, const CvMat* _response )
 train	lib/mlapcluster.h	/^		virtual bool train( const CvSparseMat* _train_data, const CvMat* _response );$/;"	p	class:CvAPCluster	access:public	signature:( const CvSparseMat* _train_data, const CvMat* _response )
+type	nqqry.h	/^	int type;$/;"	m	struct:__anon12	access:public
 uid	lib/frl_util_md5.h	/^			apr_uint64_t uid[2];$/;"	m	union:frl_md5::__anon1	access:public
 unidx	nqbwdb.h	/^	NQBWDBUNIDX* unidx;$/;"	m	struct:__anon6	access:public
 unidx	nqfdb.h	/^	NQFDBUNIDX* unidx;$/;"	m	struct:__anon10	access:public
 unidx_pool	nqbwdb.c	/^static frl_slab_pool_t* unidx_pool = 0;$/;"	v	file:
 unidx_pool	nqfdb.c	/^static frl_slab_pool_t* unidx_pool = 0;$/;"	v	file:
+unput	parser/lex.yy.c	188;"	d	file:
 unum	nqbwdb.h	/^	uint32_t unum;$/;"	m	struct:__anon6	access:public
 unum	nqfdb.h	/^	uint32_t unum;$/;"	m	struct:__anon10	access:public
 usage	lib/frl_slab_pool.h	/^	apr_size_t usage;$/;"	m	struct:frl_mem_stat_t	access:public
@@ -532,7 +677,153 @@ usage_stack	lib/frl_slab_pool.h	/^	apr_byte_t** usage_stack;$/;"	m	struct:frl_sl
 val	lib/mlapcluster.cpp	/^	double val;$/;"	m	struct:CvSparseNode2D	file:	access:public
 vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:NQRDBDATUM	access:public
 wnum	nqbwdb.h	/^	uint32_t wnum;$/;"	m	struct:__anon6	access:public
+wordCount	parser/lex.yy.c	/^	int wordCount = 0;$/;"	v
 write	lib/mlapcluster.cpp	/^CvAPCluster::write( CvFileStorage* fs,$/;"	f	class:CvAPCluster	signature:( CvFileStorage* fs, const char* name )
 write	lib/mlapcluster.h	/^		virtual void write( CvFileStorage* fs, const char* name );$/;"	p	class:CvAPCluster	access:public	signature:( CvFileStorage* fs, const char* name )
+yy_accept	parser/lex.yy.c	/^static yyconst flex_int16_t yy_accept[14] =$/;"	v	file:
+yy_at_bol	parser/lex.yy.c	/^	int yy_at_bol;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_base	parser/lex.yy.c	/^static yyconst flex_int16_t yy_base[17] =$/;"	v	file:
+yy_bs_column	parser/lex.yy.c	/^    int yy_bs_column; \/**< The column count. *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_bs_lineno	parser/lex.yy.c	/^    int yy_bs_lineno; \/**< The line count. *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buf_pos	parser/lex.yy.c	/^	char *yy_buf_pos;		\/* current position in input buffer *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buf_size	parser/lex.yy.c	/^	yy_size_t yy_buf_size;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_stack	parser/lex.yy.c	/^static YY_BUFFER_STATE * yy_buffer_stack = 0; \/**< Stack as an array. *\/$/;"	v	file:
+yy_buffer_stack_max	parser/lex.yy.c	/^static size_t yy_buffer_stack_max = 0; \/**< capacity of stack. *\/$/;"	v	file:
+yy_buffer_stack_top	parser/lex.yy.c	/^static size_t yy_buffer_stack_top = 0; \/**< index of top of stack. *\/$/;"	v	file:
+yy_buffer_state	parser/lex.yy.c	/^struct yy_buffer_state$/;"	s	file:
+yy_buffer_state::yy_at_bol	parser/lex.yy.c	/^	int yy_at_bol;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_bs_column	parser/lex.yy.c	/^    int yy_bs_column; \/**< The column count. *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_bs_lineno	parser/lex.yy.c	/^    int yy_bs_lineno; \/**< The line count. *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_buf_pos	parser/lex.yy.c	/^	char *yy_buf_pos;		\/* current position in input buffer *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_buf_size	parser/lex.yy.c	/^	yy_size_t yy_buf_size;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_buffer_status	parser/lex.yy.c	/^	int yy_buffer_status;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_ch_buf	parser/lex.yy.c	/^	char *yy_ch_buf;		\/* input buffer *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_fill_buffer	parser/lex.yy.c	/^	int yy_fill_buffer;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_input_file	parser/lex.yy.c	/^	FILE *yy_input_file;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_is_interactive	parser/lex.yy.c	/^	int yy_is_interactive;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_is_our_buffer	parser/lex.yy.c	/^	int yy_is_our_buffer;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_state::yy_n_chars	parser/lex.yy.c	/^	int yy_n_chars;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_buffer_status	parser/lex.yy.c	/^	int yy_buffer_status;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_c_buf_p	parser/lex.yy.c	/^static char *yy_c_buf_p = (char *) 0;$/;"	v	file:
+yy_ch_buf	parser/lex.yy.c	/^	char *yy_ch_buf;		\/* input buffer *\/$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_chk	parser/lex.yy.c	/^static yyconst flex_int16_t yy_chk[21] =$/;"	v	file:
+yy_create_buffer	parser/lex.yy.c	/^    YY_BUFFER_STATE yy_create_buffer  (FILE * file, int  size )$/;"	f	signature:(FILE * file, int size )
+yy_create_buffer	parser/lex.yy.c	/^YY_BUFFER_STATE yy_create_buffer (FILE *file,int size  );$/;"	p	file:	signature:(FILE *file,int size )
+yy_def	parser/lex.yy.c	/^static yyconst flex_int16_t yy_def[17] =$/;"	v	file:
+yy_delete_buffer	parser/lex.yy.c	/^    void yy_delete_buffer (YY_BUFFER_STATE  b )$/;"	f	signature:(YY_BUFFER_STATE b )
+yy_delete_buffer	parser/lex.yy.c	/^void yy_delete_buffer (YY_BUFFER_STATE b  );$/;"	p	file:	signature:(YY_BUFFER_STATE b )
+yy_did_buffer_switch_on_eof	parser/lex.yy.c	/^static int yy_did_buffer_switch_on_eof;$/;"	v	file:
+yy_ec	parser/lex.yy.c	/^static yyconst flex_int32_t yy_ec[256] =$/;"	v	file:
+yy_fatal_error	parser/lex.yy.c	/^static void yy_fatal_error (yyconst char msg[]  );$/;"	p	file:	signature:(yyconst char msg[] )
+yy_fatal_error	parser/lex.yy.c	/^static void yy_fatal_error (yyconst char* msg )$/;"	f	file:	signature:(yyconst char* msg )
+yy_fill_buffer	parser/lex.yy.c	/^	int yy_fill_buffer;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_flex_debug	parser/lex.yy.c	/^int yy_flex_debug = 0;$/;"	v
+yy_flex_strlen	parser/lex.yy.c	/^static int yy_flex_strlen (yyconst char * );$/;"	p	file:	signature:(yyconst char * )
+yy_flex_strlen	parser/lex.yy.c	/^static int yy_flex_strlen (yyconst char * s )$/;"	f	file:	signature:(yyconst char * s )
+yy_flex_strncpy	parser/lex.yy.c	/^static void yy_flex_strncpy (char *,yyconst char *,int );$/;"	p	file:	signature:(char *,yyconst char *,int )
+yy_flex_strncpy	parser/lex.yy.c	/^static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )$/;"	f	file:	signature:(char* s1, yyconst char * s2, int n )
+yy_flush_buffer	parser/lex.yy.c	/^    void yy_flush_buffer (YY_BUFFER_STATE  b )$/;"	f	signature:(YY_BUFFER_STATE b )
+yy_flush_buffer	parser/lex.yy.c	/^void yy_flush_buffer (YY_BUFFER_STATE b  );$/;"	p	file:	signature:(YY_BUFFER_STATE b )
+yy_get_next_buffer	parser/lex.yy.c	/^static int yy_get_next_buffer (void );$/;"	p	file:	signature:(void )
+yy_get_next_buffer	parser/lex.yy.c	/^static int yy_get_next_buffer (void)$/;"	f	file:	signature:(void)
+yy_get_previous_state	parser/lex.yy.c	/^    static yy_state_type yy_get_previous_state (void)$/;"	f	file:	signature:(void)
+yy_get_previous_state	parser/lex.yy.c	/^static yy_state_type yy_get_previous_state (void );$/;"	p	file:	signature:(void )
+yy_hold_char	parser/lex.yy.c	/^static char yy_hold_char;$/;"	v	file:
+yy_init	parser/lex.yy.c	/^static int yy_init = 0;		\/* whether we need to initialize *\/$/;"	v	file:
+yy_init_buffer	parser/lex.yy.c	/^    static void yy_init_buffer  (YY_BUFFER_STATE  b, FILE * file )$/;"	f	file:	signature:(YY_BUFFER_STATE b, FILE * file )
+yy_init_buffer	parser/lex.yy.c	/^static void yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );$/;"	p	file:	signature:(YY_BUFFER_STATE b,FILE *file )
+yy_init_globals	parser/lex.yy.c	/^static int yy_init_globals (void );$/;"	p	file:	signature:(void )
+yy_init_globals	parser/lex.yy.c	/^static int yy_init_globals (void)$/;"	f	file:	signature:(void)
+yy_input_file	parser/lex.yy.c	/^	FILE *yy_input_file;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_is_interactive	parser/lex.yy.c	/^	int yy_is_interactive;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_is_our_buffer	parser/lex.yy.c	/^	int yy_is_our_buffer;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_last_accepting_cpos	parser/lex.yy.c	/^static char *yy_last_accepting_cpos;$/;"	v	file:
+yy_last_accepting_state	parser/lex.yy.c	/^static yy_state_type yy_last_accepting_state;$/;"	v	file:
+yy_load_buffer_state	parser/lex.yy.c	/^static void yy_load_buffer_state  (void)$/;"	f	file:	signature:(void)
+yy_load_buffer_state	parser/lex.yy.c	/^static void yy_load_buffer_state (void );$/;"	p	file:	signature:(void )
+yy_meta	parser/lex.yy.c	/^static yyconst flex_int32_t yy_meta[6] =$/;"	v	file:
+yy_n_chars	parser/lex.yy.c	/^	int yy_n_chars;$/;"	m	struct:yy_buffer_state	file:	access:public
+yy_n_chars	parser/lex.yy.c	/^static int yy_n_chars;		\/* number of characters read into yy_ch_buf *\/$/;"	v	file:
+yy_new_buffer	parser/lex.yy.c	317;"	d	file:
+yy_nxt	parser/lex.yy.c	/^	flex_int32_t yy_nxt;$/;"	m	struct:yy_trans_info	file:	access:public
+yy_nxt	parser/lex.yy.c	/^static yyconst flex_int16_t yy_nxt[21] =$/;"	v	file:
+yy_scan_buffer	parser/lex.yy.c	/^YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )$/;"	f	signature:(char * base, yy_size_t size )
+yy_scan_buffer	parser/lex.yy.c	/^YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );$/;"	p	file:	signature:(char *base,yy_size_t size )
+yy_scan_bytes	parser/lex.yy.c	/^YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )$/;"	f	signature:(yyconst char * yybytes, int _yybytes_len )
+yy_scan_bytes	parser/lex.yy.c	/^YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );$/;"	p	file:	signature:(yyconst char *bytes,int len )
+yy_scan_string	parser/lex.yy.c	/^YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )$/;"	f	signature:(yyconst char * yystr )
+yy_scan_string	parser/lex.yy.c	/^YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );$/;"	p	file:	signature:(yyconst char *yy_str )
+yy_set_bol	parser/lex.yy.c	329;"	d	file:
+yy_set_interactive	parser/lex.yy.c	319;"	d	file:
+yy_size_t	parser/lex.yy.c	/^typedef size_t yy_size_t;$/;"	t	file:
+yy_start	parser/lex.yy.c	/^static int yy_start = 0;	\/* start state number *\/$/;"	v	file:
+yy_state_type	parser/lex.yy.c	/^typedef int yy_state_type;$/;"	t	file:
+yy_switch_to_buffer	parser/lex.yy.c	/^    void yy_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )$/;"	f	signature:(YY_BUFFER_STATE new_buffer )
+yy_switch_to_buffer	parser/lex.yy.c	/^void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer  );$/;"	p	file:	signature:(YY_BUFFER_STATE new_buffer )
+yy_trans_info	parser/lex.yy.c	/^struct yy_trans_info$/;"	s	file:
+yy_trans_info::yy_nxt	parser/lex.yy.c	/^	flex_int32_t yy_nxt;$/;"	m	struct:yy_trans_info	file:	access:public
+yy_trans_info::yy_verify	parser/lex.yy.c	/^	flex_int32_t yy_verify;$/;"	m	struct:yy_trans_info	file:	access:public
+yy_try_NUL_trans	parser/lex.yy.c	/^    static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state )$/;"	f	file:	signature:(yy_state_type yy_current_state )
+yy_try_NUL_trans	parser/lex.yy.c	/^static yy_state_type yy_try_NUL_trans (yy_state_type current_state  );$/;"	p	file:	signature:(yy_state_type current_state )
+yy_verify	parser/lex.yy.c	/^	flex_int32_t yy_verify;$/;"	m	struct:yy_trans_info	file:	access:public
+yyalloc	parser/lex.yy.c	/^void *yyalloc (yy_size_t  );$/;"	p	file:
+yyalloc	parser/lex.yy.c	/^void *yyalloc (yy_size_t  size )$/;"	f	signature:(yy_size_t size )
+yyconst	parser/lex.yy.c	106;"	d	file:
+yyconst	parser/lex.yy.c	108;"	d	file:
+yyensure_buffer_stack	parser/lex.yy.c	/^static void yyensure_buffer_stack (void );$/;"	p	file:	signature:(void )
+yyensure_buffer_stack	parser/lex.yy.c	/^static void yyensure_buffer_stack (void)$/;"	f	file:	signature:(void)
+yyfree	parser/lex.yy.c	/^void yyfree (void *  );$/;"	p	file:	signature:(void * )
+yyfree	parser/lex.yy.c	/^void yyfree (void * ptr )$/;"	f	signature:(void * ptr )
+yyget_debug	parser/lex.yy.c	/^int yyget_debug  (void)$/;"	f	signature:(void)
+yyget_debug	parser/lex.yy.c	/^int yyget_debug (void );$/;"	p	file:	signature:(void )
+yyget_extra	parser/lex.yy.c	/^YY_EXTRA_TYPE yyget_extra (void );$/;"	p	file:	signature:(void )
+yyget_in	parser/lex.yy.c	/^FILE *yyget_in  (void)$/;"	f	signature:(void)
+yyget_in	parser/lex.yy.c	/^FILE *yyget_in (void );$/;"	p	file:	signature:(void )
+yyget_leng	parser/lex.yy.c	/^int yyget_leng  (void)$/;"	f	signature:(void)
+yyget_leng	parser/lex.yy.c	/^int yyget_leng (void );$/;"	p	file:	signature:(void )
+yyget_lineno	parser/lex.yy.c	/^int yyget_lineno  (void)$/;"	f	signature:(void)
+yyget_lineno	parser/lex.yy.c	/^int yyget_lineno (void );$/;"	p	file:	signature:(void )
+yyget_out	parser/lex.yy.c	/^FILE *yyget_out  (void)$/;"	f	signature:(void)
+yyget_out	parser/lex.yy.c	/^FILE *yyget_out (void );$/;"	p	file:	signature:(void )
+yyget_text	parser/lex.yy.c	/^char *yyget_text  (void)$/;"	f	signature:(void)
+yyget_text	parser/lex.yy.c	/^char *yyget_text (void );$/;"	p	file:	signature:(void )
+yyin	parser/lex.yy.c	/^FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;$/;"	v
+yyinput	parser/lex.yy.c	/^    static int yyinput (void)$/;"	f	file:	signature:(void)
+yyinput	parser/lex.yy.c	/^static int yyinput (void );$/;"	p	file:	signature:(void )
+yyleng	parser/lex.yy.c	/^int yyleng;$/;"	v
+yyless	parser/lex.yy.c	1562;"	d	file:
+yyless	parser/lex.yy.c	1563;"	d	file:
+yyless	parser/lex.yy.c	175;"	d	file:
+yylex	parser/lex.yy.c	/^extern int yylex (void);$/;"	p	file:	signature:(void)
+yylex_destroy	parser/lex.yy.c	/^int yylex_destroy  (void)$/;"	f	signature:(void)
+yylex_destroy	parser/lex.yy.c	/^int yylex_destroy (void );$/;"	p	file:	signature:(void )
+yylineno	parser/lex.yy.c	/^int yylineno = 1;$/;"	v
+yymore	parser/lex.yy.c	457;"	d	file:
+yyout	parser/lex.yy.c	/^FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;$/;"	v
+yypop_buffer_state	parser/lex.yy.c	/^void yypop_buffer_state (void );$/;"	p	file:	signature:(void )
+yypop_buffer_state	parser/lex.yy.c	/^void yypop_buffer_state (void)$/;"	f	signature:(void)
+yypush_buffer_state	parser/lex.yy.c	/^void yypush_buffer_state (YY_BUFFER_STATE new_buffer  );$/;"	p	file:	signature:(YY_BUFFER_STATE new_buffer )
+yypush_buffer_state	parser/lex.yy.c	/^void yypush_buffer_state (YY_BUFFER_STATE new_buffer )$/;"	f	signature:(YY_BUFFER_STATE new_buffer )
+yyrealloc	parser/lex.yy.c	/^void *yyrealloc  (void * ptr, yy_size_t  size )$/;"	f	signature:(void * ptr, yy_size_t size )
+yyrealloc	parser/lex.yy.c	/^void *yyrealloc (void *,yy_size_t  );$/;"	p	file:	signature:(void *,yy_size_t )
+yyrestart	parser/lex.yy.c	/^    void yyrestart  (FILE * input_file )$/;"	f	signature:(FILE * input_file )
+yyrestart	parser/lex.yy.c	/^void yyrestart (FILE *input_file  );$/;"	p	file:	signature:(FILE *input_file )
+yyset_debug	parser/lex.yy.c	/^void yyset_debug (int  bdebug )$/;"	f	signature:(int bdebug )
+yyset_debug	parser/lex.yy.c	/^void yyset_debug (int debug_flag  );$/;"	p	file:	signature:(int debug_flag )
+yyset_extra	parser/lex.yy.c	/^void yyset_extra (YY_EXTRA_TYPE user_defined  );$/;"	p	file:	signature:(YY_EXTRA_TYPE user_defined )
+yyset_in	parser/lex.yy.c	/^void yyset_in  (FILE * in_str  );$/;"	p	file:	signature:(FILE * in_str )
+yyset_in	parser/lex.yy.c	/^void yyset_in (FILE *  in_str )$/;"	f	signature:(FILE * in_str )
+yyset_lineno	parser/lex.yy.c	/^void yyset_lineno (int  line_number )$/;"	f	signature:(int line_number )
+yyset_lineno	parser/lex.yy.c	/^void yyset_lineno (int line_number  );$/;"	p	file:	signature:(int line_number )
+yyset_out	parser/lex.yy.c	/^void yyset_out  (FILE * out_str  );$/;"	p	file:	signature:(FILE * out_str )
+yyset_out	parser/lex.yy.c	/^void yyset_out (FILE *  out_str )$/;"	f	signature:(FILE * out_str )
+yyterminate	parser/lex.yy.c	602;"	d	file:
+yytext	parser/lex.yy.c	/^char *yytext;$/;"	v
+yytext_ptr	parser/lex.yy.c	354;"	d	file:
+yyunput	parser/lex.yy.c	/^    static void yyunput (int c, register char * yy_bp )$/;"	f	file:	signature:(int c, register char * yy_bp )
+yyunput	parser/lex.yy.c	/^    static void yyunput (int c,char *buf_ptr  );$/;"	p	file:	signature:(int c,char *buf_ptr )
+yywrap	parser/lex.yy.c	/^extern "C" int yywrap (void );$/;"	p	file:	signature:(void )
+yywrap	parser/lex.yy.c	/^extern int yywrap (void );$/;"	p	file:	signature:(void )
+yywrap	parser/lex.yy.c	/^int yywrap()$/;"	f
 ~CvAPCluster	lib/mlapcluster.cpp	/^CvAPCluster::~CvAPCluster()$/;"	f	class:CvAPCluster	signature:()
 ~CvAPCluster	lib/mlapcluster.h	/^		virtual ~CvAPCluster();$/;"	p	class:CvAPCluster	access:public	signature:()
