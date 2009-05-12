@@ -10,23 +10,35 @@
 
 NQRDB* nqqrysearch(NQQRY* qry)
 {
-	NQRDB* rdb = nqrdbnew();
-	NQCOND* condptr = qry->conds;
+	NQRDB* rdb = (qry->result == 0) ? nqrdbnew() : qry->result;
 	if (qry->lmt <= 0 || qry->lmt > QRY_MAX_LMT)
 		qry->lmt = QRY_MAX_LMT;
-	int i;
+	int i, maxlmt = 0;
+	NQQRY* condptr = qry->conds;
 	for (i = 0; i < qry->cnum; i++, condptr++)
 	{
+		if (condptr->lmt <= 0)
+			condptr->lmt = qry->lmt * 2;
+		if (condptr->lmt > QRY_MAX_LMT)
+			condptr->lmt = QRY_MAX_LMT;
+		if (condptr->lmt > maxlmt)
+			maxlmt = condptr->lmt;
+	}
+	char** kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
+	float* likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
+	condptr = qry->conds;
+	for (i = 0; i < qry->cnum; i++, condptr++)
+	{
+		memset(kstr, 0, sizeof(kstr[0]) * condptr->lmt);
+		memset(likeness, 0, sizeof(likeness[0]) * condptr->lmt);
 		switch (condptr->type)
 		{
-			if (condptr->lmt <= 0)
-				condptr->lmt = qry->lmt * 2;
-			if (condptr->lmt > QRY_MAX_LMT * 2)
-				condptr->lmt = QRY_MAX_LMT * 2;
-			char** kstr = (char**)malloc(sizeof(kstr[0]) * condptr->lmt);
-			float* likeness = (float*)malloc(sizeof(likeness[0]) * condptr->lmt);
+			case NQCTAND:
+			case NQCTOR:
+				nqqrysearch(condptr);
+				break;
 			case NQTBWDB:
-				NQBWDB *tbwdb, *bwdb = (NQBWDB*)condptr->column;
+				NQBWDB *tbwdb, *bwdb = (NQBWDB*)condptr->db;
 				if (qry->ct == NQCTAND && i > 0)
 					tbwdb = nqbwdbjoin(bwdb, rdb);
 				switch (condptr->op)
@@ -59,7 +71,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				break;
 		}
 		int j;
-		switch (qry->ct)
+		switch (qry->type)
 		{
 			case NQCTAND:
 				if (i > 0)
@@ -93,10 +105,14 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				break;
 		}
 	}
-	if (qry->result != 0)
-		nqrdbdel(qry->result);
+	free(kstr);
+	free(likeness);
 	qry->result = rdb;
 	return rdb;
+}
+
+NQQRY* nqqrynew(void* mem)
+{
 }
 
 int nqqrydump(NQQRY* qry, void** mem)

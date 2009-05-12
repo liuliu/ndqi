@@ -8,9 +8,8 @@
 
 #define QRY_MAX_LMT (2000)
 
-typedef struct {
-	int type;
-	void* column;
+typedef struct NQQRY {
+	void* db;
 	union {
 		float fl;
 		int i;
@@ -18,18 +17,14 @@ typedef struct {
 		CvMat* desc;
 	} sbj;
 	float cfd;
+	int type;
 	int op;
 	int ext;
-	int lmt;
-} NQCOND;
-
-typedef struct {
-	NQCOND* conds;
-	NQRDB* result;
 	int cnum;
-	int ct;
 	int ordered;
 	int lmt;
+	NQQRY* conds;
+	NQRDB* result;
 } NQQRY;
 
 enum {
@@ -59,5 +54,7 @@ enum {
 
 NQRDB* nqqrysearch(NQQRY* qry);
 int nqqrydump(NQQRY* qry, void** mem);
+NQQRY* nqqrynew(void);
+NQQRY* nqqrynew(void* mem);
 
 #endif

@@ -5,7 +5,7 @@ apr_pool_t* mempool;
 
 void sumup(char* kstr, void* data, void* ud)
 {
-	int* t = (int*)ud;
+	uint32_t* t = (uint32_t*)ud;
 	*t += *((int*)data);
 }
 
@@ -54,7 +54,15 @@ int main()
 	}
 	time = apr_time_now()-time;
 	printf("look up 250,000 null key-value pairs and 250,000 key-value pairs in rdb in %d microsecond(s).\n", time);
-	uint64_t t = 0;
+	char** kstr = (char**)malloc(1000 * sizeof(char*));
+	for (int i = 250000; i < 251000; i++)
+		kstr[i - 250000] = (char*)key_cache[i].digest;
+	time = apr_time_now();
+	nqrdbfilter(rdb, kstr, 100);
+	time = apr_time_now()-time;
+	free(kstr);
+	printf("filter from 250,000 to only left 1,000 key-value pairs in %d microsecond(s).\n", time);
+	uint32_t t = 0;
 	time = apr_time_now();
 	nqrdbforeach(rdb, sumup, &t);
 	time = apr_time_now()-time;

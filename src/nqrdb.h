@@ -13,6 +13,7 @@ typedef struct NQRDBDATUM {
 	uint32_t rnum;
 	uint32_t max;
 	uint32_t kint[4];
+	bool dirty;
 	void* vbuf;
 	NQRDBDATUM* pr;
 	NQRDBDATUM** chd;
@@ -29,6 +30,7 @@ typedef struct {
 } NQRDB;
 
 NQRDB* nqrdbnew(void);
+bool nqrdbfilter(NQRDB* rdb, char** kstr, int len);
 bool nqrdbput(NQRDB* rdb, char* kstr, void* vbuf);
 int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len);
 void* nqrdbget(NQRDB* rdb, char* kstr);

@@ -173,130 +173,45 @@ int nqrdbput(NQRDB* rdb, char** kstr, void** vbuf, int len)
 	return t;
 }
 
-void* nqrdbget(NQRDB* rdb, char* kstr)
+inline static NQRDBDATUM* nqrdbgetdatum(NQRDB* rdb, uint32_t* kint)
 {
-	uint32_t* kint = (uint32_t*)kstr;
 	uint32_t* kp = kint;
-#if APR_HAS_THREADS
-	apr_thread_rwlock_rdlock(rdb->rwlock);
-#endif
 	NQRDBDATUM* rec = rdb->head;
 	uint32_t b16 = (*kp)>>16;
 	if (rec->chd[b16] == 0)
-	{
-#if APR_HAS_THREADS
-		apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
 		return 0;
-	} else {
+	else {
 		rec = rec->chd[b16];
 		if (kmatch(rec->kint, kint, 0))
-		{
-			void* vbuf = rec->vbuf;
-#if APR_HAS_THREADS
-			apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
-			return vbuf;
-		}
+			return rec;
 	}
 	uint32_t b6 = ((*kp)>>10)&0x3F;
 	if (rec->chd == 0 || rec->chd[b6] == 0)
-	{
-#if APR_HAS_THREADS
-		apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
 		return 0;
-	} else {
+	else {
 		rec = rec->chd[b6];
 		if (kmatch(rec->kint, kint, 0))
-		{
-			void* vbuf = rec->vbuf;
-#if APR_HAS_THREADS
-			apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
-			return vbuf;
-		}
+			return rec;
 	}
 	uint32_t i = 8;
 	do {
 		uint32_t b2 = ((*kp)>>i)&0x3;
 		if (rec->chd == 0 || rec->chd[b2] == 0)
-		{
-#if APR_HAS_THREADS
-			apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
 			return 0;
-		} else {
+		else {
 			rec = rec->chd[b2];
 			if (kmatch(rec->kint, kint, 0))
-			{
-				void* vbuf = rec->vbuf;
-#if APR_HAS_THREADS
-				apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
-				return vbuf;
-			}
+				return rec;
 		}
 		kp += (i == 0);
 		i = (i+30)&0x1F;
 	} while (kp < kint+4);
-#if APR_HAS_THREADS
-	apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
 	return 0;
 }
 
-bool nqrdbout(NQRDB* rdb, char* kstr)
+inline static NQRDBDATUM* nqrdboutdatum(NQRDB* rdb, NQRDBDATUM* rec)
 {
-	uint32_t* kint = (uint32_t*)kstr;
-	uint32_t* kp = kint;
-#if APR_HAS_THREADS
-	apr_thread_rwlock_wrlock(rdb->rwlock);
-#endif
-	NQRDBDATUM* rec = rdb->head;
-	uint32_t b16, b6, b2, i;
-	b16 = (*kp)>>16;
-	if (rec->chd[b16] == 0)
-	{
-#if APR_HAS_THREADS
-		apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
-		return 0;
-	} else {
-		rec = rec->chd[b16];
-		if (kmatch(rec->kint, kint, 0))
-			goto RMPS;
-	}
-	b6 = ((*kp)>>10)&0x3F;
-	if (rec->chd == 0 || rec->chd[b6] == 0)
-	{
-#if APR_HAS_THREADS
-		apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
-		return 0;
-	} else {
-		rec = rec->chd[b6];
-		if (kmatch(rec->kint, kint, 0))
-			goto RMPS;
-	}
-	i = 8;
-	do {
-		b2 = ((*kp)>>i)&0x3;
-		if (rec->chd == 0 || rec->chd[b2] == 0)
-		{
-#if APR_HAS_THREADS
-			apr_thread_rwlock_unlock(rdb->rwlock);
-#endif
-			return 0;
-		} else {
-			rec = rec->chd[b2];
-			if (kmatch(rec->kint, kint, 0))
-				goto RMPS;
-		}
-		kp += (i == 0);
-		i = (i+30)&0x1F;
-	} while (kp < kint+4);
-RMPS:
+	int i;
 	NQRDBDATUM* lrec = rec;
 	NQRDBDATUM* nrec;
 	while (lrec->rnum > 0)
@@ -330,14 +245,85 @@ RMPS:
 	if (lrec != rec)
 	{
 		memcpy(rec->kint, lrec->kint, 16);
+		rec->dirty = lrec->dirty;
 		rec->vbuf = lrec->vbuf;
-	}
+	} else
+		rec = 0;
 	lrec->prev->next = lrec->next;
 	lrec->next->prev = lrec->prev;
 	if (lrec->chd != 0)
 		frl_slab_pfree(lrec->chd);
 	frl_slab_pfree(lrec);
 	rdb->rnum--;
+	return rec;
+}
+
+void* nqrdbget(NQRDB* rdb, char* kstr)
+{
+	uint32_t* kint = (uint32_t*)kstr;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_rdlock(rdb->rwlock);
+#endif
+	NQRDBDATUM* rec = nqrdbgetdatum(rdb, kint);
+	if (rec == 0)
+	{
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 0;
+	}
+	void* vbuf = rec->vbuf;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+	return vbuf;
+}
+
+bool nqrdbfilter(NQRDB* rdb, char** kstr, int len)
+{
+#if APR_HAS_THREADS
+	apr_thread_rwlock_wrlock(rdb->rwlock);
+#endif
+	NQRDBDATUM* cur;
+	for (cur = rdb->head->next; cur != rdb->head; cur = cur->next)
+		cur->dirty = true;
+	int i;
+	uint32_t** kintptr = (uint32_t**)kstr;
+	for (i = 0; i < len; i++, kintptr++)
+	{
+		cur = nqrdbgetdatum(rdb, *kintptr);
+		if (cur != 0)
+			cur->dirty = false;
+	}
+	cur = rdb->head->next;
+	while (cur != rdb->head)
+	{
+		NQRDBDATUM* next = cur->next;
+		while (cur && cur->dirty)
+			cur = nqrdboutdatum(rdb, cur);
+		cur = next;
+	}
+#if APR_HAS_THREADS
+	apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+	return 1;
+}
+
+bool nqrdbout(NQRDB* rdb, char* kstr)
+{
+	uint32_t* kint = (uint32_t*)kstr;
+#if APR_HAS_THREADS
+	apr_thread_rwlock_wrlock(rdb->rwlock);
+#endif
+	NQRDBDATUM* rec = nqrdbgetdatum(rdb, kint);
+	if (rec == 0)
+	{
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(rdb->rwlock);
+#endif
+		return 0;
+	}
+	nqrdboutdatum(rdb, rec);
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
@@ -349,12 +335,13 @@ bool nqrdbforeach(NQRDB* rdb, NQFOREACH op, void* ud)
 #if APR_HAS_THREADS
 	apr_thread_rwlock_rdlock(rdb->rwlock);
 #endif
-	NQRDBDATUM* cur = rdb->head;
-	for (cur = cur->next; cur != rdb->head; cur = cur->next)
+	NQRDBDATUM* cur;
+	for (cur = rdb->head->next; cur != rdb->head; cur = cur->next)
 		op((char*)cur->kint, cur->vbuf, ud);
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(rdb->rwlock);
 #endif
+	return 1;
 }
 
 void nqrdbdel(NQRDB* rdb)
