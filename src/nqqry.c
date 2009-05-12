@@ -8,9 +8,103 @@
 #include "nqbwdb.h"
 #include "nqfdb.h"
 
+typedef struct {
+	char* kstr;
+	float likeness;
+} NQQRYPAIR;
+
+typedef struct {
+	uint32_t siz;
+	NQQRYPAIR data[0];
+} NQQRYUSERDATA;
+
+static void nqqryhpf(NQQRYPAIR* pr, uint32_t i, uint32_t siz)
+{
+	uint32_t l, r, largest = i;
+	do {
+		i = largest;
+		r = (i+1)<<1;
+		l = r-1;
+		if (l < siz && pr[l].likeness < pr[i].likeness)
+			largest = l;
+		if (r < siz && pr[r].likeness < pr[largest].likeness)
+			largest = r;
+		if (largest != i)
+		{
+			NQQRYPAIR sw = pr[largest];
+			pr[largest] = pr[i];
+			pr[i] = sw;
+		}
+	} while (largest != i);
+}
+
+static void nqqrysort(char* kstr, void* vbuf, void* ud)
+{
+	NQQRYUSERDATA* nqud = (NQQRYUSERDATA*)ud;
+	float likeness;
+	memcpy(&likeness, &vbuf, sizeof(float));
+	if (likeness > nqud->data->likeness)
+	{
+		nqud->data->likeness = likeness;
+		nqud->data->kstr = kstr;
+		nqqryhpf(nqud->data, 0, nqud->siz);
+	}
+}
+
+int nqqryresult(NQQRY* qry, char** kstr, float* likeness)
+{
+	NQQRYUSERDATA* ud = (NQQRYUSERDATA*)malloc(sizeof(NQQRYUSERDATA)+qry->lmt*sizeof(NQQRYPAIR));
+	memset(ud, 0, sizeof(NQQRYUSERDATA)+qry->lmt*sizeof(NQQRYPAIR));
+	ud->siz = qry->lmt;
+	ud->data->likeness = 0;
+	nqrdbforeach(qry->result, nqqrysort, ud);
+	int i;
+	if (qry->ordered)
+	{
+		for (i = qry->lmt-1; i > 0; i--)
+		{
+			NQQRYPAIR sw = ud->data[i];
+			ud->data[i] = ud->data[0];
+			ud->data[0] = sw;
+			nqqryhpf(ud->data, 0, i);
+		}
+	}
+	NQQRYPAIR* dptr = ud->data;
+	int k = 0;
+	if (likeness == 0)
+	{
+		for (i = 0; i < qry->lmt; i++)
+		{
+			if (dptr->kstr != 0)
+			{
+				*kstr = dptr->kstr;
+				kstr++;
+				k++;
+			}
+			dptr++;
+		}
+	} else {
+		for (i = 0; i < qry->lmt; i++)
+		{
+			if (dptr->kstr != 0)
+			{
+				*kstr = dptr->kstr;
+				*likeness = dptr->likeness;
+				kstr++;
+				likeness++;
+				k++;
+			}
+			dptr++;
+		}
+	}
+	free(ud);
+	return k;
+}
+
 NQRDB* nqqrysearch(NQQRY* qry)
 {
-	NQRDB* rdb = (qry->result == 0) ? nqrdbnew() : qry->result;
+	NQRDB* scope = qry->result;
+	NQRDB* rdb = nqrdbnew();
 	if (qry->lmt <= 0 || qry->lmt > QRY_MAX_LMT)
 		qry->lmt = QRY_MAX_LMT;
 	int i, maxlmt = 0;
@@ -35,38 +129,46 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		{
 			case NQCTAND:
 			case NQCTOR:
+				if (qry->type == NQCTAND && i > 0)
+					condptr->result = rdb;
 				nqqrysearch(condptr);
+				nqqryresult(condptr, kstr, likeness);
+				nqrdbdel(condptr->result);
 				break;
 			case NQTBWDB:
-				NQBWDB *tbwdb, *bwdb = (NQBWDB*)condptr->db;
-				if (qry->ct == NQCTAND && i > 0)
-					tbwdb = nqbwdbjoin(bwdb, rdb);
+				NQBWDB *ttbwdb, *tbwdb, *bwdb = (NQBWDB*)condptr->db;
+				tbwdb = (scope != 0) ? nqbwdbjoin(bwdb, scope) : bwdb;
+				ttbwdb = (qry->type == NQCTAND && i > 0) ? nqbwdbjoin(tbwdb, rdb) : tbwdb;
 				switch (condptr->op)
 				{
 					case NQOPLIKE:
-						nqbwdbsearch(bwdb, condptr->sbj.desc, kstr, condptr->lmt, false, likeness);
+						nqbwdbsearch(ttbwdb, condptr->sbj.desc, kstr, condptr->lmt, false, likeness);
 						break;
 					case NQOPELIKE:
-						nqbwdblike(bwdb, condptr->sbj.desc, kstr, condptr->lmt, condptr->ext, 0.6, false, likeness);
+						nqbwdblike(ttbwdb, condptr->sbj.desc, kstr, condptr->lmt, condptr->ext, 0.6, false, likeness);
 						break;
 				}
-				if (qry->ct == NQCTAND && i > 0)
+				if (qry->type == NQCTAND && i > 0)
+					nqbwdbdel(ttbwdb);
+				if (scope != 0)
 					nqbwdbdel(tbwdb);
 				break;
 			case NQTFDB:
-				NQFDB *tfdb, *fdb = (NQFDB*)condptr->column;
-				if (qry->ct == NQCTAND && i > 0)
-					tfdb = nqfdbjoin(fdb, rdb);
+				NQFDB *ttfdb, *tfdb, *fdb = (NQFDB*)condptr->db;
+				tfdb = (scope != 0) ? nqfdbjoin(fdb, scope) : fdb;
+				ttfdb = (qry->type == NQCTAND && i > 0) ? nqfdbjoin(tfdb, rdb) : tfdb;
 				switch (condptr->op)
 				{
 					case NQOPLIKE:
-						nqbwdbsearch(fdb, condptr->sbj.desc, kstr, condptr->lmt, false, likeness);
+						nqbwdbsearch(ttfdb, condptr->sbj.desc, kstr, condptr->lmt, false, likeness);
 						break;
 					case NQOPELIKE:
-						nqfdblike(fdb, condptr->sbj.desc, kstr, condptr->lmt, false, likeness);
+						nqfdblike(ttfdb, condptr->sbj.desc, kstr, condptr->lmt, false, likeness);
 						break;
 				}
-				if (qry->ct == NQCTAND && i > 0)
+				if (qry->type == NQCTAND && i > 0)
+					nqfdbdel(ttfdb);
+				if (scope != 0)
 					nqfdbdel(tfdb);
 				break;
 		}
@@ -76,11 +178,12 @@ NQRDB* nqqrysearch(NQQRY* qry)
 			case NQCTAND:
 				if (i > 0)
 				{
+					nqrdbfilter(rdb, kstr);
 					union { float fl; void* ptr; } it;
 					char** ksptr = kstr;
 					float* lkptr = likeness;
 					for (j = 0; j < condptr->lmt; j++, ksptr++, lkptr++)
-						if (*ksptr != 0)
+						if (*ksptr != 0 && (scope == 0 || nqrdbget(scope, *ksptr)))
 						{
 							it.ptr = nqrdbget(rdb, *ksptr);
 							if (it.ptr != 0)
@@ -96,7 +199,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				char** ksptr = kstr;
 				float* lkptr = likeness;
 				for (j = 0; j < condptr->lmt; j++, ksptr++, lkptr++)
-					if (*ksptr != 0)
+					if (*ksptr != 0 && (scope == 0 || nqrdbget(scope, *ksptr)))
 					{
 						it.ptr = nqrdbget(rdb, *ksptr);
 						it.fl += condptr->cfd * *lkptr;

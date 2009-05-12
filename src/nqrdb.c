@@ -300,7 +300,10 @@ bool nqrdbfilter(NQRDB* rdb, char** kstr, int len)
 	{
 		NQRDBDATUM* next = cur->next;
 		while (cur && cur->dirty)
+		{
+			next = cur->next;
 			cur = nqrdboutdatum(rdb, cur);
+		}
 		cur = next;
 	}
 #if APR_HAS_THREADS

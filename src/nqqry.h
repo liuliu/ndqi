@@ -52,6 +52,7 @@ enum {
 	NQOPELIKE		/* object is exact like (exhausted search) */
 };
 
+int nqqryresult(NQQRY* qry, char** kstr, likeness = 0);
 NQRDB* nqqrysearch(NQQRY* qry);
 int nqqrydump(NQQRY* qry, void** mem);
 NQQRY* nqqrynew(void);
