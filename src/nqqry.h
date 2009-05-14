@@ -6,6 +6,9 @@
 #ifndef _GUARD_NQQRY_
 #define _GUARD_NQQRY_
 
+#include <cv.h>
+#include "nqrdb.h"
+
 #define QRY_MAX_LMT (2000)
 
 typedef struct NQQRY {
@@ -23,22 +26,19 @@ typedef struct NQQRY {
 	int cnum;
 	int ordered;
 	int lmt;
-	NQQRY* conds;
+	NQQRY** conds;
 	NQRDB* result;
 } NQQRY;
 
 enum {
+	NQCTAND,		/* and conjunction             */
+	NQCTOR,			/* or conjunction              */
 	NQTRDB,			/* rdb type                    */
 	NQTBWDB,		/* bwdb type                   */
 	NQTFDB,			/* fdb type                    */
 	NQTTCNDB,		/* tokyo-cabinet db for number */
 	NQTTCSDB,		/* tokyo-cabinet db for string */
 	NQTSPHINX		/* sphinx full-text search     */
-};
-
-enum {
-	NQCTAND,		/* and conjunction */
-	NQCTOR			/* or conjunction  */
 };
 
 enum {
@@ -52,10 +52,11 @@ enum {
 	NQOPELIKE		/* object is exact like (exhausted search) */
 };
 
-int nqqryresult(NQQRY* qry, char** kstr, likeness = 0);
+int nqqryresult(NQQRY* qry, char** kstr, float* likeness = 0);
 NQRDB* nqqrysearch(NQQRY* qry);
-int nqqrydump(NQQRY* qry, void** mem);
+bool nqqrydump(NQQRY* qry, void** mem, int* len);
 NQQRY* nqqrynew(void);
 NQQRY* nqqrynew(void* mem);
+void nqqrydel(NQQRY* qry);
 
 #endif

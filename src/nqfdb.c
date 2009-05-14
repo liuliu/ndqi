@@ -351,6 +351,13 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 	apr_thread_rwlock_wrlock(fdb->rwunidxlock);
 #endif
 	int unum = fdb->unum;
+	if (unum <= 0)
+	{
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(fdb->rwunidxlock);
+#endif
+		return false;
+	}
 	int cols = fdb->unidx->next->datum->f->cols;
 	idx->p = 0;
 	NQFDBDATUM** data;
@@ -418,6 +425,7 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(fdb->rwidxlock);
 #endif
+	return true;
 }
 
 static void nqfrefr(char* kstr, void* vbuf, void* ud)
