@@ -138,14 +138,15 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		memset(likeness, 0, sizeof(likeness[0]) * (*condptr)->lmt);
 		NQBWDB *ttbwdb, *tbwdb, *bwdb;
 		NQFDB *ttfdb, *tfdb, *fdb;
+		TCADB *adb;
 		TCWDB *wdb;
 		uint64_t *result;
-		int k, rnum;
+		int j, k;
 		switch ((*condptr)->type)
 		{
 			case NQCTAND:
 			case NQCTOR:
-				*condptr->ordered = true;
+				(*condptr)->ordered = true;
 				if (qry->type == NQCTAND && i > 0)
 					(*condptr)->result = rdb;
 				nqqrysearch(*condptr);
@@ -196,25 +197,25 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					case NQOPLIKE:
 					case NQOPELIKE:
 						wdb = (TCWDB*)(*condptr)->db;
-						result = tcwdbsearch(wdb, (*condptr)->sbj.str, &rnum);
-						if (rnum > maxlmt)
+						result = tcwdbsearch(wdb, (*condptr)->sbj.str, &k);
+						if (k > maxlmt)
 						{
-							maxlmt = rnum;
+							maxlmt = k;
 							free(kstr);
 							free(likeness);
 							kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
 							likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
 						}
-						memset(kstr, 0, sizeof(kstr[0]) * rnum);
-						memset(likeness, 0, sizeof(likeness[0]) * rnum);
+						memset(kstr, 0, sizeof(kstr[0]) * k);
+						memset(likeness, 0, sizeof(likeness[0]) * k);
 						char** ksptr = kstr;
 						float* lkptr = likeness;
 						uint64_t* rptr = result;
-						for (i = 0; i < rnum; i++, rptr++, ksptr++, lkptr++)
+						adb = (TCADB*)(*condptr)->col;
+						for (j = 0; j < k; j++, rptr++, ksptr++, lkptr++)
 						{
-							int num;
-							adb = (TCADB*)(*condptr)->col;
-							*ksptr = tcadbget(adb, rptr, sizeof(uint64_t), &num);
+							int ksiz;
+							*ksptr = (char*)tcadbget(adb, rptr, sizeof(uint64_t), &ksiz);
 							*lkptr = 1.;
 						}
 						free(result);
@@ -222,7 +223,6 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				}
 				break;
 		}
-		int j;
 		switch (qry->type)
 		{
 			case NQCTAND:
@@ -257,8 +257,15 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					}
 				break;
 		}
+		/* conditionally free resources */
 		if ((*condptr)->type == NQCTAND || (*condptr)->type == NQCTOR)
 			nqrdbdel((*condptr)->result);
+		if ((*condptr)->type == NQTTCWDB)
+		{
+			char** ksptr = kstr;
+			for (j = 0; j < k; j++, ksptr++)
+				free(*ksptr);
+		}
 	}
 	free(kstr);
 	free(likeness);
@@ -398,12 +405,11 @@ NQQRY* nqqrynew(void* mem)
 	return qry;
 }
 
-bool nqqrydump(NQQRY* qry, void** mem, int* len)
+void* nqqrydump(NQQRY* qry, int* sp)
 {
 	int t = nqqrydumpcount(qry);
 	char* newmem = (char*)malloc(t);
 	nqqrydumpcpy(qry, newmem);
-	*mem = newmem;
-	*len = t;
-	return true;
+	*sp = t;
+	return newmem;
 }

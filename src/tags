@@ -96,7 +96,7 @@ INT32_MAX	parser/lex.yy.c	74;"	d	file:
 INT32_MIN	parser/lex.yy.c	65;"	d	file:
 INT8_MAX	parser/lex.yy.c	68;"	d	file:
 INT8_MIN	parser/lex.yy.c	59;"	d	file:
-LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui# -ltokyocabinet$/;"	m
+LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyocabinet -ltokyodystopia$/;"	m
 LINKLIB	test/makefile	/^LINKLIB=-L"$(OPENCV)\/lib"$/;"	m
 NQBWDB	nqbwdb.h	/^} NQBWDB;$/;"	t	typeref:struct:__anon6
 NQBWDBDATUM	nqbwdb.h	/^} NQBWDBDATUM;$/;"	t	typeref:struct:__anon5
@@ -597,8 +597,8 @@ nqlhnew	nqlh.c	/^CvMat* nqlhnew(CvArr* image, int bins)$/;"	f	signature:(CvArr* 
 nqlhnew	nqlh.h	/^CvMat* nqlhnew(CvArr* image, int bins);$/;"	p	signature:(CvArr* image, int bins)
 nqqrydel	nqqry.c	/^void nqqrydel(NQQRY* qry)$/;"	f	signature:(NQQRY* qry)
 nqqrydel	nqqry.h	/^void nqqrydel(NQQRY* qry);$/;"	p	signature:(NQQRY* qry)
-nqqrydump	nqqry.c	/^bool nqqrydump(NQQRY* qry, void** mem, int* len)$/;"	f	signature:(NQQRY* qry, void** mem, int* len)
-nqqrydump	nqqry.h	/^bool nqqrydump(NQQRY* qry, void** mem, int* len);$/;"	p	signature:(NQQRY* qry, void** mem, int* len)
+nqqrydump	nqqry.c	/^void* nqqrydump(NQQRY* qry, int* sp)$/;"	f	signature:(NQQRY* qry, int* sp)
+nqqrydump	nqqry.h	/^void* nqqrydump(NQQRY* qry, int* sp);$/;"	p	signature:(NQQRY* qry, int* sp)
 nqqrydumpcount	nqqry.c	/^static int nqqrydumpcount(NQQRY* qry)$/;"	f	file:	signature:(NQQRY* qry)
 nqqrydumpcpy	nqqry.c	/^static bool nqqrydumpcpy(NQQRY* qry, char* mem)$/;"	f	file:	signature:(NQQRY* qry, char* mem)
 nqqryhpf	nqqry.c	/^static void nqqryhpf(NQQRYPAIR* pr, uint32_t i, uint32_t siz)$/;"	f	file:	signature:(NQQRYPAIR* pr, uint32_t i, uint32_t siz)

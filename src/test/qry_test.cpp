@@ -10,6 +10,12 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include <tcadb.h>
+#include <tcwdb.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
+
 apr_pool_t* mempool;
 
 int main()
@@ -21,6 +27,10 @@ int main()
 	NQFDB* fdb = nqfdbnew();
 	NQBWDB* bwdb = nqbwdbnew();
 
+	TCADB* adb = tcadbnew();
+	tcadbopen(adb, "*");
+	TCWDB* wdb = tcwdbnew();
+	tcwdbopen(wdb, "casket", WDBOWRITER | WDBOCREAT);
 	/* string to hold directory name */
 	char *dirname = "./../testdata/dpdb/";
 
@@ -41,7 +51,7 @@ int main()
 	/* change working dir to be able to read file information */
 	chdir(dirname);
 	char todel[32];
-	int i = 0;
+	uint64_t i = 0;
 	while ((entry = readdir(dir)) != NULL)
 	{
 		/* only list regular files... */
@@ -50,6 +60,12 @@ int main()
 		if (S_ISREG(statinfo.st_mode))
 		{
 			printf("loading file: %s\n", entry->d_name);
+			char kstr[16];
+			memcpy(kstr, entry->d_name, 16);
+			tcadbput(adb, &i, sizeof(uint64_t), kstr, 16);
+			char prefix[] = "dsc007";
+			memcpy(prefix, entry->d_name, 6);
+			tcwdbput2(wdb, i, prefix, NULL);
 			IplImage* image = cvLoadImage(entry->d_name, CV_LOAD_IMAGE_COLOR);
 			IplImage* small = cvCreateImage(cvSize(640, 480), 8, 3);
 			cvResize(image, small, CV_INTER_AREA);
@@ -150,6 +166,14 @@ int main()
 	bwqry->op = NQOPLIKE;
 	bwqry->db = bwdb;
 	bwqry->sbj.desc = dpe1;
+	NQQRY* tagqry = qry->conds[2] = nqqrynew();
+	tagqry->db = wdb;
+	tagqry->col = adb;
+	tagqry->type = NQTTCWDB;
+	tagqry->op = NQOPSTREQ;
+	tagqry->ext = 7;
+	tagqry->sbj.str = "dsc007";
+	/*
 	NQQRY* subqry = qry->conds[2] = nqqrynew();
 	subqry->type = NQCTOR;
 	subqry->lmt = 20;
@@ -165,9 +189,9 @@ int main()
 	subbwqry->op = NQOPLIKE;
 	subbwqry->db = bwdb;
 	subbwqry->sbj.desc = dpe2;
-	char* mem = 0;
+	*/
 	int len;
-	nqqrydump(qry, (void**)&mem, &len);
+	char* mem = (char*)nqqrydump(qry, &len);
 	printf("query is encoded to %d long\n", len);
 	NQQRY* newqry = nqqrynew(mem);
 	printf("query is decoded\n");

@@ -55,7 +55,7 @@ enum {
 
 int nqqryresult(NQQRY* qry, char** kstr, float* likeness = 0);
 NQRDB* nqqrysearch(NQQRY* qry);
-bool nqqrydump(NQQRY* qry, void** mem, int* len);
+void* nqqrydump(NQQRY* qry, int* sp);
 NQQRY* nqqrynew(void);
 NQQRY* nqqrynew(void* mem);
 void nqqrydel(NQQRY* qry);
