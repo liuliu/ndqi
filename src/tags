@@ -96,7 +96,7 @@ INT32_MAX	parser/lex.yy.c	74;"	d	file:
 INT32_MIN	parser/lex.yy.c	65;"	d	file:
 INT8_MAX	parser/lex.yy.c	68;"	d	file:
 INT8_MIN	parser/lex.yy.c	59;"	d	file:
-LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui$/;"	m
+LINKFLAG	test/makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui# -ltokyocabinet$/;"	m
 LINKLIB	test/makefile	/^LINKLIB=-L"$(OPENCV)\/lib"$/;"	m
 NQBWDB	nqbwdb.h	/^} NQBWDB;$/;"	t	typeref:struct:__anon6
 NQBWDBDATUM	nqbwdb.h	/^} NQBWDBDATUM;$/;"	t	typeref:struct:__anon5
@@ -122,8 +122,8 @@ NQBWPAIR	nqbwdb.c	/^} NQBWPAIR;$/;"	t	typeref:struct:__anon2	file:
 NQBWUSERDATA	nqbwdb.c	/^} NQBWUSERDATA;$/;"	t	typeref:struct:__anon3	file:
 NQBW_LIKE_BEST_MATCH_COUNT	nqbwdb.h	12;"	d
 NQBW_LIKE_BEST_MATCH_SCORE	nqbwdb.h	13;"	d
-NQCTAND	nqqry.h	/^	NQCTAND,		\/* and conjunction             *\/$/;"	e	enum:__anon15
-NQCTOR	nqqry.h	/^	NQCTOR,			\/* or conjunction              *\/$/;"	e	enum:__anon15
+NQCTAND	nqqry.h	/^	NQCTAND,		\/* and conjunction         *\/$/;"	e	enum:__anon15
+NQCTOR	nqqry.h	/^	NQCTOR,			\/* or conjunction          *\/$/;"	e	enum:__anon15
 NQFDB	nqfdb.h	/^} NQFDB;$/;"	t	typeref:struct:__anon10
 NQFDBDATUM	nqfdb.h	/^} NQFDBDATUM;$/;"	t	typeref:struct:__anon9
 NQFDBIDX	nqfdb.h	/^typedef struct NQFDBIDX {$/;"	s
@@ -161,6 +161,7 @@ NQQRY::__anon14::i	nqqry.h	/^		int i;$/;"	m	union:NQQRY::__anon14	access:public
 NQQRY::__anon14::str	nqqry.h	/^		char* str;$/;"	m	union:NQQRY::__anon14	access:public
 NQQRY::cfd	nqqry.h	/^	float cfd;$/;"	m	struct:NQQRY	access:public
 NQQRY::cnum	nqqry.h	/^	int cnum;$/;"	m	struct:NQQRY	access:public
+NQQRY::col	nqqry.h	/^	void* col;$/;"	m	struct:NQQRY	access:public
 NQQRY::conds	nqqry.h	/^	NQQRY** conds;$/;"	m	struct:NQQRY	access:public
 NQQRY::db	nqqry.h	/^	void* db;$/;"	m	struct:NQQRY	access:public
 NQQRY::ext	nqqry.h	/^	int ext;$/;"	m	struct:NQQRY	access:public
@@ -185,12 +186,12 @@ NQRDBDATUM::pr	nqrdb.h	/^	NQRDBDATUM* pr;$/;"	m	struct:NQRDBDATUM	access:public
 NQRDBDATUM::prev	nqrdb.h	/^	NQRDBDATUM* prev;$/;"	m	struct:NQRDBDATUM	access:public
 NQRDBDATUM::rnum	nqrdb.h	/^	uint32_t rnum;$/;"	m	struct:NQRDBDATUM	access:public
 NQRDBDATUM::vbuf	nqrdb.h	/^	void* vbuf;$/;"	m	struct:NQRDBDATUM	access:public
-NQTBWDB	nqqry.h	/^	NQTBWDB,		\/* bwdb type                   *\/$/;"	e	enum:__anon15
-NQTFDB	nqqry.h	/^	NQTFDB,			\/* fdb type                    *\/$/;"	e	enum:__anon15
-NQTRDB	nqqry.h	/^	NQTRDB,			\/* rdb type                    *\/$/;"	e	enum:__anon15
-NQTSPHINX	nqqry.h	/^	NQTSPHINX		\/* sphinx full-text search     *\/$/;"	e	enum:__anon15
-NQTTCNDB	nqqry.h	/^	NQTTCNDB,		\/* tokyo-cabinet db for number *\/$/;"	e	enum:__anon15
-NQTTCSDB	nqqry.h	/^	NQTTCSDB,		\/* tokyo-cabinet db for string *\/$/;"	e	enum:__anon15
+NQTBWDB	nqqry.h	/^	NQTBWDB,		\/* bwdb type               *\/$/;"	e	enum:__anon15
+NQTFDB	nqqry.h	/^	NQTFDB,			\/* fdb type                *\/$/;"	e	enum:__anon15
+NQTRDB	nqqry.h	/^	NQTRDB,			\/* rdb type                *\/$/;"	e	enum:__anon15
+NQTSPHINX	nqqry.h	/^	NQTSPHINX		\/* sphinx full-text search *\/$/;"	e	enum:__anon15
+NQTTCTDB	nqqry.h	/^	NQTTCTDB,		\/* tokyo-cabinet table db  *\/$/;"	e	enum:__anon15
+NQTTCWDB	nqqry.h	/^	NQTTCWDB,		\/* tokyo-cabinet word db   *\/$/;"	e	enum:__anon15
 OPENCV	test/makefile	/^OPENCV=\/opt\/opencv$/;"	m
 OUTDIR	test/makefile	/^OUTDIR=..\/..\/build$/;"	m
 QRY_MAX_LMT	nqqry.h	12;"	d
@@ -335,6 +336,7 @@ chd	nqrdb.h	/^	NQRDBDATUM** chd;$/;"	m	struct:NQRDBDATUM	access:public
 clear	lib/mlapcluster.cpp	/^CvAPCluster::clear()$/;"	f	class:CvAPCluster	signature:()
 clear	lib/mlapcluster.h	/^		virtual void clear();$/;"	p	class:CvAPCluster	access:public	signature:()
 cnum	nqqry.h	/^	int cnum;$/;"	m	struct:NQQRY	access:public
+col	nqqry.h	/^	void* col;$/;"	m	struct:NQQRY	access:public
 conds	nqqry.h	/^	NQQRY** conds;$/;"	m	struct:NQQRY	access:public
 conv_img	lib/cvgist.h	/^	CvMat* conv_img;$/;"	m	struct:CvGaborFilter	access:public
 conv_real	lib/cvgist.h	/^	CvMat* conv_real;$/;"	m	struct:CvGaborFilter	access:public

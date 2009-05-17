@@ -37,7 +37,8 @@ enum {
 	NQTRDB,			/* rdb type                */
 	NQTBWDB,		/* bwdb type               */
 	NQTFDB,			/* fdb type                */
-	NQTTCDB,		/* tokyo-cabinet table db  */
+	NQTTCTDB,		/* tokyo-cabinet table db  */
+	NQTTCWDB,		/* tokyo-cabinet word db   */
 	NQTSPHINX		/* sphinx full-text search */
 };
 

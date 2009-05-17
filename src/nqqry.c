@@ -8,6 +8,15 @@
 #include "nqbwdb.h"
 #include "nqfdb.h"
 
+/* 3rd party library */
+#include <tcutil.h>
+#include <tcadb.h>
+#include <tctdb.h>
+#include <tcwdb.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
+
 typedef struct {
 	char* kstr;
 	float likeness;
@@ -129,7 +138,9 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		memset(likeness, 0, sizeof(likeness[0]) * (*condptr)->lmt);
 		NQBWDB *ttbwdb, *tbwdb, *bwdb;
 		NQFDB *ttfdb, *tfdb, *fdb;
-		int k;
+		TCWDB *wdb;
+		uint64_t *result;
+		int k, rnum;
 		switch ((*condptr)->type)
 		{
 			case NQCTAND:
@@ -176,7 +187,39 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				if (scope != 0)
 					nqfdbdel(tfdb);
 				break;
-			case NQTTDB:
+			case NQTTCTDB:
+				break;
+			case NQTTCWDB:
+				switch ((*condptr)->op)
+				{
+					case NQOPSTREQ:
+					case NQOPLIKE:
+					case NQOPELIKE:
+						wdb = (TCWDB*)(*condptr)->db;
+						result = tcwdbsearch(wdb, (*condptr)->sbj.str, &rnum);
+						if (rnum > maxlmt)
+						{
+							maxlmt = rnum;
+							free(kstr);
+							free(likeness);
+							kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
+							likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
+						}
+						memset(kstr, 0, sizeof(kstr[0]) * rnum);
+						memset(likeness, 0, sizeof(likeness[0]) * rnum);
+						char** ksptr = kstr;
+						float* lkptr = likeness;
+						uint64_t* rptr = result;
+						for (i = 0; i < rnum; i++, rptr++, ksptr++, lkptr++)
+						{
+							int num;
+							adb = (TCADB*)(*condptr)->col;
+							*ksptr = tcadbget(adb, rptr, sizeof(uint64_t), &num);
+							*lkptr = 1.;
+						}
+						free(result);
+						break;
+				}
 				break;
 		}
 		int j;
@@ -265,7 +308,8 @@ static int nqqrydumpcount(NQQRY* qry)
 				t += nqqrydumpcount(*condptr);
 				break;
 			case NQTRDB:
-			case NQTTCSDB:
+			case NQTTCTDB:
+			case NQTTCWDB:
 			case NQTSPHINX:
 				t += sizeof(NQQRY) + (*condptr)->ext;
 				break;
@@ -273,9 +317,6 @@ static int nqqrydumpcount(NQQRY* qry)
 			case NQTFDB:
 				t += (*condptr)->sbj.desc->rows * (*condptr)->sbj.desc->step;
 				t += sizeof(NQQRY) + sizeof(CvMat);
-				break;
-			case NQTTCNDB:
-				t += sizeof(NQQRY);
 				break;
 		}
 	}
@@ -298,7 +339,8 @@ static bool nqqrydumpcpy(NQQRY* qry, char* mem)
 				mem += nqqrydumpcount(*condptr);
 				break;
 			case NQTRDB:
-			case NQTTCSDB:
+			case NQTTCTDB:
+			case NQTTCWDB:
 			case NQTSPHINX:
 				memcpy(mem, *condptr, sizeof(NQQRY));
 				mem += sizeof(NQQRY);
@@ -313,10 +355,6 @@ static bool nqqrydumpcpy(NQQRY* qry, char* mem)
 				mem += sizeof(CvMat);
 				memcpy(mem, (*condptr)->sbj.desc->data.ptr, (*condptr)->sbj.desc->rows * (*condptr)->sbj.desc->cols * sizeof(float));
 				mem += (*condptr)->sbj.desc->rows * (*condptr)->sbj.desc->cols * sizeof(float);
-				break;
-			case NQTTCNDB:
-				memcpy(mem, *condptr, sizeof(NQQRY));
-				mem += sizeof(NQQRY);
 				break;
 		}
 	}
@@ -342,7 +380,8 @@ NQQRY* nqqrynew(void* mem)
 				newmem += nqqrydumpcount(*condptr);
 				break;
 			case NQTRDB:
-			case NQTTCSDB:
+			case NQTTCTDB:
+			case NQTTCWDB:
 			case NQTSPHINX:
 				(*condptr)->sbj.str = newmem;
 				newmem += (*condptr)->ext;
