@@ -1,7 +1,7 @@
 OPENCV=/opt/opencv
 OUTDIR=../../build
 COMPFLAG=-O3
-LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui
+LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui# -ltokyocabinet
 LINKLIB=-L"$(OPENCV)/lib"
 CXXFLAGS=-I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/opencv"
 

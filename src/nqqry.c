@@ -134,6 +134,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		{
 			case NQCTAND:
 			case NQCTOR:
+				*condptr->ordered = true;
 				if (qry->type == NQCTAND && i > 0)
 					(*condptr)->result = rdb;
 				nqqrysearch(*condptr);
@@ -174,6 +175,8 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					nqfdbdel(ttfdb);
 				if (scope != 0)
 					nqfdbdel(tfdb);
+				break;
+			case NQTTDB:
 				break;
 		}
 		int j;

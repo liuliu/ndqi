@@ -13,6 +13,7 @@
 
 typedef struct NQQRY {
 	void* db;
+	void* col;
 	union {
 		float fl;
 		int i;
@@ -31,14 +32,13 @@ typedef struct NQQRY {
 } NQQRY;
 
 enum {
-	NQCTAND,		/* and conjunction             */
-	NQCTOR,			/* or conjunction              */
-	NQTRDB,			/* rdb type                    */
-	NQTBWDB,		/* bwdb type                   */
-	NQTFDB,			/* fdb type                    */
-	NQTTCNDB,		/* tokyo-cabinet db for number */
-	NQTTCSDB,		/* tokyo-cabinet db for string */
-	NQTSPHINX		/* sphinx full-text search     */
+	NQCTAND,		/* and conjunction         */
+	NQCTOR,			/* or conjunction          */
+	NQTRDB,			/* rdb type                */
+	NQTBWDB,		/* bwdb type               */
+	NQTFDB,			/* fdb type                */
+	NQTTCDB,		/* tokyo-cabinet table db  */
+	NQTSPHINX		/* sphinx full-text search */
 };
 
 enum {

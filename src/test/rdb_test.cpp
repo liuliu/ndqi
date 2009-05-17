@@ -1,3 +1,9 @@
+/*
+#include <tcutil.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
+*/
 #include "../nqrdb.h"
 #include "../lib/frl_util_md5.h"
 
@@ -15,16 +21,26 @@ int main()
 	apr_pool_create(&mempool, NULL);
 	apr_atomic_init(mempool);
 	frl_md5 key_cache[500000];
+	apr_time_t time = apr_time_now();
 	for (int i = 0; i < 500000; i++)
 		key_cache[i] = frl_md5((char*)&i, 4);
+	time = apr_time_now()-time;
+	printf("data generated in %d microsecond(s).\n", time);
 	NQRDB* rdb = nqrdbnew();
 	int a[] = {10, 11, 12, 13, 22};
-	printf("data generated\n");
-	apr_time_t time = apr_time_now();
+	time = apr_time_now();
 	for (int i = 0; i < 500000; i++)
 		nqrdbput(rdb, (char*)key_cache[i].digest, a+i%5);
 	time = apr_time_now()-time;
 	printf("add 500,000 key-value pairs to rdb in %d microsecond(s).\n", time);
+/*
+	TCMAP* tcmap = tcmapnew();
+	time = apr_time_now();
+	for (int i = 0; i < 500000; i++)
+		tcmapput(tcmap, (char*)key_cache[i].digest, 16, a+i%5, 4);
+	time = apr_time_now()-time;
+	printf("add 500,000 key-value pairs to tcmap in %d microsecond(s).\n", time);
+*/
 	time = apr_time_now();
 	for (int i = 0; i < 500000; i++)
 	{
@@ -34,6 +50,18 @@ int main()
 	}
 	time = apr_time_now()-time;
 	printf("look up 500,000 key-value pairs in rdb in %d microsecond(s).\n", time);
+/*
+	time = apr_time_now();
+	for (int i = 0; i < 500000; i++)
+	{
+		int sp;
+		const void* entry = tcmapget(tcmap, (char*)key_cache[i].digest, 16, &sp);
+		if (*((int*)entry) != a[i%5])
+			printf("unexpected error in looking up %d %d.\n", *((int*)entry), a[i%5]);
+	}
+	time = apr_time_now()-time;
+	printf("look up 500,000 key-value pairs in tcmap in %d microsecond(s).\n", time);
+*/
 	time = apr_time_now();
 	for (int i = 0; i < 250000; i++)
 		nqrdbout(rdb, (char*)key_cache[i].digest);
