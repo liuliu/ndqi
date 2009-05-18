@@ -15,16 +15,14 @@ typedef struct NQQRY {
 	void* db;
 	void* col;
 	union {
-		float fl;
-		int i;
 		char* str;
 		CvMat* desc;
 	} sbj;
 	float cfd;
 	int type;
 	int op;
-	int ext;
 	int cnum;
+	int mode;
 	int ordered;
 	int lmt;
 	NQQRY** conds;

@@ -138,9 +138,11 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		memset(likeness, 0, sizeof(likeness[0]) * (*condptr)->lmt);
 		NQBWDB *ttbwdb, *tbwdb, *bwdb;
 		NQFDB *ttfdb, *tfdb, *fdb;
+		TCTDB *tdb;
 		TCADB *adb;
 		TCWDB *wdb;
-		uint64_t *result;
+		char *colname;
+		TDBQRY *tdbqry;
 		int j, k;
 		switch ((*condptr)->type)
 		{
@@ -162,7 +164,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						k = nqbwdbsearch(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
 						break;
 					case NQOPELIKE:
-						k = nqbwdblike(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, (*condptr)->ext, 0.6, true, likeness);
+						k = nqbwdblike(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, (*condptr)->mode, 0.6, true, likeness);
 						break;
 				}
 				if (qry->type == NQCTAND && i > 0)
@@ -189,6 +191,56 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					nqfdbdel(tfdb);
 				break;
 			case NQTTCTDB:
+				tdb = (TCTDB*)(*condptr)->db;
+				colname = (char*)(*condptr)->col;
+				tdbqry = tctdbqrynew(tdb);
+				switch ((*condptr)->op)
+				{
+					case NQOPNUMEQ:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNUMEQ, (*condptr)->sbj.str);
+						break;
+					case NQOPNUMGT:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNUMGT, (*condptr)->sbj.str);
+						break;
+					case NQOPNUMLT:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNUMLT, (*condptr)->sbj.str);
+						break;
+					case NQOPNUMGE:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNUMGE, (*condptr)->sbj.str);
+						break;
+					case NQOPNUMLE:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNUMLE, (*condptr)->sbj.str);
+						break;
+					case NQOPSTREQ:
+					case NQOPLIKE:
+					case NQOPELIKE:
+						tctdbqryaddcond(tdbqry, colname, TDBQCSTREQ, (*condptr)->sbj.str);
+						break;
+				}
+				{
+					TCLIST* result = tctdbqrysearch(tdbqry);
+					k = tclistnum(result);
+					if (k > maxlmt)
+					{
+						maxlmt = k;
+						free(kstr);
+						free(likeness);
+						kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
+						likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
+					}
+					memset(kstr, 0, sizeof(kstr[0]) * k);
+					memset(likeness, 0, sizeof(likeness[0]) * k);
+					char** ksptr = kstr;
+					float* lkptr = likeness;
+					for (i = 0; i < k; i++)
+					{
+						int ksiz;
+						*ksptr = (char*)tclistval(result, i, &ksiz);
+						*lkptr = 1.;
+					}
+					tclistdel(result);
+					tctdbqrydel(tdbqry);
+				}
 				break;
 			case NQTTCWDB:
 				switch ((*condptr)->op)
@@ -197,7 +249,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					case NQOPLIKE:
 					case NQOPELIKE:
 						wdb = (TCWDB*)(*condptr)->db;
-						result = tcwdbsearch(wdb, (*condptr)->sbj.str, &k);
+						uint64_t* result = tcwdbsearch(wdb, (*condptr)->sbj.str, &k);
 						if (k > maxlmt)
 						{
 							maxlmt = k;
@@ -318,7 +370,7 @@ static int nqqrydumpcount(NQQRY* qry)
 			case NQTTCTDB:
 			case NQTTCWDB:
 			case NQTSPHINX:
-				t += sizeof(NQQRY) + (*condptr)->ext;
+				t += sizeof(NQQRY) + strlen((*condptr)->sbj.str) + 1;
 				break;
 			case NQTBWDB:
 			case NQTFDB:
@@ -351,8 +403,8 @@ static bool nqqrydumpcpy(NQQRY* qry, char* mem)
 			case NQTSPHINX:
 				memcpy(mem, *condptr, sizeof(NQQRY));
 				mem += sizeof(NQQRY);
-				memcpy(mem, (*condptr)->sbj.str, (*condptr)->ext);
-				mem += (*condptr)->ext;
+				memcpy(mem, (*condptr)->sbj.str, strlen((*condptr)->sbj.str) + 1);
+				mem += strlen((*condptr)->sbj.str) + 1;
 				break;
 			case NQTBWDB:
 			case NQTFDB:
@@ -391,7 +443,7 @@ NQQRY* nqqrynew(void* mem)
 			case NQTTCWDB:
 			case NQTSPHINX:
 				(*condptr)->sbj.str = newmem;
-				newmem += (*condptr)->ext;
+				newmem += strlen((*condptr)->sbj.str) + 1;
 				break;
 			case NQTBWDB:
 			case NQTFDB:

@@ -28,7 +28,7 @@ NQFDB* nqfdbnew(void)
 		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, 16, FRL_LOCK_WITH);
 	NQFDB* fdb = (NQFDB*)frl_slab_palloc(db_pool);
 	fdb->rdb = nqrdbnew();
-	fdb->shadow = false;
+	fdb->shallow = false;
 	fdb->inum = fdb->unum = 0;
 	fdb->idx = (NQFDBIDX*)frl_slab_palloc(idx_pool);
 	fdb->idx->inum = 0;
@@ -51,7 +51,7 @@ NQFDB* nqfdbjoin(NQFDB* fdb, char** kstr, int len)
 	int i;
 	NQFDB* ndb = (NQFDB*)frl_slab_palloc(db_pool);
 	ndb->rdb = nqrdbnew();
-	ndb->shadow = true;
+	ndb->shallow = true;
 	ndb->inum = fdb->inum;
 	ndb->unum = fdb->unum;
 	ndb->idx = fdb->idx;
@@ -84,7 +84,7 @@ NQFDB* nqfdbjoin(NQFDB* fdb, NQRDB* rdb)
 	int i;
 	NQFDB* ndb = (NQFDB*)frl_slab_palloc(db_pool);
 	ndb->rdb = nqrdbnew();
-	ndb->shadow = true;
+	ndb->shallow = true;
 	ndb->inum = fdb->inum;
 	ndb->unum = fdb->unum;
 	ndb->idx = fdb->idx;
@@ -517,7 +517,7 @@ static void nqfnuk(char* kstr, void* vbuf, void* ud)
 
 void nqfdbdel(NQFDB* fdb)
 {
-	if (!fdb->shadow)
+	if (!fdb->shallow)
 	{
 		nqrdbforeach(fdb->rdb, nqfnuk, 0);
 		nqfunidxclr(fdb);

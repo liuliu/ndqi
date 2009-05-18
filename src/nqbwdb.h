@@ -45,7 +45,7 @@ typedef struct NQBWDBUNIDX {
 
 typedef struct {
 	NQRDB* rdb;
-	bool shadow;
+	bool shallow;
 	uint32_t emax;
 	uint32_t wnum;
 	uint32_t inum;

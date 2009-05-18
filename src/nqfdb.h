@@ -33,7 +33,7 @@ typedef struct NQFDBUNIDX {
 
 typedef struct {
 	NQRDB* rdb;
-	bool shadow;
+	bool shallow;
 	uint32_t inum;
 	uint32_t unum;
 	NQFDBIDX* idx;

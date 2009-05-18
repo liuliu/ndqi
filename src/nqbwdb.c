@@ -29,7 +29,7 @@ NQBWDB* nqbwdbnew(void)
 		frl_slab_pool_create(&kstr_pool, mtx_pool, 1024, 16, FRL_LOCK_WITH);
 	NQBWDB* bwdb = (NQBWDB*)frl_slab_palloc(db_pool);
 	bwdb->rdb = nqrdbnew();
-	bwdb->shadow = false;
+	bwdb->shallow = false;
 	bwdb->emax = 20;
 	bwdb->wnum = bwdb->inum = bwdb->unum = 0;
 	bwdb->idx = (NQBWDBIDX*)frl_slab_palloc(idx_pool);
@@ -55,7 +55,7 @@ NQBWDB* nqbwdbjoin(NQBWDB* bwdb, char** kstr, int len)
 	int i;
 	NQBWDB* ndb = (NQBWDB*)frl_slab_palloc(db_pool);
 	ndb->rdb = nqrdbnew();
-	ndb->shadow = true;
+	ndb->shallow = true;
 	ndb->emax = bwdb->emax;
 	ndb->wnum = bwdb->wnum;
 	ndb->inum = bwdb->inum;
@@ -89,7 +89,7 @@ NQBWDB* nqbwdbjoin(NQBWDB* bwdb, NQRDB* rdb)
 {
 	NQBWDB* ndb = (NQBWDB*)frl_slab_palloc(db_pool);
 	ndb->rdb = nqrdbnew();
-	ndb->shadow = true;
+	ndb->shallow = true;
 	ndb->emax = bwdb->emax;
 	ndb->wnum = bwdb->wnum;
 	ndb->inum = bwdb->inum;
@@ -855,7 +855,7 @@ static void nqbwnuk(char* kstr, void* vbuf, void* ud)
 
 void nqbwdbdel(NQBWDB* bwdb)
 {
-	if (!bwdb->shadow)
+	if (!bwdb->shallow)
 	{
 		nqrdbforeach(bwdb->rdb, nqbwnuk, 0);
 		nqbwunidxclr(bwdb);

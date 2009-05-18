@@ -171,7 +171,6 @@ int main()
 	tagqry->col = adb;
 	tagqry->type = NQTTCWDB;
 	tagqry->op = NQOPSTREQ;
-	tagqry->ext = 7;
 	tagqry->sbj.str = "dsc007";
 	/*
 	NQQRY* subqry = qry->conds[2] = nqqrynew();

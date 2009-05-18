@@ -156,16 +156,14 @@ NQOPSTREQ	nqqry.h	/^	NQOPSTREQ,		\/* string is equal to                      *\/
 NQQRY	nqqry.h	/^typedef struct NQQRY {$/;"	s
 NQQRY	nqqry.h	/^} NQQRY;$/;"	t	typeref:struct:NQQRY
 NQQRY::__anon14::desc	nqqry.h	/^		CvMat* desc;$/;"	m	union:NQQRY::__anon14	access:public
-NQQRY::__anon14::fl	nqqry.h	/^		float fl;$/;"	m	union:NQQRY::__anon14	access:public
-NQQRY::__anon14::i	nqqry.h	/^		int i;$/;"	m	union:NQQRY::__anon14	access:public
 NQQRY::__anon14::str	nqqry.h	/^		char* str;$/;"	m	union:NQQRY::__anon14	access:public
 NQQRY::cfd	nqqry.h	/^	float cfd;$/;"	m	struct:NQQRY	access:public
 NQQRY::cnum	nqqry.h	/^	int cnum;$/;"	m	struct:NQQRY	access:public
 NQQRY::col	nqqry.h	/^	void* col;$/;"	m	struct:NQQRY	access:public
 NQQRY::conds	nqqry.h	/^	NQQRY** conds;$/;"	m	struct:NQQRY	access:public
 NQQRY::db	nqqry.h	/^	void* db;$/;"	m	struct:NQQRY	access:public
-NQQRY::ext	nqqry.h	/^	int ext;$/;"	m	struct:NQQRY	access:public
 NQQRY::lmt	nqqry.h	/^	int lmt;$/;"	m	struct:NQQRY	access:public
+NQQRY::mode	nqqry.h	/^	int mode;$/;"	m	struct:NQQRY	access:public
 NQQRY::op	nqqry.h	/^	int op;$/;"	m	struct:NQQRY	access:public
 NQQRY::ordered	nqqry.h	/^	int ordered;$/;"	m	struct:NQQRY	access:public
 NQQRY::result	nqqry.h	/^	NQRDB* result;$/;"	m	struct:NQQRY	access:public
@@ -269,7 +267,7 @@ __anon10::inum	nqfdb.h	/^	uint32_t inum;$/;"	m	struct:__anon10	access:public
 __anon10::rdb	nqfdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon10	access:public
 __anon10::rwidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwidxlock;$/;"	m	struct:__anon10	access:public
 __anon10::rwunidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon10	access:public
-__anon10::shadow	nqfdb.h	/^	bool shadow;$/;"	m	struct:__anon10	access:public
+__anon10::shallow	nqfdb.h	/^	bool shallow;$/;"	m	struct:__anon10	access:public
 __anon10::unidx	nqfdb.h	/^	NQFDBUNIDX* unidx;$/;"	m	struct:__anon10	access:public
 __anon10::unum	nqfdb.h	/^	uint32_t unum;$/;"	m	struct:__anon10	access:public
 __anon11::head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon11	access:public
@@ -301,7 +299,7 @@ __anon6::inum	nqbwdb.h	/^	uint32_t inum;$/;"	m	struct:__anon6	access:public
 __anon6::rdb	nqbwdb.h	/^	NQRDB* rdb;$/;"	m	struct:__anon6	access:public
 __anon6::rwidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwidxlock;$/;"	m	struct:__anon6	access:public
 __anon6::rwunidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon6	access:public
-__anon6::shadow	nqbwdb.h	/^	bool shadow;$/;"	m	struct:__anon6	access:public
+__anon6::shallow	nqbwdb.h	/^	bool shallow;$/;"	m	struct:__anon6	access:public
 __anon6::unidx	nqbwdb.h	/^	NQBWDBUNIDX* unidx;$/;"	m	struct:__anon6	access:public
 __anon6::unum	nqbwdb.h	/^	uint32_t unum;$/;"	m	struct:__anon6	access:public
 __anon6::wnum	nqbwdb.h	/^	uint32_t wnum;$/;"	m	struct:__anon6	access:public
@@ -371,10 +369,8 @@ dt_pool	nqbwdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
 dt_pool	nqfdb.c	/^static frl_slab_pool_t* dt_pool = 0;$/;"	v	file:
 emax	nqbwdb.c	/^	uint32_t emax;$/;"	m	struct:__anon3	file:	access:public
 emax	nqbwdb.h	/^	uint32_t emax;$/;"	m	struct:__anon6	access:public
-ext	nqqry.h	/^	int ext;$/;"	m	struct:NQQRY	access:public
 f	nqfdb.h	/^	CvMat* f;$/;"	m	struct:NQFDBIDX	access:public
 f	nqfdb.h	/^	CvMat* f;$/;"	m	struct:__anon9	access:public
-fl	nqqry.h	/^		float fl;$/;"	m	union:NQQRY::__anon14	access:public
 flag	lib/frl_slab_pool.h	/^	apr_uint32_t flag;$/;"	m	struct:frl_mem_safe_t	access:public
 flex_int16_t	parser/lex.yy.c	/^typedef int16_t flex_int16_t;$/;"	t	file:
 flex_int16_t	parser/lex.yy.c	/^typedef short int flex_int16_t;$/;"	t	file:
@@ -448,7 +444,6 @@ hash	lib/frl_util_md5.h	/^		int hash(const void* s, const apr_size_t size);$/;"	
 head	nqrdb.h	/^	NQRDBDATUM* head;$/;"	m	struct:__anon11	access:public
 ht	nqrdb.h	/^	uint8_t ht;$/;"	m	struct:NQRDBDATUM	access:public
 i	lib/mlapcluster.cpp	/^	int i;$/;"	m	struct:CvSparseNode2D	file:	access:public
-i	nqqry.h	/^		int i;$/;"	m	union:NQQRY::__anon14	access:public
 icvCalcHist	lib/cvlocalhist.cpp	/^icvCalcHist( IplImage* img,$/;"	f	signature:( IplImage* img, int* hist, const int length, const CvRect rect )
 icvCompareHist	lib/cvlocalhist.cpp	/^icvCompareHist( int *hist1,$/;"	f	signature:( int *hist1, int *hist2, const int length )
 icvHistProjection	lib/cvlocalhist.cpp	/^icvHistProjection( CvArr* _img,$/;"	f	signature:( CvArr* _img, int bins, int* v_hist = NULL, int* h_hist = NULL )
@@ -508,6 +503,7 @@ mempool	test/irdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/lh_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/qry_test.cpp	/^apr_pool_t* mempool;$/;"	v
 mempool	test/rdb_test.cpp	/^apr_pool_t* mempool;$/;"	v
+mode	nqqry.h	/^	int mode;$/;"	m	struct:NQQRY	access:public
 mtx_pool	nqbwdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mtx_pool	nqfdb.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
 mtx_pool	nqqry.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
@@ -677,8 +673,8 @@ rwunidxlock	nqbwdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon6	a
 rwunidxlock	nqfdb.h	/^	apr_thread_rwlock_t* rwunidxlock;$/;"	m	struct:__anon10	access:public
 sbj	nqqry.h	/^	} sbj;$/;"	m	struct:NQQRY	typeref:union:NQQRY::__anon14	access:public
 scale	lib/cvgist.h	/^	int scale;$/;"	m	struct:CvGaborFilter	access:public
-shadow	nqbwdb.h	/^	bool shadow;$/;"	m	struct:__anon6	access:public
-shadow	nqfdb.h	/^	bool shadow;$/;"	m	struct:__anon10	access:public
+shallow	nqbwdb.h	/^	bool shallow;$/;"	m	struct:__anon6	access:public
+shallow	nqfdb.h	/^	bool shallow;$/;"	m	struct:__anon10	access:public
 siz	nqbwdb.c	/^	uint32_t siz;$/;"	m	struct:__anon3	file:	access:public
 siz	nqfdb.c	/^	uint32_t siz;$/;"	m	struct:__anon8	file:	access:public
 siz	nqqry.c	/^	uint32_t siz;$/;"	m	struct:__anon13	file:	access:public
