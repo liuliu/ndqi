@@ -284,7 +284,7 @@ bool nqrdbfilter(NQRDB* rdb, char** kstr, int len)
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(rdb->rwlock);
 #endif
-	NQRDBDATUM* cur;
+	NQRDBDATUM *cur, *last = 0;
 	for (cur = rdb->head->next; cur != rdb->head; cur = cur->next)
 		cur->dirty = true;
 	int i;
@@ -296,15 +296,16 @@ bool nqrdbfilter(NQRDB* rdb, char** kstr, int len)
 			cur->dirty = false;
 	}
 	cur = rdb->head->next;
-	while (cur != rdb->head)
+	while (cur && cur != rdb->head)
 	{
-		NQRDBDATUM* next = cur->next;
-		while (cur && cur->dirty)
+		if (cur->dirty)
 		{
-			next = cur->next;
-			cur = nqrdboutdatum(rdb, cur);
+			nqrdboutdatum(rdb, cur);
+			cur = (last != 0) ? last : rdb->head->next;
+		} else {
+			last = cur;
+			cur = cur->next;
 		}
-		cur = next;
 	}
 #if APR_HAS_THREADS
 	apr_thread_rwlock_unlock(rdb->rwlock);

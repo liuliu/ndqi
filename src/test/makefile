@@ -1,7 +1,7 @@
 OPENCV=/opt/opencv
 OUTDIR=../../build
 COMPFLAG=-O3
-LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyocabinet -ltokyodystopia
+LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyocabinet -ltokyodystopia -lexif
 LINKLIB=-L"$(OPENCV)/lib"
 CXXFLAGS=-I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/opencv"
 
@@ -31,7 +31,7 @@ $(OUTDIR)/gs_test: gs_test.o ../nqgs.o ../lib/cvgist.o ../nqfdb.o ../nqrdb.o ../
 $(OUTDIR)/cx_test: cx_test.o ../nqlh.o ../lib/cvlocalhist.o ../nqfdb.o ../nqbwdb.o ../nqdp.o ../nqrdb.o ../lib/mlapcluster.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o $(OPENCV)/src/ml/ml_inner_functions.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
-$(OUTDIR)/qry_test: qry_test.o ../nqqry.o ../nqlh.o ../lib/cvlocalhist.o ../nqfdb.o ../nqbwdb.o ../nqdp.o ../nqrdb.o ../lib/mlapcluster.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o $(OPENCV)/src/ml/ml_inner_functions.o
+$(OUTDIR)/qry_test: qry_test.o ../nqqry.o ../nqlh.o ../nqmeta.o ../lib/cvlocalhist.o ../nqfdb.o ../nqbwdb.o ../nqdp.o ../nqrdb.o ../lib/mlapcluster.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o $(OPENCV)/src/ml/ml_inner_functions.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
 clean:

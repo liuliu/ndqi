@@ -3,6 +3,7 @@
 #include "../nqdp.h"
 #include "../nqfdb.h"
 #include "../nqbwdb.h"
+#include "../nqmeta.h"
 
 #include "highgui.h"
 #include <stdio.h>
@@ -27,6 +28,8 @@ int main()
 	NQFDB* fdb = nqfdbnew();
 	NQBWDB* bwdb = nqbwdbnew();
 
+	TCTDB* tdb = tctdbnew();
+	tctdbopen(tdb, "casket.tct", TDBOWRITER | TDBOCREAT);
 	TCADB* adb = tcadbnew();
 	tcadbopen(adb, "*");
 	TCWDB* wdb = tcwdbnew();
@@ -63,6 +66,9 @@ int main()
 			char kstr[16];
 			memcpy(kstr, entry->d_name, 16);
 			tcadbput(adb, &i, sizeof(uint64_t), kstr, 16);
+			TCMAP* meta = nqmetanew(entry->d_name);
+			tctdbput(tdb, kstr, 16, meta);
+			tcmapdel(meta);
 			char prefix[] = "dsc007";
 			memcpy(prefix, entry->d_name, 6);
 			tcwdbput2(wdb, i, prefix, NULL);
@@ -166,12 +172,20 @@ int main()
 	bwqry->op = NQOPLIKE;
 	bwqry->db = bwdb;
 	bwqry->sbj.desc = dpe1;
+	NQQRY* tblqry = qry->conds[2] = nqqrynew();
+	tblqry->db = tdb;
+	tblqry->col = (void*)"model";
+	tblqry->type = NQTTCTDB;
+	tblqry->op = NQOPSTREQ;
+	tblqry->sbj.str = "dsc-w1";
+	/*
 	NQQRY* tagqry = qry->conds[2] = nqqrynew();
 	tagqry->db = wdb;
 	tagqry->col = adb;
 	tagqry->type = NQTTCWDB;
 	tagqry->op = NQOPSTREQ;
 	tagqry->sbj.str = "dsc007";
+	*/
 	/*
 	NQQRY* subqry = qry->conds[2] = nqqrynew();
 	subqry->type = NQCTOR;
@@ -195,6 +209,7 @@ int main()
 	NQQRY* newqry = nqqrynew(mem);
 	printf("query is decoded\n");
 	nqqrysearch(newqry);
+	printf("retrieve query result\n");
 	int k = nqqryresult(newqry, kstr, likeness);
 	tt = (double)cvGetTickCount()-tt;
 	printf( "search time = %gms\n", tt/(cvGetTickFrequency()*1000.));
