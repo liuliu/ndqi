@@ -30,6 +30,7 @@ int main()
 
 	TCTDB* tdb = tctdbnew();
 	tctdbopen(tdb, "casket.tct", TDBOWRITER | TDBOCREAT);
+	nqmetasetindex(tdb);
 	TCADB* adb = tcadbnew();
 	tcadbopen(adb, "*");
 	TCWDB* wdb = tcwdbnew();

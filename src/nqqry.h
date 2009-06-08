@@ -25,30 +25,32 @@ typedef struct NQQRY {
 	int mode;
 	int ordered;
 	int lmt;
-	NQQRY** conds;
+	struct NQQRY** conds;
 	NQRDB* result;
 } NQQRY;
 
 enum {
-	NQCTAND,		/* and conjunction         */
-	NQCTOR,			/* or conjunction          */
-	NQTRDB,			/* rdb type                */
-	NQTBWDB,		/* bwdb type               */
-	NQTFDB,			/* fdb type                */
-	NQTTCTDB,		/* tokyo-cabinet table db  */
-	NQTTCWDB,		/* tokyo-cabinet word db   */
-	NQTSPHINX		/* sphinx full-text search */
+	NQCTAND   = 0x01,	/* and conjunction         */
+	NQCTOR    = 0x02,	/* or conjunction          */
+	NQTRDB    = 0x03,	/* rdb type                */
+	NQTBWDB   = 0x04,	/* bwdb type               */
+	NQTFDB    = 0x05,	/* fdb type                */
+	NQTTCTDB  = 0x06,	/* tokyo-cabinet table db  */
+	NQTTCWDB  = 0x07,	/* tokyo-cabinet word db   */
+	NQTSPHINX = 0x08,	/* sphinx full-text search */
+	NQSUBQ    = 0x10	/* sub-query               */
 };
 
 enum {
-	NQOPSTREQ,		/* string is equal to                      */
-	NQOPNUMEQ,		/* number is equal to                      */
-	NQOPNUMGT,		/* number is greater than                  */
-	NQOPNUMGE,		/* number is greater than or equal to      */
-	NQOPNUMLT,		/* number is less than                     */
-	NQOPNUMLE,		/* number is less than or equal to         */
-	NQOPLIKE,		/* object is like (index search)           */
-	NQOPELIKE		/* object is exact like (exhausted search) */
+	NQOPSTREQ = 0x01,	/* string is equal to                      */
+	NQOPNUMEQ = 0x02,	/* number is equal to                      */
+	NQOPNUMGT = 0x03,	/* number is greater than                  */
+	NQOPNUMGE = 0x04,	/* number is greater than or equal to      */
+	NQOPNUMLT = 0x05,	/* number is less than                     */
+	NQOPNUMLE = 0x06,	/* number is less than or equal to         */
+	NQOPLIKE  = 0x07,	/* object is like (index search)           */
+	NQOPELIKE = 0x08,	/* object is exact like (exhausted search) */
+	NQOPNOT   = 0x10	/* not operator                            */
 };
 
 int nqqryresult(NQQRY* qry, char** kstr, float* likeness = 0);

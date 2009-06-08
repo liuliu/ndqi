@@ -92,3 +92,20 @@ TCMAP* nqmetanew(const char* file)
 	exif_data_unref(exif);
 	return cols;
 }
+
+bool nqmetasetindex(TCTDB* tdb)
+{
+	return tctdbsetindex(tdb, "make", TDBITLEXICAL) &&
+		   tctdbsetindex(tdb, "model", TDBITLEXICAL) &&
+		   tctdbsetindex(tdb, "year", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "month", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "day", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "hour", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "minute", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "second", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "exposure", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "fnumber", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "focal", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "flash", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "iso", TDBITDECIMAL);
+}

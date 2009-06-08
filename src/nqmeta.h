@@ -7,10 +7,12 @@
 #define _GUARD_NQMETA_
 
 #include <tcutil.h>
+#include <tctdb.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 TCMAP* nqmetanew(const char* file);
+bool nqmetasetindex(TCTDB* tdb);
 
 #endif
