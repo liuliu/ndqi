@@ -38,7 +38,7 @@ enum {
 	NQTTCTDB  = 0x06,	/* tokyo-cabinet table db  */
 	NQTTCWDB  = 0x07,	/* tokyo-cabinet word db   */
 	NQTSPHINX = 0x08,	/* sphinx full-text search */
-	NQSUBQ    = 0x10	/* sub-query               */
+	NQSUBQRY  = 0x10	/* sub-query               */
 };
 
 enum {

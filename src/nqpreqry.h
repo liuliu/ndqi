@@ -34,6 +34,8 @@ enum {
 };
 
 NQPREQRY* nqpreqrynew(void);
+NQPREQRY* nqpreqrynew(apr_pool_t* pool);
+NQPREQRY* nqpreqrydup(NQPREQRY* qry);
 void nqpreqrydel(NQPREQRY* qry);
 
 #endif

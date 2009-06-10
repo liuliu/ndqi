@@ -19,6 +19,42 @@ NQPREQRY* nqpreqrynew(void)
 	return preqry;
 }
 
+NQPREQRY* nqpreqrynew(apr_pool_t* pool)
+{
+	NQPREQRY* preqry = (NQPREQRY*)apr_pcalloc(pool, sizeof(NQPREQRY));
+	return preqry;
+}
+
+static char* nqstrdup(const char* str, unsigned int maxlen)
+{
+	unsigned int tlen = strlen(str);
+	unsigned int slen = (tlen > maxlen) ? maxlen : tlen;
+	char* ret = (char*)malloc(slen + 1);
+	memcpy(ret, str, slen);
+	ret[slen] = '\0';
+	return ret;
+}
+
+NQPREQRY* nqpreqrydup(NQPREQRY* qry)
+{
+	NQPREQRY* newqry = nqpreqrynew();
+	memcpy(newqry, qry, sizeof(NQPREQRY));
+	newqry->result = 0;
+	NQPREQRY** condptr1 = qry->conds;
+	NQPREQRY** condptr2 = newqry->conds = (NQPREQRY**)malloc(qry->cnum * sizeof(NQPREQRY*));
+	int i;
+	for (i = 0; i < qry->cnum; i++, condptr1++, condptr2++)
+		*condptr2 = nqpreqrydup(*condptr1);
+	if (qry->type & NQSUBQRY)
+		newqry->sbj.subqry = nqpreqrydup(qry->sbj.subqry);
+	else if (qry->sbj.str != 0) {
+		newqry->sbj.str = nqstrdup(qry->sbj.str, 1024);
+	}
+	if (qry->col != 0)
+		newqry->col = nqstrdup(qry->col, 1024);
+	return newqry;
+}
+
 void nqpreqrydel(NQPREQRY* qry)
 {
 	if (qry->result != 0)
@@ -29,7 +65,7 @@ void nqpreqrydel(NQPREQRY* qry)
 		nqpreqrydel(*condptr);
 	if (qry->conds != 0)
 		free(qry->conds);
-	if (qry->type & NQSUBQ)
+	if (qry->type & NQSUBQRY)
 		nqpreqrydel(qry->sbj.subqry);
 	else if (qry->sbj.str != 0)
 		free(qry->sbj.str);

@@ -1,4 +1,4 @@
-LEX = flex -I
+LEX = flex -8
 YACC = byacc -dv
 OPENCV = /opt/opencv
 LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyocabinet -ltokyodystopia -lexif

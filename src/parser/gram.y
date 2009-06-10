@@ -1,6 +1,7 @@
 %{
 //#define YYDEBUG 1
 #include "parser.h"
+static NQPREQRY* YY_RESULT = 0;
 %}
 
 %union
@@ -28,6 +29,7 @@ SelectListStmt: SelectStmt |
 SelectStmt:	SELECT ColumnOptListStmt WHERE CondStmt
 			{
 				$$ = $4;
+				YY_RESULT = $$.qry;
 			};
 
 ColumnOptListStmt:	/* empty value */ |
@@ -38,7 +40,7 @@ CondStmt:	CondStmt OR CondStmt
 				$$.qry = nqpreqrynew();
 				$$.qry->cnum = 2;
 				$$.qry->op = NQCTOR;
-				$$.qry->conds = (NQPREQRY**)malloc(2 * sizeof(NQPREQRY*));
+				$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), 2 * sizeof(NQPREQRY*));
 				$$.qry->conds[0] = $1.qry;
 				$$.qry->conds[1] = $3.qry;
 			} |
@@ -47,7 +49,7 @@ CondStmt:	CondStmt OR CondStmt
 				$$.qry = nqpreqrynew();
 				$$.qry->cnum = 2;
 				$$.qry->op = NQCTAND;
-				$$.qry->conds = (NQPREQRY**)malloc(2 * sizeof(NQPREQRY*));
+				$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), 2 * sizeof(NQPREQRY*));
 				$$.qry->conds[0] = $1.qry;
 				$$.qry->conds[1] = $3.qry;
 			} |
@@ -143,7 +145,7 @@ InStmt:	ScalarExp IN SubQueryStmt;
 
 LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 			{
-				$$.qry = nqpreqrynew();
+				$$.qry = nqpreqrynew(yymem());
 				if (nqqryident($$.qry, $1.str))
 				{
 					$$.qry->op = NQOPELIKE;
@@ -155,7 +157,7 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 			} |
 			ColumnStmt LIKE UUIDENT
 			{
-				$$.qry = nqpreqrynew();
+				$$.qry = nqpreqrynew(yymem());
 				if (nqqryident($$.qry, $1.str))
 				{
 					$$.qry->op = NQOPLIKE;
@@ -167,7 +169,7 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 			} |
 			ColumnStmt EXACT LIKE SubQueryStmt
 			{
-				$$.qry = nqpreqrynew();
+				$$.qry = nqpreqrynew(yymem());
 				if (nqqryident($$.qry, $1.str))
 				{
 					$$.qry->op = NQOPELIKE;
@@ -179,7 +181,7 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 			} |
 			ColumnStmt LIKE SubQueryStmt
 			{
-				$$.qry = nqpreqrynew();
+				$$.qry = nqpreqrynew(yymem());
 				if (nqqryident($$.qry, $1.str))
 				{
 					$$.qry->op = NQOPLIKE;
@@ -198,27 +200,22 @@ ColumnStmt:	UUID { $$ = $1; } |
 			IDENT '.' IDENT
 			{
 				int len = strlen($1.str) + 1 + strlen($3.str);
-				$$.str = (char*)malloc(len + 1);
+				$$.str = (char*)apr_palloc(yymem(), len + 1);
 				$$.str[len] = '\0';
 				memcpy($$.str, $1.str, strlen($1.str));
 				$$.str[strlen($1.str)] = '.';
 				memcpy($$.str + strlen($1.str) + 1, $3.str, strlen($3.str));
-				free($1.str);
-				free($3.str);
 			} |
 			IDENT '.' IDENT '.' IDENT
 			{
 				int len = strlen($1.str) + 1 + strlen($3.str) + 1 + strlen($5.str);
-				$$.str = (char*)malloc(len + 1);
+				$$.str = (char*)apr_palloc(yymem(), len + 1);
 				$$.str[len] = '\0';
 				memcpy($$.str, $1.str, strlen($1.str));
 				$$.str[strlen($1.str)] = '.';
 				memcpy($$.str + strlen($1.str) + 1, $3.str, strlen($3.str));
 				$$.str[strlen($1.str) + 1 + strlen($3.str)] = '.';
 				memcpy($$.str + strlen($1.str) + 1 + strlen($3.str) + 1, $5.str, strlen($5.str));
-				free($1.str);
-				free($3.str);
-				free($5.str);
 			};
 
 SubQueryStmt: '(' SelectStmt ')' { $$ = $2; };
@@ -229,6 +226,11 @@ ScalarExp:	ICONST { $$ = $1; } |
 
 %%
 
+NQPREQRY* yyresult()
+{
+	return YY_RESULT;
+}
+
 static bool nqqryident(NQPREQRY* qry, char* str)
 {
 	switch (str[0])
@@ -236,7 +238,7 @@ static bool nqqryident(NQPREQRY* qry, char* str)
 		case 'e': /* "exif" */
 			qry->type = NQTTCTDB;
 			qry->db = NQDBEXIF;
-			qry->col = (char*)malloc(strlen(str) - 4);
+			qry->col = (char*)apr_palloc(yymem(), strlen(str) - 4);
 			memcpy(qry->col, str + 5, strlen(str) - 5);
 			qry->col[strlen(str) - 5] = '\0';
 			break;
