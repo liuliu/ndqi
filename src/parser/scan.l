@@ -70,11 +70,7 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 					return ICONST;
 				}
 
-{decimal}		{
-					yylval.str = nqstrdup(yytext, yyleng);
-					return FCONST;
-				}
-
+{decimal}	|
 {real}			{
 					yylval.str = nqstrdup(yytext, yyleng);
 					return FCONST;
@@ -96,10 +92,12 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 					if (keyword != NULL)
 					{
 						yylval.keyword = keyword->name;
+						//printf("keyword: %s\n", yylval.str);
 						return keyword->value;
 					}
 					ident = downcase_truncate_identifier(yytext, yyleng);
 					yylval.str = ident;
+					//printf("other word: %s\n", yylval.str);
 					return IDENT;
 				}
 
@@ -107,7 +105,7 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 
 bool YY_ERROR;
 
-void yyerror(char* s)
+void yyerror(const char* s)
 {
 	fprintf(stderr, "yyerror: %s at %s\n", s, yytext);
 	YY_ERROR = true;

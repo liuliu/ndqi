@@ -13,9 +13,9 @@ static NQPREQRY* YY_RESULT = 0;
 	NQPREQRY* qry;
 }
 
-%token ALL, ANY, ASC, BETWEEN, BY, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, LIKE, LIMIT, ORDER, SELECT, SOME, WHERE
-%token UUID, UUIDENT, IDENT, FCONST, ICONST
-%token NUMGT, NUMGE, NUMLT, NUMLE, STRNE, STREQ
+%nonassoc ALL, ANY, ASC, BETWEEN, BY, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, LIKE, LIMIT, ORDER, SELECT, SOME, WHERE
+%nonassoc UUID, UUIDENT, IDENT, FCONST, ICONST
+%nonassoc NUMGT, NUMGE, NUMLT, NUMLE, STRNE, STREQ
 %left OR
 %left AND
 %left NOT
@@ -37,26 +37,55 @@ ColumnOptListStmt:	/* empty value */ |
 
 CondStmt:	CondStmt OR CondStmt
 			{
-				$$.qry = nqpreqrynew();
-				$$.qry->cnum = 2;
-				$$.qry->op = NQCTOR;
-				$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), 2 * sizeof(NQPREQRY*));
-				$$.qry->conds[0] = $1.qry;
-				$$.qry->conds[1] = $3.qry;
+				$$.qry = nqpreqrynew(yymem());
+				$$.qry->type = NQCTOR;
+				$$.qry->cnum  = ($1.qry->type == NQCTOR) ? $1.qry->cnum : 1;
+				$$.qry->cnum += ($3.qry->type == NQCTOR) ? $3.qry->cnum : 1;
+				$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), $$.qry->cnum * sizeof(NQPREQRY*));
+				NQPREQRY** condptr = $$.qry->conds;
+				if ($1.qry->type == NQCTOR)
+				{
+					memcpy(condptr, $1.qry->conds, $1.qry->cnum * sizeof(NQPREQRY*));
+					condptr += $1.qry->cnum;
+				} else {
+					*condptr = $1.qry;
+					condptr++;
+				}
+				if ($3.qry->type == NQCTOR)
+					memcpy(condptr, $3.qry->conds, $3.qry->cnum * sizeof(NQPREQRY*));
+				else
+					*condptr = $3.qry;
 			} |
 			CondStmt AND CondStmt
 			{
-				$$.qry = nqpreqrynew();
-				$$.qry->cnum = 2;
-				$$.qry->op = NQCTAND;
-				$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), 2 * sizeof(NQPREQRY*));
-				$$.qry->conds[0] = $1.qry;
-				$$.qry->conds[1] = $3.qry;
+				$$.qry = nqpreqrynew(yymem());
+				$$.qry->type = NQCTAND;
+				$$.qry->cnum  = ($1.qry->type == NQCTAND && !($1.qry->op & NQOPNOT)) ? $1.qry->cnum : 1;
+				$$.qry->cnum += ($3.qry->type == NQCTAND && !($3.qry->op & NQOPNOT)) ? $3.qry->cnum : 1;
+				$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), $$.qry->cnum * sizeof(NQPREQRY*));
+				NQPREQRY** condptr = $$.qry->conds;
+				if ($1.qry->type == NQCTAND && !($1.qry->op & NQOPNOT))
+				{
+					memcpy(condptr, $1.qry->conds, $1.qry->cnum * sizeof(NQPREQRY*));
+					condptr += $1.qry->cnum;
+				} else {
+					*condptr = $1.qry;
+					condptr++;
+				}
+				if ($3.qry->type == NQCTAND && !($3.qry->op & NQOPNOT))
+					memcpy(condptr, $3.qry->conds, $3.qry->cnum * sizeof(NQPREQRY*));
+				else
+					*condptr = $3.qry;
 			} |
 			NOT CondStmt
 			{
 				$$.qry = $2.qry;
 				$$.qry->op = ($$.qry->op & NQOPNOT) ? $$.qry->op & !NQOPNOT : $$.qry->op | NQOPNOT;
+			} |
+			CondStmt LIMIT ICONST
+			{
+				$$.qry = $1.qry;
+				$$.qry->lmt = strtol($3.str, NULL, 10);
 			} |
 			'(' CondStmt ')' { $$ = $2; } |
 			PredicateStmt { $$ = $1; };
@@ -64,84 +93,103 @@ CondStmt:	CondStmt OR CondStmt
 PredicateStmt:	ComparisonStmt { $$ = $1; } |
 				BetweenStmt { $$ = $1; } |
 				InStmt { $$ = $1; } |
-				LikeStmt { $$ = $1; };
+				LikeCfdStmt { $$ = $1; };
 
 ComparisonStmt:	ColumnStmt NUMGT ScalarExp
 				{
-					$$.qry = nqpreqrynew();
+					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
 						$$.qry->op = NQOPNUMGT;
 						$$.qry->sbj.str = $3.str;
 					} else {
-						nqpreqrydel($$.qry);
 						yyerror("column name doesn't exist.");
 					}
 				} |
 				ColumnStmt NUMGE ScalarExp
 				{
-					$$.qry = nqpreqrynew();
+					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
 						$$.qry->op = NQOPNUMGE;
 						$$.qry->sbj.str = $3.str;
 					} else {
-						nqpreqrydel($$.qry);
 						yyerror("column name doesn't exist.");
 					}
 				} |
 				ColumnStmt NUMLT ScalarExp
 				{
-					$$.qry = nqpreqrynew();
+					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
 						$$.qry->op = NQOPNUMLT;
 						$$.qry->sbj.str = $3.str;
 					} else {
-						nqpreqrydel($$.qry);
 						yyerror("column name doesn't exist.");
 					}
 				} |
 				ColumnStmt NUMLE ScalarExp
 				{
-					$$.qry = nqpreqrynew();
+					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
 						$$.qry->op = NQOPNUMLE;
 						$$.qry->sbj.str = $3.str;
 					} else {
-						nqpreqrydel($$.qry);
 						yyerror("column name doesn't exist.");
 					}
 				} |
 				ColumnStmt STRNE ScalarExp
 				{
-					$$.qry = nqpreqrynew();
+					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
 						$$.qry->op = NQOPSTREQ | NQOPNOT;
 						$$.qry->sbj.str = $3.str;
 					} else {
-						nqpreqrydel($$.qry);
 						yyerror("column name doesn't exist.");
 					}
 				} |
 				ColumnStmt STREQ ScalarExp
 				{
-					$$.qry = nqpreqrynew();
+					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
 						$$.qry->op = NQOPSTREQ;
 						$$.qry->sbj.str = $3.str;
 					} else {
-						nqpreqrydel($$.qry);
 						yyerror("column name doesn't exist.");
 					}
 				};
 
-BetweenStmt:	ColumnStmt BETWEEN ScalarExp AND ScalarExp;
+BetweenStmt:	ColumnStmt BETWEEN ScalarExp AND ScalarExp
+				{
+					$$.qry = nqpreqrynew(yymem());
+					$$.qry->cnum = 2;
+					$$.qry->op = NQCTAND;
+					$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), 2 * sizeof(NQPREQRY*));
+					$$.qry->conds[0] = nqpreqrynew(yymem());
+					$$.qry->conds[1] = nqpreqrynew(yymem());
+					if (nqqryident($$.qry->conds[0], $1.str) &&
+						nqqryident($$.qry->conds[1], $1.str))
+					{
+						$$.qry->conds[0]->op = NQOPNUMGE;
+						$$.qry->conds[0]->sbj.str = $3.str;
+						$$.qry->conds[1]->op = NQOPNUMLE;
+						$$.qry->conds[1]->sbj.str = $5.str;
+					} else {
+						yyerror("column name doesn't exist.");
+					}
+				};
 
 InStmt:	ScalarExp IN SubQueryStmt;
+
+LikeCfdStmt:	LikeStmt |
+				LikeStmt ScalarExp '%'
+				{
+					$$ = $1;
+					$$.qry->cfd = strtod($2.str, NULL) * 0.01;
+				};
 
 LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 			{
@@ -151,7 +199,6 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 					$$.qry->op = NQOPELIKE;
 					$$.qry->sbj.str = $4.str;
 				} else {
-					nqpreqrydel($$.qry);
 					yyerror("column name doesn't exist.");
 				}
 			} |
@@ -163,7 +210,6 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 					$$.qry->op = NQOPLIKE;
 					$$.qry->sbj.str = $3.str;
 				} else {
-					nqpreqrydel($$.qry);
 					yyerror("column name doesn't exist.");
 				}
 			} |
@@ -175,7 +221,6 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 					$$.qry->op = NQOPELIKE;
 					$$.qry->sbj.subqry = $4.qry;
 				} else {
-					nqpreqrydel($$.qry);
 					yyerror("column name doesn't exist.");
 				}
 			} |
@@ -187,7 +232,6 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 					$$.qry->op = NQOPLIKE;
 					$$.qry->sbj.subqry = $3.qry;
 				} else {
-					nqpreqrydel($$.qry);
 					yyerror("column name doesn't exist.");
 				}
 			};

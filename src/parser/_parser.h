@@ -8,6 +8,6 @@ extern apr_pool_t* yymem(void);
 extern NQPREQRY* yyresult(void);
 extern int yyparse(void);
 extern int yylex(void);
-extern void yyerror(char*);
+extern void yyerror(const char*);
 
 #endif

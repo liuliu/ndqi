@@ -16,12 +16,14 @@ NQPREQRY* nqpreqrynew(void)
 		frl_slab_pool_create(&preqry_pool, mtx_pool, 1024, sizeof(NQPREQRY), FRL_LOCK_WITH);
 	NQPREQRY* preqry = (NQPREQRY*)frl_slab_palloc(preqry_pool);
 	memset(preqry, 0, sizeof(NQPREQRY));
+	preqry->cfd = 1.;
 	return preqry;
 }
 
 NQPREQRY* nqpreqrynew(apr_pool_t* pool)
 {
 	NQPREQRY* preqry = (NQPREQRY*)apr_pcalloc(pool, sizeof(NQPREQRY));
+	preqry->cfd = 1.;
 	return preqry;
 }
 

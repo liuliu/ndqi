@@ -15,6 +15,7 @@ typedef struct NQPREQRY {
 		char* str;
 		struct NQPREQRY* subqry;
 	} sbj;
+	float cfd;
 	int type;
 	int op;
 	int cnum;
