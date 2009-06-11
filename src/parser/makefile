@@ -4,12 +4,12 @@ OPENCV = /opt/opencv
 LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyocabinet -ltokyodystopia -lexif
 CXXFLAGS = -I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/opencv"
 
-all: parser
+all: test
 
 clean:
-	rm *.o ../lib/*.o ../*.o gram.h gram.c gram.out scan.c parser
+	rm *.o ../lib/*.o ../*.o gram.h gram.c gram.out scan.c test
 
-parser: scan.o gram.o keywords.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o
+test: test.o scan.o gram.o keywords.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o
 	g++ -o $@ $^ $(LINKFLAG)
 
 scan.c: scan.l gram.h

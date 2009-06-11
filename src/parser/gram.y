@@ -1,6 +1,6 @@
 %{
 //#define YYDEBUG 1
-#include "parser.h"
+#include "_parser.h"
 static NQPREQRY* YY_RESULT = 0;
 %}
 

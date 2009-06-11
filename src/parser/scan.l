@@ -1,5 +1,5 @@
 %{
-#include "parser.h"
+#include "_parser.h"
 #include "gram.h"
 static char* nqstrdup(const char* str, unsigned int maxlen);
 static char* downcase_truncate_identifier(const char* ident, int maxlen);
@@ -66,17 +66,17 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 "=="			{ return STREQ; }
 
 {integer}		{
-					yylval.str = nqstrdup(yytext, NAMEDATALEN);
+					yylval.str = nqstrdup(yytext, yyleng);
 					return ICONST;
 				}
 
 {decimal}		{
-					yylval.str = nqstrdup(yytext, NAMEDATALEN);
+					yylval.str = nqstrdup(yytext, yyleng);
 					return FCONST;
 				}
 
 {real}			{
-					yylval.str = nqstrdup(yytext, NAMEDATALEN);
+					yylval.str = nqstrdup(yytext, yyleng);
 					return FCONST;
 				}
 
@@ -85,7 +85,7 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 				}
 
 {uuident}		{
-					yylval.str = nqstrdup(yytext + 1, NAMEDATALEN);
+					yylval.str = nqstrdup(yytext + 1, yyleng - 1);
 					return UUIDENT;
 				}
 
@@ -98,7 +98,7 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 						yylval.keyword = keyword->name;
 						return keyword->value;
 					}
-					ident = downcase_truncate_identifier(yytext, NAMEDATALEN);
+					ident = downcase_truncate_identifier(yytext, yyleng);
 					yylval.str = ident;
 					return IDENT;
 				}
@@ -109,7 +109,7 @@ bool YY_ERROR;
 
 void yyerror(char* s)
 {
-	printf("yyerror: %s at %s\n", s, yytext);
+	fprintf(stderr, "yyerror: %s at %s\n", s, yytext);
 	YY_ERROR = true;
 }
 
@@ -154,10 +154,18 @@ static char* downcase_truncate_identifier(const char* ident, int maxlen)
 	return result;
 }
 
+static apr_pool_t* root = 0;
+static apr_thread_mutex_t* parse_mtx = 0;
+
 NQPREQRY* nqparse(char* str, int siz)
 {
+	if (root == 0)
+		apr_pool_create(&root, NULL);
+	if (parse_mtx == 0)
+		apr_thread_mutex_create(&parse_mtx, APR_THREAD_MUTEX_DEFAULT, root);
+	apr_thread_mutex_lock(parse_mtx);
 	if (yymem() == 0)
-		apr_pool_create(&YY_MEM, NULL);
+		apr_pool_create(&YY_MEM, root);
 	if (YY_CURRENT_BUFFER)
 		yy_delete_buffer(YY_CURRENT_BUFFER);
 	char* scanbuf = (char*)apr_palloc(yymem(), siz + 2);
@@ -169,17 +177,16 @@ NQPREQRY* nqparse(char* str, int siz)
 	yy_delete_buffer(scanbufhandle);
 	NQPREQRY* result = (YY_ERROR) ? 0 : nqpreqrydup(yyresult());
 	apr_pool_clear(yymem());
+	apr_thread_mutex_unlock(parse_mtx);
 	return result;
 }
 
-int main()
+void nqparsedel()
 {
-	apr_initialize();
-	NQPREQRY* result;
-	char ql1[] = "SELECT # WHERE LFD LIKE #Dh2uakSd98fnwEi3ne-1i3 AND EXIF.MAKE=\"SONY\";";
-	result = nqparse(ql1, strlen(ql1));
-	char ql3[] = "select where lh exact like #Dh2uakSd98fnwEi3ne-1_3 and exif.gps.latitude<102.938;";
-	result = nqparse(ql3, strlen(ql3));
-	char ql2[] = "SELECT # WHERE EXIF.MODEL=\"A720\" AND LFD EXACT LIKE (SELECT LFD WHERE EXIF.MAKE=\"CANON\");";
-	result = nqparse(ql2, strlen(ql2));
+	if (parse_mtx != 0)
+		apr_thread_mutex_destroy(parse_mtx);
+	if (YY_MEM != 0)
+		apr_pool_destroy(YY_MEM);
+	if (root != 0)
+		apr_pool_destroy(root);
 }
