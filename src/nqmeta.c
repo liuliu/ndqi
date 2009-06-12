@@ -89,6 +89,38 @@ TCMAP* nqmetanew(const char* file)
 		snprintf(buf, 1024, "%i", v_short);
 		tcmapput(cols, "iso", 3, buf, strlen(buf));
 	}
+	if (exif_entry = exif_content_get_entry(exif->ifd[EXIF_IFD_GPS], (ExifTag)EXIF_TAG_GPS_LATITUDE))
+	{
+		v_rat = exif_get_rational(exif_entry->data, o);
+		d = (double)v_rat.numerator / (double)v_rat.denominator;
+		v_rat = exif_get_rational(exif_entry->data + sizeof(ExifRational), o);
+		d += (double)v_rat.numerator / (double)v_rat.denominator / 60;
+		v_rat = exif_get_rational(exif_entry->data + sizeof(ExifRational) * 2, o);
+		d += (double)v_rat.numerator / (double)v_rat.denominator / 3600;
+		if (exif_entry = exif_content_get_entry(exif->ifd[EXIF_IFD_GPS], (ExifTag)EXIF_TAG_GPS_LATITUDE_REF))
+		{
+			if (exif_entry->data[0] == 'S')
+				d = -d;
+			snprintf(buf, 1024, "%lf", d);
+			tcmapput(cols, "gps.latitude", 12, buf, strlen(buf));
+		}
+	}
+	if (exif_entry = exif_content_get_entry(exif->ifd[EXIF_IFD_GPS], (ExifTag)EXIF_TAG_GPS_LONGITUDE))
+	{
+		v_rat = exif_get_rational(exif_entry->data, o);
+		d = (double)v_rat.numerator / (double)v_rat.denominator;
+		v_rat = exif_get_rational(exif_entry->data + sizeof(ExifRational), o);
+		d += (double)v_rat.numerator / (double)v_rat.denominator / 60;
+		v_rat = exif_get_rational(exif_entry->data + sizeof(ExifRational) * 2, o);
+		d += (double)v_rat.numerator / (double)v_rat.denominator / 3600;
+		if (exif_entry = exif_content_get_entry(exif->ifd[EXIF_IFD_GPS], (ExifTag)EXIF_TAG_GPS_LONGITUDE_REF))
+		{
+			if (exif_entry->data[0] == 'S')
+				d = -d;
+			snprintf(buf, 1024, "%lf", d);
+			tcmapput(cols, "gps.longitude", 13, buf, strlen(buf));
+		}
+	}
 	exif_data_unref(exif);
 	return cols;
 }

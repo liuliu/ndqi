@@ -80,7 +80,7 @@ CondStmt:	CondStmt OR CondStmt
 			NOT CondStmt
 			{
 				$$.qry = $2.qry;
-				$$.qry->op = ($$.qry->op & NQOPNOT) ? $$.qry->op & !NQOPNOT : $$.qry->op | NQOPNOT;
+				$$.qry->op = ($$.qry->op & NQOPNOT) ? $$.qry->op & ~NQOPNOT : $$.qry->op | NQOPNOT;
 			} |
 			CondStmt LIMIT ICONST
 			{

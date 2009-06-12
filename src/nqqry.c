@@ -159,7 +159,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				bwdb = (NQBWDB*)(*condptr)->db;
 				tbwdb = (scope != 0) ? nqbwdbjoin(bwdb, scope) : bwdb;
 				ttbwdb = (qry->type == NQCTAND && i > 0) ? nqbwdbjoin(tbwdb, rdb) : tbwdb;
-				switch ((*condptr)->op & !NQOPNOT)
+				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPLIKE:
 						k = nqbwdbsearch(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
@@ -177,7 +177,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				fdb = (NQFDB*)(*condptr)->db;
 				tfdb = (scope != 0) ? nqfdbjoin(fdb, scope) : fdb;
 				ttfdb = (qry->type == NQCTAND && i > 0) ? nqfdbjoin(tfdb, rdb) : tfdb;
-				switch ((*condptr)->op & !NQOPNOT)
+				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPLIKE:
 						k = nqfdbsearch(ttfdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
@@ -195,7 +195,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				tdb = (TCTDB*)(*condptr)->db;
 				colname = (char*)(*condptr)->col;
 				tdbqry = tctdbqrynew(tdb);
-				switch ((*condptr)->op & !NQOPNOT)
+				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPNUMEQ:
 						tctdbqryaddcond(tdbqry, colname, TDBQCNUMEQ, (*condptr)->sbj.str);
@@ -243,7 +243,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				}
 				break;
 			case NQTTCWDB:
-				switch ((*condptr)->op & !NQOPNOT)
+				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPSTREQ:
 					case NQOPLIKE:

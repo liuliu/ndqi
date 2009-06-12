@@ -161,8 +161,9 @@ int main()
 	NQQRY* qry = nqqrynew();
 	qry->type = NQCTAND;
 	qry->lmt = 20;
-	qry->cnum = 3;
+	qry->cnum = 1;
 	qry->conds = (NQQRY**)malloc(sizeof(NQQRY*) * 3);
+	/*
 	NQQRY* fqry = qry->conds[0] = nqqrynew();
 	fqry->type = NQTFDB;
 	fqry->op = NQOPLIKE;
@@ -173,12 +174,13 @@ int main()
 	bwqry->op = NQOPLIKE;
 	bwqry->db = bwdb;
 	bwqry->sbj.desc = dpe1;
-	NQQRY* tblqry = qry->conds[2] = nqqrynew();
+	*/
+	NQQRY* tblqry = qry->conds[0] = nqqrynew();
 	tblqry->db = tdb;
-	tblqry->col = (void*)"model";
+	tblqry->col = (void*)"gps.longitude";
 	tblqry->type = NQTTCTDB;
-	tblqry->op = NQOPSTREQ;
-	tblqry->sbj.str = "dsc-w1";
+	tblqry->op = NQOPNUMGT;
+	tblqry->sbj.str = "100";
 	/*
 	NQQRY* tagqry = qry->conds[2] = nqqrynew();
 	tagqry->db = wdb;
