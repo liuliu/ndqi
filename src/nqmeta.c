@@ -58,7 +58,7 @@ TCMAP* nqmetanew(const char* file)
 			snprintf(buf, 1024, "%i", tm.tm_sec);
 			tcmapput(cols, "second", 6, buf, strlen(buf));
 			snprintf(buf, 1024, "%i", tm.tm_wday);
-			tcmapput(cols, "weekday", 6, buf, strlen(buf));
+			tcmapput(cols, "weekday", 7, buf, strlen(buf));
 			time_t epoch = mktime(&tm);
 			snprintf(buf, 1024, "%li", epoch);
 			tcmapput(cols, "datetime", 8, buf, strlen(buf));
