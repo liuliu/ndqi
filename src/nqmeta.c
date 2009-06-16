@@ -6,6 +6,7 @@
 #include "nqmeta.h"
 #include <cctype>
 #include <string.h>
+#include <time.h>
 #include <libexif/exif-data.h>
 
 static void strtolower(char* buf)
@@ -41,20 +42,27 @@ TCMAP* nqmetanew(const char* file)
 	if (exif_entry = exif_content_get_entry(exif->ifd[EXIF_IFD_0], EXIF_TAG_DATE_TIME))
 	{
 		exif_entry_get_value(exif_entry, buf, sizeof(buf));
-		int year, month, day, hour, minute, second;
-		sscanf(buf, "%d:%d:%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
-		snprintf(buf, 1024, "%i", year);
-		tcmapput(cols, "year", 4, buf, strlen(buf));
-		snprintf(buf, 1024, "%i", month);
-		tcmapput(cols, "month", 5, buf, strlen(buf));
-		snprintf(buf, 1024, "%i", day);
-		tcmapput(cols, "day", 3, buf, strlen(buf));
-		snprintf(buf, 1024, "%i", hour);
-		tcmapput(cols, "hour", 4, buf, strlen(buf));
-		snprintf(buf, 1024, "%i", minute);
-		tcmapput(cols, "minute", 6, buf, strlen(buf));
-		snprintf(buf, 1024, "%i", second);
-		tcmapput(cols, "second", 6, buf, strlen(buf));
+		struct tm tm;
+		if (strptime(buf, "%Y:%m:%d %H:%M:%S", &tm))
+		{
+			snprintf(buf, 1024, "%i", tm.tm_year + 1900);
+			tcmapput(cols, "year", 4, buf, strlen(buf));
+			snprintf(buf, 1024, "%i", tm.tm_mon + 1);
+			tcmapput(cols, "month", 5, buf, strlen(buf));
+			snprintf(buf, 1024, "%i", tm.tm_mday);
+			tcmapput(cols, "day", 3, buf, strlen(buf));
+			snprintf(buf, 1024, "%i", tm.tm_hour);
+			tcmapput(cols, "hour", 4, buf, strlen(buf));
+			snprintf(buf, 1024, "%i", tm.tm_min);
+			tcmapput(cols, "minute", 6, buf, strlen(buf));
+			snprintf(buf, 1024, "%i", tm.tm_sec);
+			tcmapput(cols, "second", 6, buf, strlen(buf));
+			snprintf(buf, 1024, "%i", tm.tm_wday);
+			tcmapput(cols, "weekday", 6, buf, strlen(buf));
+			time_t epoch = mktime(&tm);
+			snprintf(buf, 1024, "%li", epoch);
+			tcmapput(cols, "datetime", 8, buf, strlen(buf));
+		}
 	}
 	if (exif_entry = exif_content_get_entry(exif->ifd[EXIF_IFD_EXIF], EXIF_TAG_EXPOSURE_TIME))
 	{
@@ -135,6 +143,8 @@ bool nqmetasetindex(TCTDB* tdb)
 		   tctdbsetindex(tdb, "hour", TDBITDECIMAL) &&
 		   tctdbsetindex(tdb, "minute", TDBITDECIMAL) &&
 		   tctdbsetindex(tdb, "second", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "weekday", TDBITDECIMAL) &&
+		   tctdbsetindex(tdb, "datetime", TDBITDECIMAL) &&
 		   tctdbsetindex(tdb, "exposure", TDBITDECIMAL) &&
 		   tctdbsetindex(tdb, "fnumber", TDBITDECIMAL) &&
 		   tctdbsetindex(tdb, "focal", TDBITDECIMAL) &&

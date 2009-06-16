@@ -14,6 +14,7 @@
 typedef struct NQQRY {
 	void* db;
 	void* col;
+	void* orderby;
 	union {
 		char* str;
 		CvMat* desc;
@@ -23,7 +24,7 @@ typedef struct NQQRY {
 	int op;
 	int cnum;
 	int mode;
-	int ordered;
+	int order;
 	int lmt;
 	struct NQQRY** conds;
 	NQRDB* result;
@@ -48,8 +49,9 @@ enum {
 	NQOPNUMGE = 0x04,	/* number is greater than or equal to      */
 	NQOPNUMLT = 0x05,	/* number is less than                     */
 	NQOPNUMLE = 0x06,	/* number is less than or equal to         */
-	NQOPLIKE  = 0x07,	/* object is like (index search)           */
-	NQOPELIKE = 0x08,	/* object is exact like (exhausted search) */
+	NQOPNUMBT = 0x07,	/* between two numbers                     */
+	NQOPLIKE  = 0x08,	/* object is like (index search)           */
+	NQOPELIKE = 0x09,	/* object is exact like (exhausted search) */
 	NQOPNOT   = 0x10	/* not operator                            */
 };
 

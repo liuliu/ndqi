@@ -70,7 +70,7 @@ int nqqryresult(NQQRY* qry, char** kstr, float* likeness)
 	ud->data->likeness = 0;
 	nqrdbforeach(qry->result, nqqrysort, ud);
 	int i;
-	if (qry->ordered)
+	if (qry->order)
 	{
 		for (i = qry->lmt-1; i > 0; i--)
 		{
@@ -144,12 +144,13 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		TCLIST *tclist;
 		char *colname;
 		TDBQRY *tdbqry;
-		int j, k;
+		int j, k, TDBQCNOT;
+		bool negate = (*condptr)->op & NQOPNOT;
 		switch ((*condptr)->type)
 		{
 			case NQCTAND:
 			case NQCTOR:
-				(*condptr)->ordered = true;
+				(*condptr)->order = true;
 				if (qry->type == NQCTAND && i > 0)
 					(*condptr)->result = rdb;
 				nqqrysearch(*condptr);
@@ -192,30 +193,34 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					nqfdbdel(tfdb);
 				break;
 			case NQTTCTDB:
+				negate = false;
 				tdb = (TCTDB*)(*condptr)->db;
 				colname = (char*)(*condptr)->col;
 				tdbqry = tctdbqrynew(tdb);
+				TDBQCNOT = ((*condptr)->op & NQOPNOT) ? TDBQCNEGATE : 0;
 				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPNUMEQ:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNUMEQ, (*condptr)->sbj.str);
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMEQ, (*condptr)->sbj.str);
 						break;
 					case NQOPNUMGT:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNUMGT, (*condptr)->sbj.str);
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMGT, (*condptr)->sbj.str);
 						break;
 					case NQOPNUMLT:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNUMLT, (*condptr)->sbj.str);
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMLT, (*condptr)->sbj.str);
 						break;
 					case NQOPNUMGE:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNUMGE, (*condptr)->sbj.str);
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMGE, (*condptr)->sbj.str);
 						break;
 					case NQOPNUMLE:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNUMLE, (*condptr)->sbj.str);
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMLE, (*condptr)->sbj.str);
 						break;
+					case NQOPNUMBT:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMBT, (*condptr)->sbj.str);
 					case NQOPSTREQ:
 					case NQOPLIKE:
 					case NQOPELIKE:
-						tctdbqryaddcond(tdbqry, colname, TDBQCSTREQ, (*condptr)->sbj.str);
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTREQ, (*condptr)->sbj.str);
 						break;
 				}
 				{
@@ -280,7 +285,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 			case NQCTAND:
 				if (i > 0)
 				{
-					if ((*condptr)->op & NQOPNOT)
+					if (negate)
 					{
 						char** ksptr = kstr;
 						for (j = 0; j < k; j++, ksptr++)

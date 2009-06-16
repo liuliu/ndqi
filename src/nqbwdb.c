@@ -531,7 +531,7 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	apr_thread_rwlock_wrlock(bwdb->rwunidxlock);
 #endif
 	int unum = bwdb->unum;
-	int i, t = 0, tt = 0, kmax = 0, cols = 0;
+	int i, t = 0, kmax = 0, cols = 0;
 	NQBWDBUNIDX* unidx_array = (NQBWDBUNIDX*)malloc(unum * sizeof(NQBWDBUNIDX));
 	NQBWDBUNIDX* unidx_array_end = unidx_array + unum;
 	NQBWDBUNIDX* unidx_y = unidx_array;
@@ -560,7 +560,7 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	CvSparseMat* sim = cvCreateSparseMat(2, sizes, CV_64FC1);
 	CvMat* idx = cvCreateMat(kmax, 2, CV_32SC1);
 	CvMat* dist = cvCreateMat(kmax, 2, CV_64FC1);
-	double tpref = 0;
+	double pref = 0, tpref;
 	int x_offset = 0;
 	for (unidx_x = unidx_array; unidx_x != unidx_array_end; unidx_x++)
 	{
@@ -580,9 +580,10 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 						((dptr[1] < dptr[0] && dptr[1] < dptr[0] * match)||
 						 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * match)))
 					{
-						cvSetReal2D(sim, x_offset + i, y_offset + (dptr[1] < dptr[0] ? iptr[1] : iptr[0]), -(dptr[1] < dptr[0] ? dptr[1] : dptr[0]));
-						tpref -= dptr[1] < dptr[0] ? dptr[1] : dptr[0];
-						tt++;
+						tpref = -(dptr[1] < dptr[0] ? dptr[1] : dptr[0]);
+						cvSetReal2D(sim, x_offset + i, y_offset + (dptr[1] < dptr[0] ? iptr[1] : iptr[0]), tpref);
+						if (tpref < pref)
+							pref = tpref;
 					}
 			}
 			y_offset += unidx_y->datum->bw->rows;
@@ -592,7 +593,6 @@ bool nqbwdbidx(NQBWDB* bwdb, int min, double match)
 	idx->rows = dist->rows = kmax;
 	cvReleaseMat(&idx);
 	cvReleaseMat(&dist);
-	double pref = tpref / tt;
 	for (i = 0; i < t; i++)
 		cvSetReal2D(sim, i, i, pref);
 	CvAPCluster apcluster = CvAPCluster(CvAPCParams(2000, 200, 0.5));

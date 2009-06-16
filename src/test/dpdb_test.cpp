@@ -53,7 +53,7 @@ int main()
 			if (dpm != NULL)
 			{
 				CvMat* dpe = nqbweplr(dpm);
-		printf("%d => %d\n", dpm->rows, dpe->rows);
+				printf("%d => %d\n", dpm->rows, dpe->rows);
 				cvReleaseMat(&dpm);
 				if (dpe != NULL)
 				{
