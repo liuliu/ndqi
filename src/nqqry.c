@@ -217,10 +217,14 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						break;
 					case NQOPNUMBT:
 						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMBT, (*condptr)->sbj.str);
+						break;
 					case NQOPSTREQ:
 					case NQOPLIKE:
 					case NQOPELIKE:
 						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTREQ, (*condptr)->sbj.str);
+						break;
+					case NQOPNULL:
+						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTRBW, "");
 						break;
 				}
 				{
