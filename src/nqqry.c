@@ -224,7 +224,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTREQ, (*condptr)->sbj.str);
 						break;
 					case NQOPNULL:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTRBW, "");
+						tctdbqryaddcond(tdbqry, colname, ~TDBQCNOT & TDBQCSTRBW, "");
 						break;
 				}
 				{

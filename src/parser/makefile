@@ -9,7 +9,7 @@ all: test
 clean:
 	rm *.o ../lib/*.o ../*.o gram.h gram.c gram.out scan.c test
 
-test: test.o scan.o gram.o keywords.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o
+test: test.o scan.o gram.o keywords.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_managed_mem.o ../config/databases.o
 	g++ -o $@ $^ $(LINKFLAG)
 
 scan.c: scan.l gram.h

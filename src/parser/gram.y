@@ -10,12 +10,13 @@ static NQPREQRY* YY_RESULT = 0;
 	char chr;
 	char *str;
 	const char *keyword;
-	NQPREQRY* qry;
+	NQPREQRY *qry;
 }
 
-%nonassoc ALL, ANY, ASC, BETWEEN, BY, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, LIKE, LIMIT, ORDER, SELECT, SOME, WHERE
+%nonassoc ALL, ANY, ASC, BETWEEN, BY, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, IS, LIKE, LIMIT, NULL_P, ORDER, SELECT, SOME, WHERE
 %nonassoc UUID, UUIDENT, IDENT, FCONST, ICONST
-%nonassoc NUMGT, NUMGE, NUMLT, NUMLE, STRNE, STREQ
+%nonassoc STRTYPE, NUMTYPE, NOTYPE
+%nonassoc NUMGT, NUMGE, NUMLT, NUMLE, COLNE, COLEQ
 %left OR
 %left AND
 %left NOT
@@ -87,6 +88,9 @@ CondStmt:	CondStmt OR CondStmt
 				$$.qry = $1.qry;
 				$$.qry->lmt = strtol($3.str, NULL, 10);
 			} |
+			CondStmt ORDER BY ColumnStmt
+			{
+			} |
 			'(' CondStmt ')' { $$ = $2; } |
 			PredicateStmt { $$ = $1; };
 
@@ -139,23 +143,23 @@ ComparisonStmt:	ColumnStmt NUMGT ScalarExp
 						yyerror("column name doesn't exist.");
 					}
 				} |
-				ColumnStmt STRNE ScalarExp
+				ColumnStmt COLNE ScalarExp
 				{
 					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
-						$$.qry->op = NQOPSTREQ | NQOPNOT;
+						$$.qry->op = (NUMTYPE == nqqrytype($1.str)) ? NQOPNUMEQ | NQOPNOT : NQOPSTREQ | NQOPNOT;
 						$$.qry->sbj.str = $3.str;
 					} else {
 						yyerror("column name doesn't exist.");
 					}
 				} |
-				ColumnStmt STREQ ScalarExp
+				ColumnStmt COLEQ ScalarExp
 				{
 					$$.qry = nqpreqrynew(yymem());
 					if (nqqryident($$.qry, $1.str))
 					{
-						$$.qry->op = NQOPSTREQ;
+						$$.qry->op = (NUMTYPE == nqqrytype($1.str)) ? NQOPNUMEQ : NQOPSTREQ;
 						$$.qry->sbj.str = $3.str;
 					} else {
 						yyerror("column name doesn't exist.");
@@ -165,18 +169,15 @@ ComparisonStmt:	ColumnStmt NUMGT ScalarExp
 BetweenStmt:	ColumnStmt BETWEEN ScalarExp AND ScalarExp
 				{
 					$$.qry = nqpreqrynew(yymem());
-					$$.qry->cnum = 2;
-					$$.qry->op = NQCTAND;
-					$$.qry->conds = (NQPREQRY**)apr_palloc(yymem(), 2 * sizeof(NQPREQRY*));
-					$$.qry->conds[0] = nqpreqrynew(yymem());
-					$$.qry->conds[1] = nqpreqrynew(yymem());
-					if (nqqryident($$.qry->conds[0], $1.str) &&
-						nqqryident($$.qry->conds[1], $1.str))
+					$$.qry->op = NQOPNUMBT;
+					if (nqqryident($$.qry, $1.str))
 					{
-						$$.qry->conds[0]->op = NQOPNUMGE;
-						$$.qry->conds[0]->sbj.str = $3.str;
-						$$.qry->conds[1]->op = NQOPNUMLE;
-						$$.qry->conds[1]->sbj.str = $5.str;
+						int len = strlen($3.str) + 1 + strlen($5.str);
+						$$.qry->sbj.str = (char*)apr_palloc(yymem(), len + 1);
+						$$.qry->sbj.str[len] = '\0';
+						memcpy($$.qry->sbj.str, $3.str, strlen($3.str));
+						$$.qry->sbj.str[strlen($3.str)] = ' ';
+						memcpy($$.qry->sbj.str + strlen($3.str) + 1, $5.str, strlen($5.str));
 					} else {
 						yyerror("column name doesn't exist.");
 					}
@@ -275,42 +276,47 @@ NQPREQRY* yyresult()
 	return YY_RESULT;
 }
 
-static bool nqqryident(NQPREQRY* qry, char* str)
+static int nqqrytype(char* str)
 {
 	switch (str[0])
 	{
 		case 'e': /* "exif" */
-			qry->type = NQTTCTDB;
-			qry->db = NQDBEXIF;
-			qry->col = (char*)apr_palloc(yymem(), strlen(str) - 4);
-			memcpy(qry->col, str + 5, strlen(str) - 5);
-			qry->col[strlen(str) - 5] = '\0';
-			break;
-		case 'g': /* "gist" */
-			qry->type = NQTFDB;
-			qry->db = NQDBGIST;
-			break;
-		case 'l':
-			switch (str[1])
+			switch (str[5])
 			{
-				case 'f': /* "lfd" */
-					qry->type = NQTBWDB;
-					qry->db = NQDBLFD;
-					break;
-				case 'h': /* "lh" */
-					qry->type = NQTFDB;
-					qry->db = NQDBLH;
-					break;
+				case 'm':
+					switch (str[7])
+					{
+						case 'k': /* "make" */
+						case 'd': /* "model" */
+							return STRTYPE;
+						default:
+							return NUMTYPE;
+					}
 				default:
-					return false;
+					return NUMTYPE;
 			}
-			break;
-		case 't':
-			qry->type = NQTTCWDB;
-			qry->db = NQDBTAG;
-			break;
 		default:
-			return false;
+			return NOTYPE;
 	}
-	return true;
+	return NOTYPE;
+}
+
+static bool nqqryident(NQPREQRY* qry, char* str)
+{
+	char* spliter = strchr(str, '.');
+	if (spliter != NULL)
+		spliter[0] = '\0';
+	const ScanDatabase* db = ScanDatabaseLookup(str);
+	if (db != NULL)
+	{
+		qry->type = db->type;
+		qry->db = db->name;
+		if (qry->type == NQTTCTDB && spliter != NULL)
+		{
+			qry->col = (char*)apr_palloc(yymem(), strlen(spliter + 1) + 1);
+			qry->col[strlen(spliter + 1)] = '\0';
+		}
+		return true;
+	}
+	return false;
 }

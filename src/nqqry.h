@@ -18,6 +18,7 @@ typedef struct NQQRY {
 	union {
 		char* str;
 		CvMat* desc;
+		NQRDB* sub;
 	} sbj;
 	float cfd;
 	int type;
@@ -52,7 +53,7 @@ enum {
 	NQOPNUMBT = 0x07,	/* between two numbers                     */
 	NQOPLIKE  = 0x08,	/* object is like (index search)           */
 	NQOPELIKE = 0x09,	/* object is exact like (exhausted search) */
-	NQOPNULL  = 0x0A,	/* object is exact like (exhausted search) */
+	NQOPNULL  = 0x0A,	/* object is null                          */
 	NQOPNOT   = 0x10	/* not operator                            */
 };
 

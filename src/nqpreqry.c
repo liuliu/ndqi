@@ -4,6 +4,7 @@
  ********************************************************/
 
 #include "nqpreqry.h"
+#include "lib/frl_managed_mem.h"
 
 static apr_pool_t* mtx_pool = 0;
 static frl_slab_pool_t* preqry_pool = 0;
@@ -31,7 +32,7 @@ static char* nqstrdup(const char* str, unsigned int maxlen)
 {
 	unsigned int tlen = strlen(str);
 	unsigned int slen = (tlen > maxlen) ? maxlen : tlen;
-	char* ret = (char*)malloc(slen + 1);
+	char* ret = (char*)frl_managed_malloc(slen + 1);
 	memcpy(ret, str, slen);
 	ret[slen] = '\0';
 	return ret;
@@ -70,9 +71,9 @@ void nqpreqrydel(NQPREQRY* qry)
 	if (qry->type & NQSUBQRY)
 		nqpreqrydel(qry->sbj.subqry);
 	else if (qry->sbj.str != 0)
-		free(qry->sbj.str);
+		frl_managed_unref(qry->sbj.str);
 	if (qry->col != 0)
-		free(qry->col);
+		frl_managed_unref(qry->col);
 	frl_slab_pfree(qry);
 }
 

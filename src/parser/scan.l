@@ -61,9 +61,9 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 "<="	|
 "=<"			{ return NUMLE; }
 "<>"	|
-"!="			{ return STRNE; }
+"!="			{ return COLNE; }
 "="		|
-"=="			{ return STREQ; }
+"=="			{ return COLEQ; }
 
 {integer}		{
 					yylval.str = nqstrdup(yytext, yyleng);
@@ -121,7 +121,7 @@ apr_pool_t* yymem()
 static char* nqstrdup(const char* str, unsigned int maxlen)
 {
 	unsigned int tlen = strlen(str);
-	int i, len = (tlen > maxlen) ? maxlen : tlen;
+	int len = (tlen > maxlen) ? maxlen : tlen;
 	char* result = (char*)apr_palloc(yymem(), len + 1);
 	memcpy(result, str, len);
 	result[len] = '\0';

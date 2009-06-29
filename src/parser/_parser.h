@@ -2,6 +2,7 @@
 #define _GUARD__PARSER_
 
 #include "keywords.h"
+#include "../config/databases.h"
 #include "../nqpreqry.h"
 
 extern apr_pool_t* yymem(void);

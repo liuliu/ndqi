@@ -7,7 +7,7 @@ CXXFLAGS = -I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/o
 all: nqserver
 
 clean:
-	rm *.o ../parser/*.o ../lib/*.o ../*.o ../parser/gram.h ../parser/gram.c ../parser/gram.out ../parser/scan.c nqserver
+	rm *.o ../parser/*.o ../config/*.o ../lib/*.o ../*.o ../parser/gram.h ../parser/gram.c ../parser/gram.out ../parser/scan.c nqserver
 
 nqserver: nqserver.o nqplan.o nqclient.o ../parser/scan.o ../parser/gram.o ../parser/keywords.o ../nqbwdb.o ../nqfdb.o ../nqqry.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_managed_mem.o ../lib/frl_util_md5.o ../lib/mlapcluster.o $(OPENCV)/src/ml/ml_inner_functions.o ../lib/cvgist.o ../lib/cvlocalhist.o ../config/databases.o
 	g++ -o $@ $^ $(LINKFLAG)

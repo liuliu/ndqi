@@ -4,7 +4,7 @@
 #define NQ_KEYWORD(a,b,c) {a,b,c},
 
 const ScanKeyword ScanKeywords[] = {
-#include "kwlist.h"
+#include "kwlist.i"
 };
 
 const ScanKeyword* LastScanKeyword = ScanKeywords + sizeof(ScanKeywords) / sizeof(ScanKeyword);

@@ -9,8 +9,9 @@
 #include "nqqry.h"
 
 typedef struct NQPREQRY {
-	int db;
+	const char* db;
 	char* col;
+	char* orderby;
 	union {
 		char* str;
 		struct NQPREQRY* subqry;
@@ -20,19 +21,11 @@ typedef struct NQPREQRY {
 	int op;
 	int cnum;
 	int mode;
-	int ordered;
+	int order;
 	int lmt;
 	struct NQPREQRY** conds;
 	NQRDB* result;
 } NQPREQRY;
-
-enum {
-	NQDBLFD  = 0x01,	/* local feature descriptor database */
-	NQDBLH   = 0x02,	/* local histogram database          */
-	NQDBGIST = 0x03,	/* gist feature database             */
-	NQDBTAG  = 0x04,	/* tag database                      */
-	NQDBEXIF = 0x05		/* exif database                     */
-};
 
 NQPREQRY* nqpreqrynew(void);
 NQPREQRY* nqpreqrynew(apr_pool_t* pool);
