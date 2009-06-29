@@ -1,0 +1,43 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+NQPLAN	nqplan.h	/^} NQPLAN;$/;"	t	typeref:struct:__anon1
+NQPLANITER	nqplan.h	/^typedef struct NQPLANITER {$/;"	s
+NQPLANITER	nqplan.h	/^} NQPLANITER;$/;"	t	typeref:struct:NQPLANITER
+NQPLANITER::postqry	nqplan.h	/^	NQQRY* postqry;$/;"	m	struct:NQPLANITER	access:public
+NQPLANITER::prev	nqplan.h	/^	NQPLANITER* prev;$/;"	m	struct:NQPLANITER	access:public
+NQPLANITER::qry	nqplan.h	/^	NQQRY* qry;$/;"	m	struct:NQPLANITER	access:public
+_GUARD_NQCLIENT_	nqclient.h	2;"	d
+_GUARD_NQPLAN_	nqplan.h	2;"	d
+__anon1::cnum	nqplan.h	/^	int cnum;$/;"	m	struct:__anon1	access:public
+__anon1::head	nqplan.h	/^	NQPLANITER* head;$/;"	m	struct:__anon1	access:public
+__anon1::tail	nqplan.h	/^	NQPLANITER* tail;$/;"	m	struct:__anon1	access:public
+cnum	nqplan.h	/^	int cnum;$/;"	m	struct:__anon1	access:public
+generic_handler	nqserver.c	/^void generic_handler(struct evhttp_request *req, void *arg)$/;"	f	signature:(struct evhttp_request *req, void *arg)
+head	nqplan.h	/^	NQPLANITER* head;$/;"	m	struct:__anon1	access:public
+main	nqserver.c	/^int main(int argc, char** argv)$/;"	f	signature:(int argc, char** argv)
+mtx_pool	nqplan.c	/^static apr_pool_t* mtx_pool = 0;$/;"	v	file:
+ncbwdbget	nqclient.c	/^CvMat* ncbwdbget(const char* db, const char* uuid)$/;"	f	signature:(const char* db, const char* uuid)
+ncbwdbget	nqclient.h	/^CvMat* ncbwdbget(const char* db, const char* uuid);$/;"	p	signature:(const char* db, const char* uuid)
+ncfdbget	nqclient.c	/^CvMat* ncfdbget(const char* db, const char* uuid)$/;"	f	signature:(const char* db, const char* uuid)
+ncfdbget	nqclient.h	/^CvMat* ncfdbget(const char* db, const char* uuid);$/;"	p	signature:(const char* db, const char* uuid)
+ncqrysearch	nqclient.c	/^void ncqrysearch(NQQRY* qry, char** kstr, float* likeness)$/;"	f	signature:(NQQRY* qry, char** kstr, float* likeness)
+ncqrysearch	nqclient.h	/^void ncqrysearch(NQQRY* qry, char** kstr, float* likeness = 0);$/;"	p	signature:(NQQRY* qry, char** kstr, float* likeness = 0)
+nctdbget	nqclient.c	/^char* nctdbget(const char* db, const char* col, const char* uuid)$/;"	f	signature:(const char* db, const char* col, const char* uuid)
+nctdbget	nqclient.h	/^char* nctdbget(const char* db, const char* col, const char* uuid);$/;"	p	signature:(const char* db, const char* col, const char* uuid)
+nqplandel	nqplan.c	/^void nqplandel(NQPLAN* plan)$/;"	f	signature:(NQPLAN* plan)
+nqplandel	nqplan.h	/^void nqplandel(NQPLAN* plan);$/;"	p	signature:(NQPLAN* plan)
+nqplannew	nqplan.c	/^NQPLAN* nqplannew(NQPREQRY* preqry)$/;"	f	signature:(NQPREQRY* preqry)
+nqplannew	nqplan.h	/^NQPLAN* nqplannew(NQPREQRY* preqry);$/;"	p	signature:(NQPREQRY* preqry)
+nqplanrun	nqplan.c	/^void nqplanrun(NQPLAN* plan, char** kstr, float* likeness)$/;"	f	signature:(NQPLAN* plan, char** kstr, float* likeness)
+nqplanrun	nqplan.h	/^void nqplanrun(NQPLAN* plan, char** kstr, float* likeness = 0);$/;"	p	signature:(NQPLAN* plan, char** kstr, float* likeness = 0)
+nqqrytrans	nqplan.c	/^static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)$/;"	f	file:	signature:(NQPLAN* plan, NQPREQRY* preqry)
+plan_iter_pool	nqplan.c	/^static frl_slab_pool_t* plan_iter_pool = 0;$/;"	v	file:
+plan_pool	nqplan.c	/^static frl_slab_pool_t* plan_pool = 0;$/;"	v	file:
+postqry	nqplan.h	/^	NQQRY* postqry;$/;"	m	struct:NQPLANITER	access:public
+prev	nqplan.h	/^	NQPLANITER* prev;$/;"	m	struct:NQPLANITER	access:public
+qry	nqplan.h	/^	NQQRY* qry;$/;"	m	struct:NQPLANITER	access:public
+tail	nqplan.h	/^	NQPLANITER* tail;$/;"	m	struct:__anon1	access:public
