@@ -5,7 +5,8 @@ LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyo
 LINKLIB=-L"$(OPENCV)/lib"
 CXXFLAGS=-I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/opencv"
 
-all: $(OUTDIR)/rdb_test $(OUTDIR)/dpdb_test $(OUTDIR)/irdb_test $(OUTDIR)/idx_test $(OUTDIR)/lh_test $(OUTDIR)/gs_test $(OUTDIR)/cx_test $(OUTDIR)/qry_test $(OUTDIR)/mm_test
+all: $(OUTDIR)/file_test
+# all: $(OUTDIR)/rdb_test $(OUTDIR)/dpdb_test $(OUTDIR)/irdb_test $(OUTDIR)/idx_test $(OUTDIR)/lh_test $(OUTDIR)/gs_test $(OUTDIR)/cx_test $(OUTDIR)/qry_test $(OUTDIR)/mm_test $(OUTDIR)/file_test
 
 $(OUTDIR)/rdb_test: rdb_test.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
@@ -35,6 +36,9 @@ $(OUTDIR)/qry_test: qry_test.o ../nqqry.o ../nqlh.o ../nqmeta.o ../lib/cvlocalhi
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
 $(OUTDIR)/mm_test: mm_test.o ../lib/frl_managed_mem.o
+	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
+
+$(OUTDIR)/file_test: file_test.o ../nqbwdb.o ../nqdp.o ../nqrdb.o ../lib/mlapcluster.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o $(OPENCV)/src/ml/ml_inner_functions.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
 clean:

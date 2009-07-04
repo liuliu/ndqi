@@ -31,10 +31,14 @@ typedef struct NQBWDBIDX {
 	struct NQBWDBIDX* next;
 } NQBWDBIDX;
 
+const short int NQBWDBIDX_MAGIC_VAL = 0x8239;
+
 typedef struct {
 	CvMat* bw;
 	CvFeatureTree* bwft;
 } NQBWDBDATUM;
+
+const short int NQBWDBDATUM_MAGIC_VAL = 0x7643;
 
 typedef struct NQBWDBUNIDX {
 	char* kstr;
@@ -42,6 +46,8 @@ typedef struct NQBWDBUNIDX {
 	struct NQBWDBUNIDX* prev;
 	struct NQBWDBUNIDX* next;
 } NQBWDBUNIDX;
+
+const short int NQBWDBUNIDX_MAGIC_VAL = 0x1839;
 
 typedef struct {
 	NQRDB* rdb;
@@ -58,6 +64,8 @@ typedef struct {
 #endif
 } NQBWDB;
 
+const short int NQBWDB_MAGIC_VAL = 0x9304;
+
 NQBWDB* nqbwdbnew(void);
 NQBWDB* nqbwdbjoin(NQBWDB* bwdb, char** kstr, int len);
 NQBWDB* nqbwdbjoin(NQBWDB* bwdb, NQRDB* rdb);
@@ -70,6 +78,8 @@ bool nqbwdbidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
 bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min = 1, double match = 0.6);
 bool nqbwdbreidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
 bool nqbwdbout(NQBWDB* bwdb, char* kstr);
+bool nqbwdbsnap(NQBWDB* bwdb, char* filename);
+bool nqbwdbsync(NQBWDB* bwdb, char* filename);
 void nqbwdbdel(NQBWDB* bwdb);
 
 #endif
