@@ -13,16 +13,23 @@ typedef struct {
 	CvMat* f;
 } NQFDBDATUM;
 
+const short int NQFDBDATUM_MAGIC_VAL = 0x2487;
+
 typedef struct NQFDBIDX {
 	CvMat* f;
 	CvMat* p;
 	CvFeatureTree* ft;
 	uint32_t inum;
+	int naive;
+	double rho;
+	double tau;
 	char** kstr;
 	NQFDBDATUM** data;
 	struct NQFDBIDX* prev;
 	struct NQFDBIDX* next;
 } NQFDBIDX;
+
+const short int NQFDBIDX_MAGIC_VAL = 0x9837;
 
 typedef struct NQFDBUNIDX {
 	char* kstr;
@@ -30,6 +37,8 @@ typedef struct NQFDBUNIDX {
 	struct NQFDBUNIDX* prev;
 	struct NQFDBUNIDX* next;
 } NQFDBUNIDX;
+
+const short int NQFDBUNIDX_MAGIC_VAL = 0x8393;
 
 typedef struct {
 	NQRDB* rdb;
@@ -44,6 +53,8 @@ typedef struct {
 #endif
 } NQFDB;
 
+const short int NQFDB_MAGIC_VAL = 0x2F28;
+
 NQFDB* nqfdbnew(void);
 NQFDB* nqfdbjoin(NQFDB* fdb, char** kstr, int len);
 NQFDB* nqfdbjoin(NQFDB* fdb, NQRDB* rdb);
@@ -54,6 +65,8 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = fals
 bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);
 bool nqfdbreidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);
 bool nqfdbout(NQFDB* fdb, char* kstr);
+bool nqfdbsnap(NQFDB* fdb, char* filename);
+bool nqfdbsync(NQFDB* fdb, char* filename);
 void nqfdbdel(NQFDB* fdb);
 
 #endif

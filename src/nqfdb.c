@@ -413,6 +413,9 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 	apr_thread_rwlock_unlock(fdb->rwunidxlock);
 #endif
 	idx->inum = unum;
+	idx->naive = naive;
+	idx->rho = rho;
+	idx->tau = tau;
 	idx->ft = cvCreateSpillTree(idx->f, naive, rho, tau);
 #if APR_HAS_THREADS
 	apr_thread_rwlock_wrlock(fdb->rwidxlock);
@@ -506,6 +509,206 @@ bool nqfdbout(NQFDB* fdb, char* kstr)
 		return nqrdbout(fdb->rdb, kstr);
 	}
 	return false;
+}
+
+#define BUF_PTR_VAL(x,y,z) *(z*)(x) = (y); (x) += sizeof(z);
+#define BUF_PTR_CPY(x,y,z) memcpy((x),(y),(z)); (x) += (z);
+static void nqfdbwrite(char* kstr, void* vbuf, void* ud)
+{
+	NQFDBDATUM* datum = (NQFDBDATUM*)vbuf;
+	int bufsiz = 2 +16 + sizeof(datum->f->rows) + sizeof(datum->f->cols);
+	bufsiz += datum->f->rows * datum->f->cols * sizeof(float);
+	char *bufptr, *buf = *(char**)ud;
+	int maxbufsiz = *(int*)buf;
+	apr_file_t* file = *(apr_file_t**)(buf + sizeof(int));
+	if (maxbufsiz < bufsiz)
+	{
+		maxbufsiz = bufsiz;
+		free(buf);
+		*(char**)ud = buf = (char*)malloc(maxbufsiz + sizeof(apr_file_t*) + sizeof(int));
+		BUF_PTR_VAL(buf, maxbufsiz, int);
+		BUF_PTR_VAL(buf, file, apr_file_t*);
+	} else
+		buf += sizeof(int) + sizeof(apr_file_t*);
+	bufptr = buf;
+	BUF_PTR_VAL(bufptr, NQFDBDATUM_MAGIC_VAL, short int);
+	BUF_PTR_CPY(bufptr, kstr, 16);
+	BUF_PTR_VAL(bufptr, datum->f->rows, int);
+	BUF_PTR_VAL(bufptr, datum->f->cols, int);
+	BUF_PTR_CPY(bufptr, datum->f->data.ptr, datum->f->rows * datum->f->cols * sizeof(float));
+	apr_file_write_full(file, buf, bufsiz, NULL);
+}
+
+bool nqfdbsnap(NQFDB* fdb, char* filename)
+{
+	if (!fdb->shallow)
+	{
+		apr_status_t rv;
+		apr_file_t* file;
+		apr_pool_t* flpool;
+		apr_pool_create(&flpool, NULL);
+		rv = apr_file_open(&file, filename, APR_CREATE | APR_WRITE, APR_OS_DEFAULT, flpool);
+		if (APR_SUCCESS == rv)
+		{
+			int maxbufsiz = 0, bufsiz = 0;
+			char *bufptr, *buf = 0;
+			maxbufsiz = bufsiz = 2 + sizeof(fdb->inum) + sizeof(fdb->unum);
+			bufptr = buf = (char*)malloc(bufsiz);
+			BUF_PTR_VAL(bufptr, NQFDB_MAGIC_VAL, short int);
+			BUF_PTR_VAL(bufptr, fdb->inum, uint32_t);
+			BUF_PTR_VAL(bufptr, fdb->unum, uint32_t);
+			apr_file_write_full(file, buf, bufsiz, NULL);
+
+			*(int*)buf = maxbufsiz - sizeof(int) - sizeof(apr_file_t*);
+			*(apr_file_t**)(buf + sizeof(int)) = file;
+			nqrdbforeach(fdb->rdb, nqfdbwrite, &buf);
+
+			maxbufsiz = *(int*)buf + sizeof(int) + sizeof(apr_file_t*);
+
+			NQFDBIDX* idx;
+			for (idx = fdb->idx->next; idx != fdb->idx; idx = idx->next)
+			{
+				bufsiz = 2 + sizeof(idx->inum) + sizeof(idx->naive) + sizeof(idx->rho) + sizeof(idx->tau) + sizeof(idx->p->rows) + sizeof(idx->p->cols) + sizeof(idx->f->rows) + sizeof(idx->f->cols);
+				bufsiz += idx->inum * 16 + idx->p->rows * idx->p->cols * sizeof(float) + idx->f->rows * idx->f->cols * sizeof(float);
+				if (maxbufsiz < bufsiz)
+				{
+					maxbufsiz = bufsiz;
+					if (buf != 0)
+						free(buf);
+					buf = (char*)malloc(bufsiz);
+				}
+				bufptr = buf;
+				BUF_PTR_VAL(bufptr, NQFDBIDX_MAGIC_VAL, short int);
+				BUF_PTR_VAL(bufptr, idx->inum, uint32_t);
+				BUF_PTR_VAL(bufptr, idx->naive, int);
+				BUF_PTR_VAL(bufptr, idx->rho, double);
+				BUF_PTR_VAL(bufptr, idx->tau, double);
+				BUF_PTR_VAL(bufptr, idx->p->rows, int);
+				BUF_PTR_VAL(bufptr, idx->p->cols, int);
+				BUF_PTR_CPY(bufptr, idx->p->data.ptr, idx->p->rows * idx->p->cols * sizeof(float));
+				BUF_PTR_VAL(bufptr, idx->f->rows, int);
+				BUF_PTR_VAL(bufptr, idx->f->cols, int);
+				BUF_PTR_CPY(bufptr, idx->f->data.ptr, idx->f->rows * idx->f->cols * sizeof(float));
+				int i;
+				for (i = 0; i < idx->inum; i++)
+				{
+					BUF_PTR_CPY(bufptr, idx->kstr[i], 16);
+				}
+				apr_file_write_full(file, buf, bufsiz, NULL);
+			}
+
+			NQFDBUNIDX* unidx;
+			for (unidx = fdb->unidx->next; unidx != fdb->unidx; unidx = unidx->next)
+			{
+				bufsiz = 2 + 16;
+				if (maxbufsiz < bufsiz)
+				{
+					maxbufsiz = bufsiz;
+					if (buf != 0)
+						free(buf);
+					buf = (char*)malloc(bufsiz);
+				}
+				bufptr = buf;
+				BUF_PTR_VAL(bufptr, NQFDBUNIDX_MAGIC_VAL, short int);
+				BUF_PTR_CPY(bufptr, unidx->kstr, 16);
+				apr_file_write_full(file, buf, bufsiz, NULL);
+			}
+
+			free(buf);
+			apr_file_close(file);
+		}
+		apr_pool_destroy(flpool);
+	}
+	return true;
+}
+#undef BUF_PTR_VAL
+#undef BUF_PTR_CPY
+
+bool nqfdbsync(NQFDB* fdb, char* filename)
+{
+	apr_status_t rv;
+	apr_file_t* file;
+	apr_pool_t* flpool;
+	apr_pool_create(&flpool, NULL);
+	rv = apr_file_open(&file, filename, APR_READ, APR_OS_DEFAULT, flpool);
+	if (APR_SUCCESS == rv)
+	{
+		short int magicval;
+		for (;;)
+		{
+			rv = apr_file_read_full(file, &magicval, sizeof(short int), NULL);
+			if (rv != APR_SUCCESS)
+				break;
+			switch (magicval)
+			{
+				case NQFDB_MAGIC_VAL:
+					{
+						apr_file_read_full(file, &fdb->inum, sizeof(fdb->inum), NULL);
+						apr_file_read_full(file, &fdb->unum, sizeof(fdb->unum), NULL);
+						break;
+					}
+				case NQFDBDATUM_MAGIC_VAL:
+					{
+						NQFDBDATUM* datum = (NQFDBDATUM*)frl_slab_palloc(dt_pool);
+						char kstr[16];
+						apr_file_read_full(file, kstr, 16, NULL);
+						int rows, cols;
+						apr_file_read_full(file, &rows, sizeof(rows), NULL);
+						apr_file_read_full(file, &cols, sizeof(cols), NULL);
+						datum->f = cvCreateMat(rows, cols, CV_32FC1);
+						apr_file_read_full(file, datum->f->data.ptr, rows * cols * sizeof(float), NULL);
+						nqrdbput(fdb->rdb, kstr, datum);
+						break;
+					}
+				case NQFDBIDX_MAGIC_VAL:
+					{
+						NQFDBIDX* idx = (NQFDBIDX*)frl_slab_palloc(idx_pool);
+						apr_file_read_full(file, &idx->inum, sizeof(idx->inum), NULL);
+						apr_file_read_full(file, &idx->naive, sizeof(idx->naive), NULL);
+						apr_file_read_full(file, &idx->rho, sizeof(idx->rho), NULL);
+						apr_file_read_full(file, &idx->tau, sizeof(idx->tau), NULL);
+						int rows, cols;
+						apr_file_read_full(file, &rows, sizeof(rows), NULL);
+						apr_file_read_full(file, &cols, sizeof(cols), NULL);
+						idx->p = cvCreateMat(rows, cols, CV_32FC1);
+						apr_file_read_full(file, idx->p->data.ptr, rows * cols * sizeof(float), NULL);
+						apr_file_read_full(file, &rows, sizeof(rows), NULL);
+						apr_file_read_full(file, &cols, sizeof(cols), NULL);
+						idx->f = cvCreateMat(rows, cols, CV_32FC1);
+						apr_file_read_full(file, idx->f->data.ptr, rows * cols * sizeof(float), NULL);
+						int i;
+						idx->kstr = (char**)malloc(idx->inum * sizeof(char*));
+						idx->data = (NQFDBDATUM**)malloc(idx->inum * sizeof(NQFDBDATUM*));
+						for (i = 0; i < idx->inum; i++)
+						{
+							idx->kstr[i] = (char*)frl_slab_palloc(kstr_pool);
+							apr_file_read_full(file, idx->kstr[i], 16, NULL);
+							idx->data[i] = (NQFDBDATUM*)nqrdbget(fdb->rdb, idx->kstr[i]);
+						}
+						idx->ft = cvCreateSpillTree(idx->f, idx->naive, idx->rho, idx->tau);
+						idx->prev = fdb->idx->prev;
+						idx->next = fdb->idx;
+						fdb->idx->prev->next = idx;
+						fdb->idx->prev = idx;
+						break;
+					}
+				case NQFDBUNIDX_MAGIC_VAL:
+					{
+						NQFDBUNIDX* unidx = (NQFDBUNIDX*)frl_slab_palloc(unidx_pool);
+						unidx->kstr = (char*)frl_slab_palloc(kstr_pool);
+						unidx->datum = (NQFDBDATUM*)nqrdbget(fdb->rdb, unidx->kstr);
+						unidx->prev = fdb->unidx->prev;
+						unidx->next = fdb->unidx;
+						fdb->unidx->prev->next = unidx;
+						fdb->unidx->prev = unidx;
+						break;
+					}
+			}
+		}
+		apr_file_close(file);
+	}
+	apr_pool_destroy(flpool);
+	return true;
 }
 
 static void nqfnuk(char* kstr, void* vbuf, void* ud)
