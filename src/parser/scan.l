@@ -128,6 +128,16 @@ static char* nqstrdup(const char* str, unsigned int maxlen)
 	return result;
 }
 
+static char* nqstrdup_m(const char* str, unsigned int maxlen)
+{
+	unsigned int tlen = strlen(str);
+	int len = (tlen > maxlen) ? maxlen : tlen;
+	char* result = (char*)malloc(len + 1);
+	memcpy(result, str, len);
+	result[len] = '\0';
+	return result;
+}
+
 #define HIGHBIT                 (0x80)
 #define IS_HIGHBIT_SET(ch)      ((unsigned char)(ch) & HIGHBIT)
 
@@ -155,7 +165,7 @@ static char* downcase_truncate_identifier(const char* ident, int maxlen)
 static apr_pool_t* root = 0;
 static apr_thread_mutex_t* parse_mtx = 0;
 
-NQPREQRY* nqparse(char* str, int siz)
+NQPARSERESULT* nqparse(char* str, int siz)
 {
 	if (root == 0)
 		apr_pool_create(&root, NULL);
@@ -173,7 +183,41 @@ NQPREQRY* nqparse(char* str, int siz)
 	YY_ERROR = false;
 	yyparse();
 	yy_delete_buffer(scanbufhandle);
-	NQPREQRY* result = (YY_ERROR) ? 0 : nqpreqrydup(yyresult());
+	NQPARSERESULT* result = 0;
+	if (!YY_ERROR)
+	{
+		result = (NQPARSERESULT*)malloc(sizeof(NQPARSERESULT));
+		result->type = yyresult()->type;
+		switch (result->type)
+		{
+			case NQRTSELECT:
+				result->result = nqpreqrydup((NQPREQRY*)yyresult()->result);
+				break;
+			case NQRTINSERT:
+			case NQRTUPDATE:
+			case NQRTDELETE:
+				NQMANIPULATE* mp = (NQMANIPULATE*)malloc(sizeof(NQMANIPULATE));
+				memcpy(mp, yyresult()->result, sizeof(NQMANIPULATE));
+				switch (mp->type)
+				{
+					case NQMPSIMPLE:
+						mp->sbj.str = nqstrdup_m(mp->sbj.str, 256);
+						break;
+					case NQMPUUIDENT:
+						mp->sbj.str = nqstrdup_m(mp->sbj.str, 256);
+						mp->col = (mp->col == 0) ? 0 : nqstrdup_m(mp->col, 256);
+						mp->val = nqstrdup_m(mp->val, 256);
+						break;
+					case NQMPWHERE:
+						mp->sbj.qry = nqpreqrydup(mp->sbj.qry);
+						mp->col = (mp->col == 0) ? 0 : nqstrdup_m(mp->col, 256);
+						mp->val = nqstrdup_m(mp->val, 256);
+						break;
+				}
+				result->result = mp;
+				break;
+		}
+	}
 	apr_pool_clear(yymem());
 	apr_thread_mutex_unlock(parse_mtx);
 	return result;

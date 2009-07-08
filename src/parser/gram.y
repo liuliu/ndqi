@@ -1,7 +1,7 @@
 %{
 //#define YYDEBUG 1
 #include "_parser.h"
-static NQPREQRY* YY_RESULT = 0;
+static NQPARSERESULT* YY_RESULT = 0;
 %}
 
 %union
@@ -11,9 +11,10 @@ static NQPREQRY* YY_RESULT = 0;
 	char *str;
 	const char *keyword;
 	NQPREQRY *qry;
+	NQPARSERESULT* result;
 }
 
-%nonassoc ALL, ANY, ASC, BETWEEN, BY, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, IS, LIKE, LIMIT, NULL_P, ORDER, SELECT, SOME, WHERE
+%nonassoc ALL, ANY, ASC, BETWEEN, BY, DELETE, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, INSERT, INTO, IS, LIKE, LIMIT, NULL_P, ORDER, SELECT, SOME, UPDATE, WHERE
 %nonassoc UUID, UUIDENT, IDENT, FCONST, ICONST
 %nonassoc STRTYPE, NUMTYPE, NOTYPE
 %nonassoc NUMGT, NUMGE, NUMLT, NUMLE, COLNE, COLEQ
@@ -23,15 +24,100 @@ static NQPREQRY* YY_RESULT = 0;
 
 %%
 
-SelectListStmt: SelectStmt |
-				SelectStmt ';' |
-				SelectStmt ';' SelectListStmt;
+ListStmt:	Stmt { YY_RESULT = $$.result = $1.result; } |
+			Stmt ';' { YY_RESULT = $$.result = $1.result; } |
+			Stmt ';' Stmt { YY_RESULT = $$.result = $1.result; }
+
+Stmt:	DeleteStmt { $$ = $1; } |
+		InsertStmt { $$ = $1; } |
+		SelectStmt { $$ = $1; }
+
+DeleteStmt:	DELETE UUIDENT
+			{
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTDELETE;
+				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
+				mp->type = NQMPSIMPLE;
+				mp->sbj.str = $2.str;
+				$$.result->result = mp;
+			} |
+			DELETE ColumnStmt COLEQ ScalarExp FROM UUIDENT
+			{
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTDELETE;
+				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
+				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
+				{
+					mp->type = NQMPUUIDENT;
+					mp->sbj.str = $6.str;
+					mp->val = $4.str;
+					$$.result->result = mp;
+				} else {
+					yyerror("column name doesn't exist.");
+				}
+			} |
+			DELETE ColumnStmt COLEQ ScalarExp WHERE CondStmt
+			{
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTDELETE;
+				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
+				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
+				{
+					mp->type = NQMPWHERE;
+					mp->sbj.qry = $6.qry;
+					mp->val = $4.str;
+					$$.result->result = mp;
+				} else {
+					yyerror("column name doesn't exist.");
+				}
+			}
+
+InsertStmt:	INSERT UUIDENT
+			{
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTINSERT;
+				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
+				mp->type = NQMPSIMPLE;
+				mp->sbj.str = $2.str;
+				$$.result->result = mp;
+			} |
+			INSERT ColumnStmt COLEQ ScalarExp INTO UUIDENT
+			{
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTINSERT;
+				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
+				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
+				{
+					mp->type = NQMPUUIDENT;
+					mp->sbj.str = $6.str;
+					mp->val = $4.str;
+					$$.result->result = mp;
+				} else {
+					yyerror("column name doesn't exist.");
+				}
+			} |
+			INSERT ColumnStmt COLEQ ScalarExp WHERE CondStmt
+			{
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTINSERT;
+				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
+				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
+				{
+					mp->type = NQMPUUIDENT;
+					mp->sbj.qry = $6.qry;
+					mp->val = $4.str;
+					$$.result->result = mp;
+				} else {
+					yyerror("column name doesn't exist.");
+				}
+			}
 
 SelectStmt:	SELECT ColumnOptListStmt WHERE CondStmt
 			{
-				$$ = $4;
-				YY_RESULT = $$.qry;
-			};
+				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+				$$.result->type = NQRTSELECT;
+				$$.result->result = $4.qry;
+			}
 
 ColumnOptListStmt:	/* empty value */ |
 					ColumnListStmt;
@@ -92,12 +178,12 @@ CondStmt:	CondStmt OR CondStmt
 			{
 			} |
 			'(' CondStmt ')' { $$ = $2; } |
-			PredicateStmt { $$ = $1; };
+			PredicateStmt { $$ = $1; }
 
 PredicateStmt:	ComparisonStmt { $$ = $1; } |
 				BetweenStmt { $$ = $1; } |
 				InStmt { $$ = $1; } |
-				LikeCfdStmt { $$ = $1; };
+				LikeCfdStmt { $$ = $1; }
 
 ComparisonStmt:	ColumnStmt NUMGT ScalarExp
 				{
@@ -164,7 +250,7 @@ ComparisonStmt:	ColumnStmt NUMGT ScalarExp
 					} else {
 						yyerror("column name doesn't exist.");
 					}
-				};
+				}
 
 BetweenStmt:	ColumnStmt BETWEEN ScalarExp AND ScalarExp
 				{
@@ -181,7 +267,7 @@ BetweenStmt:	ColumnStmt BETWEEN ScalarExp AND ScalarExp
 					} else {
 						yyerror("column name doesn't exist.");
 					}
-				};
+				}
 
 InStmt:	ScalarExp IN SubQueryStmt;
 
@@ -190,7 +276,7 @@ LikeCfdStmt:	LikeStmt |
 				{
 					$$ = $1;
 					$$.qry->cfd = strtod($2.str, NULL) * 0.01;
-				};
+				}
 
 LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 			{
@@ -235,7 +321,7 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 				} else {
 					yyerror("column name doesn't exist.");
 				}
-			};
+			}
 
 ColumnListStmt:	ColumnStmt |
 				ColumnListStmt ',' ColumnStmt;
@@ -261,17 +347,17 @@ ColumnStmt:	UUID { $$ = $1; } |
 				memcpy($$.str + strlen($1.str) + 1, $3.str, strlen($3.str));
 				$$.str[strlen($1.str) + 1 + strlen($3.str)] = '.';
 				memcpy($$.str + strlen($1.str) + 1 + strlen($3.str) + 1, $5.str, strlen($5.str));
-			};
+			}
 
 SubQueryStmt: '(' SelectStmt ')' { $$ = $2; };
 
 ScalarExp:	ICONST { $$ = $1; } |
 			FCONST { $$ = $1; } |
-			'"' IDENT '"' { $$ = $2; };
+			'"' IDENT '"' { $$ = $2; }
 
 %%
 
-NQPREQRY* yyresult()
+NQPARSERESULT* yyresult()
 {
 	return YY_RESULT;
 }
@@ -301,7 +387,7 @@ static int nqqrytype(char* str)
 	return NOTYPE;
 }
 
-static bool nqqryident(NQPREQRY* qry, char* str)
+static bool nqcolident(int* dbtype, const char** dbname, char** col, char* str)
 {
 	char* spliter = strchr(str, '.');
 	if (spliter != NULL)
@@ -309,14 +395,21 @@ static bool nqqryident(NQPREQRY* qry, char* str)
 	const ScanDatabase* db = ScanDatabaseLookup(str);
 	if (db != NULL)
 	{
-		qry->type = db->type;
-		qry->db = db->name;
-		if (qry->type == NQTTCTDB && spliter != NULL)
+		*dbtype = db->type;
+		*dbname = db->name;
+		if (db->type == NQTTCTDB && spliter != NULL)
 		{
-			qry->col = (char*)apr_palloc(yymem(), strlen(spliter + 1) + 1);
-			qry->col[strlen(spliter + 1)] = '\0';
+			*col = (char*)apr_palloc(yymem(), strlen(spliter + 1) + 1);
+			(*col)[strlen(spliter + 1)] = '\0';
+		} else {
+			*col = 0;
 		}
 		return true;
 	}
 	return false;
+}
+
+static bool nqqryident(NQPREQRY* qry, char* str)
+{
+	return nqcolident(&qry->type, &qry->db, &qry->col, str);
 }
