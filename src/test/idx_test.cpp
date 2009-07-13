@@ -98,6 +98,7 @@ int main()
 
 	/* Finally close the directory stream */
 	closedir(dir);
+
 	return 0;
 }
 

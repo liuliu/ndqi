@@ -164,6 +164,43 @@ static char* downcase_truncate_identifier(const char* ident, int maxlen)
 
 static apr_pool_t* root = 0;
 static apr_thread_mutex_t* parse_mtx = 0;
+static frl_slab_pool_t* prpool = 0;
+static frl_slab_pool_t* mppool = 0;
+
+void nqparseresultdel(NQPARSERESULT* result)
+{
+	switch (result->type)
+	{
+		case NQRTSELECT:
+			nqpreqrydel((NQPREQRY*)result->result);
+			break;
+		case NQRTINSERT:
+		case NQRTUPDATE:
+		case NQRTDELETE:
+			NQMANIPULATE* mp = (NQMANIPULATE*)result->result;
+			switch (mp->type)
+			{
+				case NQMPSIMPLE:
+					free(mp->sbj.str);
+					break;
+				case NQMPUUIDENT:
+					free(mp->sbj.str);
+					if (mp->col != 0)
+						free(mp->col);
+					free(mp->val);
+					break;
+				case NQMPWHERE:
+					nqpreqrydel(mp->sbj.qry);
+					if (mp->col != 0)
+						free(mp->col);
+					free(mp->val);
+					break;
+			}
+			frl_slab_pfree(mp);
+			break;
+	}
+	frl_slab_pfree(result);
+}
 
 NQPARSERESULT* nqparse(char* str, int siz)
 {
@@ -186,7 +223,9 @@ NQPARSERESULT* nqparse(char* str, int siz)
 	NQPARSERESULT* result = 0;
 	if (!YY_ERROR)
 	{
-		result = (NQPARSERESULT*)malloc(sizeof(NQPARSERESULT));
+		if (prpool == 0)
+			frl_slab_pool_create(&prpool, root, 256, sizeof(NQPARSERESULT), FRL_LOCK_WITH);
+		result = (NQPARSERESULT*)frl_slab_palloc(prpool);
 		result->type = yyresult()->type;
 		switch (result->type)
 		{
@@ -196,7 +235,9 @@ NQPARSERESULT* nqparse(char* str, int siz)
 			case NQRTINSERT:
 			case NQRTUPDATE:
 			case NQRTDELETE:
-				NQMANIPULATE* mp = (NQMANIPULATE*)malloc(sizeof(NQMANIPULATE));
+				if (mppool == 0)
+					frl_slab_pool_create(&mppool, root, 128, sizeof(NQMANIPULATE), FRL_LOCK_WITH);
+				NQMANIPULATE* mp = (NQMANIPULATE*)frl_slab_palloc(mppool);
 				memcpy(mp, yyresult()->result, sizeof(NQMANIPULATE));
 				switch (mp->type)
 				{
@@ -227,6 +268,10 @@ void nqparsedel()
 {
 	if (parse_mtx != 0)
 		apr_thread_mutex_destroy(parse_mtx);
+	if (mppool != 0)
+		frl_slab_pool_destroy(mppool);
+	if (prpool != 0)
+		frl_slab_pool_destroy(prpool);
 	if (YY_MEM != 0)
 		apr_pool_destroy(YY_MEM);
 	if (root != 0)

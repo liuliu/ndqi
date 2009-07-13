@@ -36,14 +36,35 @@ void generic_handler(struct evhttp_request *req, void *arg)
 		if (buf == NULL)
 			F_ERROR("failed to create response buffer\n");
 
-		NQPREQRY* preqry = nqparse(q, strlen(q));
-		if (preqry != NULL)
+		NQPARSERESULT* result = nqparse(q, strlen(q));
+		if (result != NULL)
 		{
-			NQPLAN* plan = nqplannew(preqry);
-			nqpreqrydel(preqry);
+			NQPLAN* plan;
 			char* kstr[QRY_MAX_LMT];
-			int siz = nqplanrun(plan, kstr);
-			nqplandel(plan);
+			int siz;
+			switch (result->type)
+			{
+				case NQRTSELECT:
+					plan = nqplannew((NQPREQRY*)result->result);
+					siz = nqplanrun(plan, kstr);
+					nqplandel(plan);
+					break;
+				case NQRTINSERT:
+				case NQRTUPDATE:
+				case NQRTDELETE:
+					NQMANIPULATE* mp = (NQMANIPULATE*)result->result;
+					switch (mp->type)
+					{
+						case NQMPSIMPLE:
+							break;
+						case NQMPUUIDENT:
+							break;
+						case NQMPWHERE:
+							break;
+					}
+					break;
+			}
+			nqparseresultdel(result);
 
 			evbuffer_add_printf(buf, "[");
 			if (siz > 0 && kstr[0] != 0)

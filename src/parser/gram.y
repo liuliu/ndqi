@@ -300,28 +300,35 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 					yyerror("column name doesn't exist.");
 				}
 			} |
-			ColumnStmt EXACT LIKE SubQueryStmt
+			ColumnStmt EXACT LIKE AllSomeAnyOptList SubQueryStmt
 			{
 				$$.qry = nqpreqrynew(yymem());
 				if (nqqryident($$.qry, $1.str))
 				{
+					$$.qry->type |= NQSUBQRY | $3.ival;
 					$$.qry->op = NQOPELIKE;
 					$$.qry->sbj.subqry = $4.qry;
 				} else {
 					yyerror("column name doesn't exist.");
 				}
 			} |
-			ColumnStmt LIKE SubQueryStmt
+			ColumnStmt LIKE AllSomeAnyOptList SubQueryStmt
 			{
 				$$.qry = nqpreqrynew(yymem());
 				if (nqqryident($$.qry, $1.str))
 				{
+					$$.qry->type |= NQSUBQRY | $3.ival;
 					$$.qry->op = NQOPLIKE;
 					$$.qry->sbj.subqry = $3.qry;
 				} else {
 					yyerror("column name doesn't exist.");
 				}
 			}
+
+AllSomeAnyOptList:	ALL { $$.ival = NQSQRYALL; } |
+					SOME { $$.ival = NQSQRYANY; } |
+					ANY { $$.ival = NQSQRYANY; } |
+						{ $$.ival = 0; }
 
 ColumnListStmt:	ColumnStmt |
 				ColumnListStmt ',' ColumnStmt;

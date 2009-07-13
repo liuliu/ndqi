@@ -33,6 +33,7 @@ enum {
 	NQMPWHERE   = 0x3,
 };
 
+void nqparseresultdel(NQPARSERESULT* result);
 NQPARSERESULT* nqparse(char* str, int siz);
 void nqparsedel(void);
 

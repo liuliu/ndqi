@@ -8,6 +8,7 @@ typedef struct NQPLANITER {
 	NQQRY* qry;
 	NQPLANITER* prev;
 	NQQRY* postqry;
+	int type;
 } NQPLANITER;
 
 typedef struct {

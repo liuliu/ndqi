@@ -14,7 +14,8 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 	qry->db = ScanDatabaseLookup(preqry->db)->ref;
 	qry->cfd = preqry->cfd;
 	qry->col = preqry->col;
-	qry->type = preqry->type;
+	qry->op = preqry->op;
+	qry->type = preqry->type & ~(NQSUBQRY | NQSQRYANY | NQSQRYALL);
 	switch (qry->type)
 	{
 		case NQTBWDB:
@@ -37,11 +38,11 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 		for (i = 0; i < qry->cnum; i++)
 			qry->conds[i] = nqqrytrans(plan, preqry->conds[i]);
 	}
-	qry->op = preqry->op & ~NQSUBQRY;
-	if (preqry->op & NQSUBQRY)
+	if (preqry->type & NQSUBQRY)
 	{
 		NQPLANITER* prev = (NQPLANITER*)frl_slab_palloc(plan_iter_pool);
 		prev->prev = 0;
+		prev->type = preqry->type;
 		prev->postqry = qry;
 		plan->head->prev = prev;
 		plan->head = prev;
@@ -63,6 +64,7 @@ NQPLAN* nqplannew(NQPREQRY* preqry)
 	memset(plan, 0, sizeof(NQPLAN));
 	plan->tail = (NQPLANITER*)frl_slab_palloc(plan_iter_pool);
 	plan->tail->prev = 0;
+	plan->tail->type = 0;
 	plan->tail->postqry = 0;
 	plan->head = plan->tail;
 	plan->cnum++;
