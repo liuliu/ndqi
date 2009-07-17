@@ -11,9 +11,11 @@ static frl_slab_pool_t* plan_iter_pool = 0;
 static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 {
 	NQQRY* qry = nqqrynew();
-	qry->db = ScanDatabaseLookup(preqry->db)->ref;
+	ScanDatabase* db = ScanDatabaseLookup(preqry->db);
+	qry->db = db->ref;
 	qry->cfd = preqry->cfd;
-	qry->col = preqry->col;
+	/* for tcwdb, no need for col, but helper to keep the map of uuid to uid64 */
+	qry->col = (preqry->type & NQTTCWDB) ? db->helper : preqry->col;
 	qry->op = preqry->op;
 	qry->type = preqry->type & ~(NQSUBQRY | NQSQRYANY | NQSQRYALL);
 	switch (qry->type)
@@ -42,6 +44,7 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 	{
 		NQPLANITER* prev = (NQPLANITER*)frl_slab_palloc(plan_iter_pool);
 		prev->prev = 0;
+		prev->dbname = preqry->db;
 		prev->type = preqry->type;
 		prev->postqry = qry;
 		plan->head->prev = prev;
@@ -64,6 +67,7 @@ NQPLAN* nqplannew(NQPREQRY* preqry)
 	memset(plan, 0, sizeof(NQPLAN));
 	plan->tail = (NQPLANITER*)frl_slab_palloc(plan_iter_pool);
 	plan->tail->prev = 0;
+	plan->tail->dbname = 0;
 	plan->tail->type = 0;
 	plan->tail->postqry = 0;
 	plan->head = plan->tail;
@@ -75,13 +79,47 @@ NQPLAN* nqplannew(NQPREQRY* preqry)
 int nqplanrun(NQPLAN* plan, char** kstr, float* likeness)
 {
 	NQPLANITER* cur = plan->tail;
-	int i, t;
+	int i, j, t;
 	for (i == 0; i < plan->cnum; i++)
 	{
 		t = ncqrysearch(cur->qry, kstr, likeness);
 		if (cur->postqry != 0)
 		{
-			/* TODO: reducing a nested query */
+			char** ksptr = kstr;
+			NQQRY *condptr, *qry = cur->postqry;
+			if (cur->type == NQSUBQRY)
+			{
+				switch (qry->type)
+				{
+					case NQTBWDB:
+						qry->sbj.desc = ncbwdbget(cur->dbname, *ksptr);
+						break;
+					case NQTFDB:
+						qry->sbj.desc = ncfdbget(cur->dbname, *ksptr);
+						break;
+				}
+			} else {
+				qry->cnum = t;
+				condptr = qry->conds = (NQQRY**)malloc(qry->cnum * sizeof(NQQRY*));
+				for (j = 0; j < qry->cnum; j++, condptr++, ksptr++)
+				{
+					condptr->db = qry->db;
+					condptr->cfd = qry->cfd;
+					condptr->col = qry->col;
+					condptr->op = qry->op;
+					condptr->type = qry->type;
+					switch (qry->type)
+					{
+						case NQTBWDB:
+							condptr->sbj.desc = ncbwdbget(cur->dbname, *ksptr);
+							break;
+						case NQTFDB:
+							condptr->sbj.desc = ncfdbget(cur->dbname, *ksptr);
+							break;
+					}
+				}
+				qry->type = (cur->type == NQSQRYALL) ? NQCTAND : NQCTOR;
+			}
 		}
 		cur = cur->prev;
 	}

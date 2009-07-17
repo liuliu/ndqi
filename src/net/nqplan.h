@@ -8,6 +8,7 @@ typedef struct NQPLANITER {
 	NQQRY* qry;
 	NQPLANITER* prev;
 	NQQRY* postqry;
+	const char* dbname;
 	int type;
 } NQPLANITER;
 

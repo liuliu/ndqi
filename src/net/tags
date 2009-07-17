@@ -10,6 +10,7 @@ LINKFLAG	makefile	/^LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -l
 NQPLAN	nqplan.h	/^} NQPLAN;$/;"	t	typeref:struct:__anon1
 NQPLANITER	nqplan.h	/^typedef struct NQPLANITER {$/;"	s
 NQPLANITER	nqplan.h	/^} NQPLANITER;$/;"	t	typeref:struct:NQPLANITER
+NQPLANITER::dbname	nqplan.h	/^	const char* dbname;$/;"	m	struct:NQPLANITER	access:public
 NQPLANITER::postqry	nqplan.h	/^	NQQRY* postqry;$/;"	m	struct:NQPLANITER	access:public
 NQPLANITER::prev	nqplan.h	/^	NQPLANITER* prev;$/;"	m	struct:NQPLANITER	access:public
 NQPLANITER::qry	nqplan.h	/^	NQQRY* qry;$/;"	m	struct:NQPLANITER	access:public
@@ -22,6 +23,7 @@ __anon1::cnum	nqplan.h	/^	int cnum;$/;"	m	struct:__anon1	access:public
 __anon1::head	nqplan.h	/^	NQPLANITER* head;$/;"	m	struct:__anon1	access:public
 __anon1::tail	nqplan.h	/^	NQPLANITER* tail;$/;"	m	struct:__anon1	access:public
 cnum	nqplan.h	/^	int cnum;$/;"	m	struct:__anon1	access:public
+dbname	nqplan.h	/^	const char* dbname;$/;"	m	struct:NQPLANITER	access:public
 generic_handler	nqserver.c	/^void generic_handler(struct evhttp_request *req, void *arg)$/;"	f	signature:(struct evhttp_request *req, void *arg)
 head	nqplan.h	/^	NQPLANITER* head;$/;"	m	struct:__anon1	access:public
 main	nqserver.c	/^int main(int argc, char** argv)$/;"	f	signature:(int argc, char** argv)
@@ -30,10 +32,17 @@ ncbwdbget	nqclient.c	/^CvMat* ncbwdbget(const char* db, char* uuid)$/;"	f	signat
 ncbwdbget	nqclient.h	/^CvMat* ncbwdbget(const char* db, char* uuid);$/;"	p	signature:(const char* db, char* uuid)
 ncfdbget	nqclient.c	/^CvMat* ncfdbget(const char* db, char* uuid)$/;"	f	signature:(const char* db, char* uuid)
 ncfdbget	nqclient.h	/^CvMat* ncfdbget(const char* db, char* uuid);$/;"	p	signature:(const char* db, char* uuid)
+ncinit	nqclient.c	/^void ncinit()$/;"	f
+ncinit	nqclient.h	/^void ncinit(void);$/;"	p	signature:(void)
 ncqrysearch	nqclient.c	/^int ncqrysearch(NQQRY* qry, char** kstr, float* likeness)$/;"	f	signature:(NQQRY* qry, char** kstr, float* likeness)
 ncqrysearch	nqclient.h	/^int ncqrysearch(NQQRY* qry, char** kstr, float* likeness = 0);$/;"	p	signature:(NQQRY* qry, char** kstr, float* likeness = 0)
+ncsnap	nqclient.c	/^void ncsnap()$/;"	f
+ncsync	nqclient.c	/^void ncsync()$/;"	f
 nctdbget	nqclient.c	/^char* nctdbget(const char* db, char* col, char* uuid)$/;"	f	signature:(const char* db, char* col, char* uuid)
 nctdbget	nqclient.h	/^char* nctdbget(const char* db, char* col, char* uuid);$/;"	p	signature:(const char* db, char* col, char* uuid)
+ncterm	nqclient.c	/^void ncterm()$/;"	f
+ncwdbput	nqclient.c	/^bool ncwdbput(const char* db, char* uuid, char* word)$/;"	f	signature:(const char* db, char* uuid, char* word)
+ncwdbput	nqclient.h	/^bool ncwdbput(const char* db, char* uuid, char* word);$/;"	p	signature:(const char* db, char* uuid, char* word)
 nqplandel	nqplan.c	/^void nqplandel(NQPLAN* plan)$/;"	f	signature:(NQPLAN* plan)
 nqplandel	nqplan.h	/^void nqplandel(NQPLAN* plan);$/;"	p	signature:(NQPLAN* plan)
 nqplannew	nqplan.c	/^NQPLAN* nqplannew(NQPREQRY* preqry)$/;"	f	signature:(NQPREQRY* preqry)

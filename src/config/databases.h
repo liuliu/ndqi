@@ -11,6 +11,7 @@ typedef struct {
 	int type;
 	const char* location;
     void* ref;
+	void* helper;
 } ScanDatabase;
 
 extern const ScanDatabase ScanDatabases[];

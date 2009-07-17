@@ -12,6 +12,47 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+void ncinit()
+{
+	ScanDatabase* database = ScanDatabases;
+	ScanDatabase* LastScanDatabase = ScanDatabases + sizeof(ScanDatabases) / sizeof(ScanDatabase);
+	for (; database < LastScanDatabase; database++)
+	{
+		switch (database->type)
+		{
+			case NQTBWDB:
+				database->ref = nqbwdbnew();
+				break;
+			case NQTFDB:
+				database->ref = nqfdbnew();
+				break;
+			case NQTTCTDB:
+				database->ref = tctdbnew();
+				tctdbopen((TCTDB*)database->ref, database->location, TDBOWRITER | TDBOCREAT);
+				nqmetasetindex((TCTDB*)database->ref);
+				break;
+			case NQTTCWDB:
+				database->ref = tcwdbnew();
+				tcwdbopen((TCWDB*)database->ref, database->location, WDBOWRITER | WDBOCREAT);
+				database->helper = tcadbnew();
+				tcadbopen((TCADB*)database->helper, );
+				break;
+		}
+	}
+}
+
+void ncsnap()
+{
+}
+
+void ncsync()
+{
+}
+
+void ncterm()
+{
+}
+
 CvMat* ncbwdbget(const char* db, char* uuid)
 {
 	NQBWDB* bwdb = (NQBWDB*)ScanDatabaseLookup(db)->ref;
@@ -46,6 +87,32 @@ char* nctdbget(const char* db, char* col, char* uuid)
 	memcpy(result, str, len);
 	result[len] = '\0';
 	return result;
+}
+
+bool ncwdbput(const char* db, char* uuid, char* word)
+{
+	ScanDatabase* sdb = ScanDatabaseLookup(db);
+	TCWDB* wdb = (TCWDB*)sdb->ref;
+	TCADB* adb = (TCADB*)sdb->helper;
+	int sp;
+	uint32_t uid64, *uid64_b = (uint32_t*)tcadbget(adb, uuid, 16, &sp);
+	if (uid64_b == NULL)
+	{
+		tcadbtranbegin(adb);
+		uint32_t counter, *counter_b = (uint32_t*)tcadbget(adb, "counter", 7, &sp);
+		if (counter_b == NULL)
+			counter = 0;
+		else {
+			counter = *counter_b + 1;
+			free(counter_b);
+		}
+		tcadbput(adb, "counter", 7, &counter, sizeof(counter));
+		tcadbtrancommit(adb);
+	} else {
+		uid64 = *uid64_b;
+		free(uid64_b);
+	}
+	return tcwdbput2(wdb, uid64, word, NULL);
 }
 
 int ncqrysearch(NQQRY* qry, char** kstr, float* likeness)

@@ -60,6 +60,9 @@ void generic_handler(struct evhttp_request *req, void *arg)
 						case NQMPUUIDENT:
 							break;
 						case NQMPWHERE:
+							plan = nqplannew(mp->sbj.qry);
+							siz = nqplanrun(plan, kstr);
+							nqplandel(plan);
 							break;
 					}
 					break;

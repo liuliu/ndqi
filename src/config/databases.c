@@ -1,6 +1,6 @@
 #include "databases.h"
 
-#define NQ_DATABASE(a,b,c) {a,b,c,0},
+#define NQ_DATABASE(a,b,c) {a,b,c,0,0},
 
 const ScanDatabase ScanDatabases[] = {
 #include "dblist.i"
