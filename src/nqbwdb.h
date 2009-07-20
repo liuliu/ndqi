@@ -78,8 +78,8 @@ bool nqbwdbidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
 bool nqbwdbmgidx(NQBWDB* bwdb, int max, int min = 1, double match = 0.6);
 bool nqbwdbreidx(NQBWDB* bwdb, int min = 1, double match = 0.6);
 bool nqbwdbout(NQBWDB* bwdb, char* kstr);
-bool nqbwdbsnap(NQBWDB* bwdb, char* filename);
-bool nqbwdbsync(NQBWDB* bwdb, char* filename);
+bool nqbwdbsnap(NQBWDB* bwdb, const char* filename);
+bool nqbwdbsync(NQBWDB* bwdb, const char* filename);
 void nqbwdbdel(NQBWDB* bwdb);
 
 #endif

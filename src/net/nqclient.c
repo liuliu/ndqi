@@ -1,7 +1,12 @@
 #include "nqclient.h"
 #include "../config/databases.h"
+#include "../lib/frl_util_md5.h"
 #include "../nqbwdb.h"
 #include "../nqfdb.h"
+#include "../nqdp.h"
+#include "../nqlh.h"
+#include "../nqgs.h"
+#include "../nqmeta.h"
 
 /* 3rd party library */
 #include <tcutil.h>
@@ -11,11 +16,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <cv.h>
+#include <highgui.h>
 
 void ncinit()
 {
-	ScanDatabase* database = ScanDatabases;
-	ScanDatabase* LastScanDatabase = ScanDatabases + sizeof(ScanDatabases) / sizeof(ScanDatabase);
+	ScanDatabase* database = (ScanDatabase*)ScanDatabases;
 	for (; database < LastScanDatabase; database++)
 	{
 		switch (database->type)
@@ -28,14 +34,14 @@ void ncinit()
 				break;
 			case NQTTCTDB:
 				database->ref = tctdbnew();
-				tctdbopen((TCTDB*)database->ref, database->location, TDBOWRITER | TDBOCREAT);
+				tctdbopen((TCTDB*)database->ref, database->refloc, TDBOWRITER | TDBOCREAT);
 				nqmetasetindex((TCTDB*)database->ref);
 				break;
 			case NQTTCWDB:
 				database->ref = tcwdbnew();
-				tcwdbopen((TCWDB*)database->ref, database->location, WDBOWRITER | WDBOCREAT);
-				database->helper = tcadbnew();
-				tcadbopen((TCADB*)database->helper, );
+				tcwdbopen((TCWDB*)database->ref, database->refloc, WDBOWRITER | WDBOCREAT);
+				database->hpr = tcadbnew();
+				tcadbopen((TCADB*)database->hpr, database->hprloc);
 				break;
 		}
 	}
@@ -43,14 +49,109 @@ void ncinit()
 
 void ncsnap()
 {
+	ScanDatabase* database = ScanDatabases;
+	for (; database < LastScanDatabase; database++)
+	{
+		switch (database->type)
+		{
+			case NQTBWDB:
+				nqbwdbsnap((NQBWDB*)database->ref, database->refloc);
+				break;
+			case NQTFDB:
+				nqfdbsnap((NQFDB*)database->ref, database->refloc);
+				break;
+			case NQTTCTDB:
+				tctdbsync((TCTDB*)database->ref);
+				break;
+			case NQTTCWDB:
+				tcwdbsync((TCWDB*)database->ref);
+				tcadbsync((TCADB*)database->hpr);
+				break;
+		}
+	}
 }
 
 void ncsync()
 {
+	ScanDatabase* database = ScanDatabases;
+	for (; database < LastScanDatabase; database++)
+	{
+		switch (database->type)
+		{
+			case NQTBWDB:
+				nqbwdbsync((NQBWDB*)database->ref, database->refloc);
+				break;
+			case NQTFDB:
+				nqfdbsync((NQFDB*)database->ref, database->refloc);
+				break;
+			case NQTTCTDB:
+				tctdbsync((TCTDB*)database->ref);
+				break;
+			case NQTTCWDB:
+				tcwdbsync((TCWDB*)database->ref);
+				tcadbsync((TCADB*)database->hpr);
+				break;
+		}
+	}
 }
 
 void ncterm()
 {
+	ScanDatabase* database = ScanDatabases;
+	for (; database < LastScanDatabase; database++)
+	{
+		switch (database->type)
+		{
+			case NQTBWDB:
+				nqbwdbdel((NQBWDB*)database->ref);
+				break;
+			case NQTFDB:
+				nqfdbdel((NQFDB*)database->ref);
+				break;
+			case NQTTCTDB:
+				tctdbclose((TCTDB*)database->ref);
+				tctdbdel((TCTDB*)database->ref);
+				break;
+			case NQTTCWDB:
+				tcwdbclose((TCWDB*)database->ref);
+				tcwdbdel((TCWDB*)database->ref);
+				tcadbclose((TCADB*)database->hpr);
+				tcadbdel((TCADB*)database->hpr);
+				break;
+		}
+	}
+}
+
+void ncputany(char* uuid)
+{
+	char filename[] = "~/store/lossless/#####################.png";
+	char* pch = strchr(filename, '#');
+	if (pch == NULL)
+		return;
+	frl_md5 b64;
+	memcpy(b64.digest, uuid, 16);
+	char name[23];
+	b64.base64_encode((apr_byte_t*)name);
+	strncpy(pch, name, 22);
+
+	NQBWDB* lfd = (NQBWDB*)ScanDatabaseLookup("lfd")->ref;
+	NQFDB* lh = (NQFDB*)ScanDatabaseLookup("lh")->ref;
+	NQFDB* gs = (NQFDB*)ScanDatabaseLookup("gs")->ref;
+	TCTDB* exif = (TCTDB*)ScanDatabaseLookup("exif")->ref;
+
+	IplImage* image = cvLoadImage(filename, CV_LOAD_IMAGE_GRAYSCALE);
+	CvMat* lfdrmat = nqdpnew(image, cvSURFParams(1200, 0));
+	CvMat* lfdmat = nqbweplr(lfdrmat);
+	cvReleaseMat(&lfdrmat);
+	nqbwdbput(lfd, uuid, lfdmat);
+	CvMat* lhmat = nqlhnew(image, 512);
+	nqfdbput(lh, uuid, lhmat);
+	CvMat* gsmat = nqgsnew(image, 24);
+	nqfdbput(gs, uuid, gsmat);
+	cvReleaseImage(&image);
+	TCMAP* meta = nqmetanew(filename);
+	tctdbput(exif, uuid, 16, meta);
+	tcmapdel(meta);
 }
 
 CvMat* ncbwdbget(const char* db, char* uuid)
@@ -91,9 +192,9 @@ char* nctdbget(const char* db, char* col, char* uuid)
 
 bool ncwdbput(const char* db, char* uuid, char* word)
 {
-	ScanDatabase* sdb = ScanDatabaseLookup(db);
+	const ScanDatabase* sdb = ScanDatabaseLookup(db);
 	TCWDB* wdb = (TCWDB*)sdb->ref;
-	TCADB* adb = (TCADB*)sdb->helper;
+	TCADB* adb = (TCADB*)sdb->hpr;
 	int sp;
 	uint32_t uid64, *uid64_b = (uint32_t*)tcadbget(adb, uuid, 16, &sp);
 	if (uid64_b == NULL)

@@ -1,12 +1,12 @@
 #include "databases.h"
 
-#define NQ_DATABASE(a,b,c) {a,b,c,0,0},
+#define NQ_DATABASE(a,b,c,d) {a,b,0,c,0,d},
 
-const ScanDatabase ScanDatabases[] = {
+ScanDatabase ScanDatabases[] = {
 #include "dblist.i"
 };
 
-const ScanDatabase* LastScanDatabase = ScanDatabases + sizeof(ScanDatabases) / sizeof(ScanDatabase);
+ScanDatabase* LastScanDatabase = ScanDatabases + sizeof(ScanDatabases) / sizeof(ScanDatabase);
 
 const ScanDatabase* ScanDatabaseLookup(const char *text)
 {
@@ -37,7 +37,7 @@ const ScanDatabase* ScanDatabaseLookup(const char *text)
 	while (low <= high)
 	{
 		const ScanDatabase *middle;
-		int			difference;
+		int difference;
 
 		middle = low + (high - low) / 2;
 		difference = strcmp(middle->name, word);

@@ -11,11 +11,11 @@ static frl_slab_pool_t* plan_iter_pool = 0;
 static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 {
 	NQQRY* qry = nqqrynew();
-	ScanDatabase* db = ScanDatabaseLookup(preqry->db);
+	const ScanDatabase* db = ScanDatabaseLookup(preqry->db);
 	qry->db = db->ref;
 	qry->cfd = preqry->cfd;
 	/* for tcwdb, no need for col, but helper to keep the map of uuid to uid64 */
-	qry->col = (preqry->type & NQTTCWDB) ? db->helper : preqry->col;
+	qry->col = (preqry->type & NQTTCWDB) ? db->hpr : preqry->col;
 	qry->op = preqry->op;
 	qry->type = preqry->type & ~(NQSUBQRY | NQSQRYANY | NQSQRYALL);
 	switch (qry->type)
@@ -86,7 +86,7 @@ int nqplanrun(NQPLAN* plan, char** kstr, float* likeness)
 		if (cur->postqry != 0)
 		{
 			char** ksptr = kstr;
-			NQQRY *condptr, *qry = cur->postqry;
+			NQQRY **condptr, *qry = cur->postqry;
 			if (cur->type == NQSUBQRY)
 			{
 				switch (qry->type)
@@ -103,18 +103,18 @@ int nqplanrun(NQPLAN* plan, char** kstr, float* likeness)
 				condptr = qry->conds = (NQQRY**)malloc(qry->cnum * sizeof(NQQRY*));
 				for (j = 0; j < qry->cnum; j++, condptr++, ksptr++)
 				{
-					condptr->db = qry->db;
-					condptr->cfd = qry->cfd;
-					condptr->col = qry->col;
-					condptr->op = qry->op;
-					condptr->type = qry->type;
+					(*condptr)->db = qry->db;
+					(*condptr)->cfd = qry->cfd;
+					(*condptr)->col = qry->col;
+					(*condptr)->op = qry->op;
+					(*condptr)->type = qry->type;
 					switch (qry->type)
 					{
 						case NQTBWDB:
-							condptr->sbj.desc = ncbwdbget(cur->dbname, *ksptr);
+							(*condptr)->sbj.desc = ncbwdbget(cur->dbname, *ksptr);
 							break;
 						case NQTFDB:
-							condptr->sbj.desc = ncfdbget(cur->dbname, *ksptr);
+							(*condptr)->sbj.desc = ncfdbget(cur->dbname, *ksptr);
 							break;
 					}
 				}

@@ -539,7 +539,7 @@ static void nqfdbwrite(char* kstr, void* vbuf, void* ud)
 	apr_file_write_full(file, buf, bufsiz, NULL);
 }
 
-bool nqfdbsnap(NQFDB* fdb, char* filename)
+bool nqfdbsnap(NQFDB* fdb, const char* filename)
 {
 	if (!fdb->shallow)
 	{
@@ -624,7 +624,7 @@ bool nqfdbsnap(NQFDB* fdb, char* filename)
 #undef BUF_PTR_VAL
 #undef BUF_PTR_CPY
 
-bool nqfdbsync(NQFDB* fdb, char* filename)
+bool nqfdbsync(NQFDB* fdb, const char* filename)
 {
 	apr_status_t rv;
 	apr_file_t* file;

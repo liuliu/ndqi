@@ -4,6 +4,11 @@
 #include "../nqqry.h"
 
 void ncinit(void);
+void ncsnap(void);
+void ncsync(void);
+void ncterm(void);
+void ncputany(char* uuid);
+
 CvMat* ncbwdbget(const char* db, char* uuid);
 CvMat* ncfdbget(const char* db, char* uuid);
 char* nctdbget(const char* db, char* col, char* uuid);

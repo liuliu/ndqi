@@ -873,7 +873,7 @@ static void nqbwdbwrite(char* kstr, void* vbuf, void* ud)
 	apr_file_write_full(file, buf, bufsiz, NULL);
 }
 
-bool nqbwdbsnap(NQBWDB* bwdb, char* filename)
+bool nqbwdbsnap(NQBWDB* bwdb, const char* filename)
 {
 	if (!bwdb->shallow)
 	{
@@ -974,7 +974,7 @@ bool nqbwdbsnap(NQBWDB* bwdb, char* filename)
 #undef BUF_PTR_VAL
 #undef BUF_PTR_CPY
 
-bool nqbwdbsync(NQBWDB* bwdb, char* filename)
+bool nqbwdbsync(NQBWDB* bwdb, const char* filename)
 {
 	apr_status_t rv;
 	apr_file_t* file;

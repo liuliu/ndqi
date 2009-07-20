@@ -65,8 +65,8 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered = fals
 bool nqfdbidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);
 bool nqfdbreidx(NQFDB* fdb, int naive = 2, double rho = 0.75, double tau = 0.2);
 bool nqfdbout(NQFDB* fdb, char* kstr);
-bool nqfdbsnap(NQFDB* fdb, char* filename);
-bool nqfdbsync(NQFDB* fdb, char* filename);
+bool nqfdbsnap(NQFDB* fdb, const char* filename);
+bool nqfdbsync(NQFDB* fdb, const char* filename);
 void nqfdbdel(NQFDB* fdb);
 
 #endif

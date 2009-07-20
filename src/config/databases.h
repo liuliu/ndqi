@@ -9,12 +9,14 @@
 typedef struct {
 	const char* name;
 	int type;
-	const char* location;
     void* ref;
-	void* helper;
+	const char* refloc;
+	void* hpr;
+    const char* hprloc;
 } ScanDatabase;
 
-extern const ScanDatabase ScanDatabases[];
+extern ScanDatabase ScanDatabases[];
+extern ScanDatabase* LastScanDatabase;
 extern const ScanDatabase* ScanDatabaseLookup(const char* text);
 
 #endif

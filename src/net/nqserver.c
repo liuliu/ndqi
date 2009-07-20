@@ -11,7 +11,9 @@
 
 #include "../parser/nqparser.h"
 #include "../lib/frl_logging.h"
+#include "../lib/frl_util_md5.h"
 #include "nqplan.h"
+#include "nqclient.h"
 
 void generic_handler(struct evhttp_request *req, void *arg)
 {
@@ -56,6 +58,7 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					switch (mp->type)
 					{
 						case NQMPSIMPLE:
+							ncputany((char*)frl_md5((apr_byte_t*)mp->sbj.str).digest);
 							break;
 						case NQMPUUIDENT:
 							break;
@@ -106,7 +109,7 @@ int main(int argc, char** argv)
 	char addr[] = "0.0.0.0\0\0\0\0\0\0\0\0\0";
 	int port = 8080;
 
-	while (-1 != (o = getopt(argc, argv, "d:s:p:hvV")))
+	while (-1 != (o = getopt(argc, argv, "d:l:p:hvV")))
 	{
 		switch (o)
 		{
@@ -128,8 +131,11 @@ int main(int argc, char** argv)
 		}
 	}
 
+	apr_initialize();
+	ncinit();
+	F_INFO("db init\n");
 	event_init();
-	printf("init at %s : %d\n", addr, port);
+	F_INFO("http init at %s : %d\n", addr, port);
 	F_ERROR_IF_RUN(NULL == (httpd = evhttp_start(addr, port)), return 0, "cannot binding port or IP address\n");
 
 	/* Set a callback for all other requests. */
