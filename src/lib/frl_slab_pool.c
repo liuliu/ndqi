@@ -220,6 +220,20 @@ APR_DECLARE(void) frl_slab_pfree(void* pointer)
 		frl_slab_pfree_lock_with(pointer);
 }
 
+APR_DECLARE(void) frl_slab_ref(void* pointer)
+{
+	frl_mem_t* mem = (frl_mem_t*)((apr_byte_t*)pointer-SIZEOF_FRL_MEM_T);
+	apr_atomic_inc32(&mem->refcount);
+}
+
+APR_DECLARE(void) frl_slab_unref(void* pointer)
+{
+	frl_mem_t* mem = (frl_mem_t*)((apr_byte_t*)pointer-SIZEOF_FRL_MEM_T);
+	apr_uint32_t refcount = apr_atomic_dec32(&mem->refcount);
+	if (refcount == 0)
+		frl_slab_pfree(pointer);
+}
+
 APR_DECLARE(void*) frl_slab_pcalloc(frl_slab_pool_t* pool)
 {
 	void* pointer = frl_slab_palloc(pool);

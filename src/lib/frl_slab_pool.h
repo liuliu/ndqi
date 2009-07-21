@@ -40,6 +40,7 @@ struct frl_slab_pool_t
 struct frl_mem_t
 {
 	apr_uint32_t id;
+	volatile apr_uint32_t refcount;
 	void* pointer;
 	frl_slab_block_t* block;
 };
@@ -66,6 +67,8 @@ const apr_uint32_t SIZEOF_FRL_MEM_STAT_T = sizeof(frl_mem_stat_t);
 APR_DECLARE(void*) frl_slab_palloc(frl_slab_pool_t* pool);
 APR_DECLARE(void*) frl_slab_pcalloc(frl_slab_pool_t* pool);
 APR_DECLARE(void) frl_slab_pfree(void* pointer);
+APR_DECLARE(void) frl_slab_ref(void* pointer);
+APR_DECLARE(void) frl_slab_unref(void* pointer);
 APR_DECLARE(void) frl_slab_pool_clear(frl_slab_pool_t* pool);
 APR_DECLARE(apr_status_t) frl_slab_pool_destroy(frl_slab_pool_t* pool);
 APR_DECLARE(apr_status_t) frl_slab_pool_create(frl_slab_pool_t** newpool, apr_pool_t *mempool, apr_uint32_t capacity, apr_uint32_t per_size, frl_lock_u lock);

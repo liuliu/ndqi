@@ -43,7 +43,7 @@ void generic_handler(struct evhttp_request *req, void *arg)
 		{
 			NQPLAN* plan;
 			char* kstr[QRY_MAX_LMT];
-			int siz;
+			int siz = 0;
 			switch (result->type)
 			{
 				case NQRTSELECT:
@@ -59,6 +59,8 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					{
 						case NQMPSIMPLE:
 							ncputany((char*)frl_md5((apr_byte_t*)mp->sbj.str).digest);
+							siz = 1;
+							kstr[0] = mp->sbj.str;
 							break;
 						case NQMPUUIDENT:
 							break;
@@ -70,7 +72,6 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					}
 					break;
 			}
-			nqparseresultdel(result);
 
 			evbuffer_add_printf(buf, "[");
 			if (siz > 0 && kstr[0] != 0)
@@ -81,6 +82,8 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					evbuffer_add_printf(buf, ",%s", kstr[i]);
 			evbuffer_add_printf(buf, "]\n");
 			evhttp_send_reply(req, HTTP_OK, "OK", buf);
+
+			nqparseresultdel(result);
 		} else {
 			evhttp_send_error(req, HTTP_BADREQUEST, "Syntax Error");
 			F_ERROR("syntax error at\n");

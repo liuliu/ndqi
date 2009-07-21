@@ -124,32 +124,39 @@ void ncterm()
 
 void ncputany(char* uuid)
 {
-	char filename[] = "~/store/lossless/#####################.png";
+	char filename[] = "/home/liu/store/lossless/######################.png";
 	char* pch = strchr(filename, '#');
-	if (pch == NULL)
+	char filename_o[] = "/home/liu/store/raw/######################.jpg";
+	char* pch_o = strchr(filename_o, '#');
+	if (pch == NULL || pch_o == NULL)
 		return;
 	frl_md5 b64;
 	memcpy(b64.digest, uuid, 16);
 	char name[23];
 	b64.base64_encode((apr_byte_t*)name);
 	strncpy(pch, name, 22);
+	strncpy(pch_o, name, 22);
 
 	NQBWDB* lfd = (NQBWDB*)ScanDatabaseLookup("lfd")->ref;
 	NQFDB* lh = (NQFDB*)ScanDatabaseLookup("lh")->ref;
-	NQFDB* gs = (NQFDB*)ScanDatabaseLookup("gs")->ref;
+	NQFDB* gist = (NQFDB*)ScanDatabaseLookup("gist")->ref;
 	TCTDB* exif = (TCTDB*)ScanDatabaseLookup("exif")->ref;
 
-	IplImage* image = cvLoadImage(filename, CV_LOAD_IMAGE_GRAYSCALE);
-	CvMat* lfdrmat = nqdpnew(image, cvSURFParams(1200, 0));
+	IplImage* image = cvLoadImage(filename, CV_LOAD_IMAGE_COLOR);
+	IplImage* gray = cvCreateImage(cvGetSize(image), 8, 1);
+	cvCvtColor(image, gray, CV_BGR2GRAY);
+	CvMat* lfdrmat = nqdpnew(gray, cvSURFParams(1200, 0));
 	CvMat* lfdmat = nqbweplr(lfdrmat);
 	cvReleaseMat(&lfdrmat);
 	nqbwdbput(lfd, uuid, lfdmat);
 	CvMat* lhmat = nqlhnew(image, 512);
 	nqfdbput(lh, uuid, lhmat);
-	CvMat* gsmat = nqgsnew(image, 24);
-	nqfdbput(gs, uuid, gsmat);
+	CvMat* gsmat = nqgsnew(gray, 24);
+	nqfdbput(gist, uuid, gsmat);
+	cvReleaseImage(&gray);
 	cvReleaseImage(&image);
-	TCMAP* meta = nqmetanew(filename);
+
+	TCMAP* meta = nqmetanew(filename_o);
 	tctdbput(exif, uuid, 16, meta);
 	tcmapdel(meta);
 }

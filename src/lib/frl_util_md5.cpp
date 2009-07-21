@@ -6,7 +6,7 @@ int frl_md5::hash(const void* s, const apr_size_t size)
 	return 1;
 }
 
-const apr_byte_t base64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const apr_byte_t base64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 
 int frl_md5::base64_encode(apr_byte_t* q)
 {
