@@ -14,7 +14,7 @@ static NQPARSERESULT* YY_RESULT = 0;
 	NQPARSERESULT* result;
 }
 
-%nonassoc ALL, ANY, ASC, BETWEEN, BY, DELETE, DESC, DISTINCT, EXACT, EXISTS, FROM, IN, INSERT, INTO, IS, LIKE, LIMIT, NULL_P, ORDER, SELECT, SOME, UPDATE, WHERE
+%nonassoc ALL, ANY, APPEND, ASC, BETWEEN, BY, CACHE, DELETE, DESC, DISK, DISTINCT, EXACT, EXISTS, FROM, IN, INDEX, INSERT, INTO, IS, LIKE, LIMIT, MEMORY, MERGE, NULL_P, ORDER, REINDEX, SELECT, SOME, SYNCHRONIZE, UPDATE, WHERE
 %nonassoc UUID, UUIDENT, IDENT, FCONST, ICONST
 %nonassoc STRTYPE, NUMTYPE, NOTYPE
 %nonassoc NUMGT, NUMGE, NUMLT, NUMLE, COLNE, COLEQ
@@ -28,9 +28,55 @@ ListStmt:	Stmt { YY_RESULT = $$.result = $1.result; } |
 			Stmt ';' { YY_RESULT = $$.result = $1.result; } |
 			Stmt ';' Stmt { YY_RESULT = $$.result = $1.result; }
 
-Stmt:	DeleteStmt { $$ = $1; } |
+Stmt:	CommandStmt	{ $$ = $1; } |
+		DeleteStmt { $$ = $1; } |
 		InsertStmt { $$ = $1; } |
 		SelectStmt { $$ = $1; }
+
+CommandStmt:	SYNCHRONIZE DISK
+				{
+					$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+					$$.result->type = NQRTCOMMAND;
+					NQCOMMAND* cmd = (NQCOMMAND*)apr_palloc(yymem(), sizeof(NQCOMMAND));
+					cmd->cmd = NQCMDSYNCDISK;
+					$$.result->result = cmd;
+				} |
+				SYNCHRONIZE MEMORY
+				{
+					$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+					$$.result->type = NQRTCOMMAND;
+					NQCOMMAND* cmd = (NQCOMMAND*)apr_palloc(yymem(), sizeof(NQCOMMAND));
+					cmd->cmd = NQCMDSYNCMEM;
+					$$.result->result = cmd;
+				} |
+				MERGE INDEX ICONST IN IDENT
+				{
+					$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+					$$.result->type = NQRTCOMMAND;
+					NQCOMMAND* cmd = (NQCOMMAND*)apr_palloc(yymem(), sizeof(NQCOMMAND));
+					cmd->cmd = NQCMDMGIDX;
+					cmd->params[0].str = ScanDatabaseLookup($5.str)->name;
+					sscanf($3.str, "%d", &cmd->params[1].i);
+					$$.result->result = cmd;
+				} |
+				APPEND INDEX IN IDENT
+				{
+					$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+					$$.result->type = NQRTCOMMAND;
+					NQCOMMAND* cmd = (NQCOMMAND*)apr_palloc(yymem(), sizeof(NQCOMMAND));
+					cmd->cmd = NQCMDMGIDX;
+					cmd->params[0].str = ScanDatabaseLookup($4.str)->name;
+					$$.result->result = cmd;
+				} |
+				REINDEX IN IDENT
+				{
+					$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
+					$$.result->type = NQRTCOMMAND;
+					NQCOMMAND* cmd = (NQCOMMAND*)apr_palloc(yymem(), sizeof(NQCOMMAND));
+					cmd->cmd = NQCMDMGIDX;
+					cmd->params[0].str = ScanDatabaseLookup($3.str)->name;
+					$$.result->result = cmd;
+				}
 
 DeleteStmt:	DELETE UUIDENT
 			{
@@ -407,6 +453,7 @@ static bool nqcolident(int* dbtype, const char** dbname, char** col, char* str)
 		if (db->type == NQTTCTDB && spliter != NULL)
 		{
 			*col = (char*)apr_palloc(yymem(), strlen(spliter + 1) + 1);
+			memcpy(*col, spliter + 1, strlen(spliter + 1));
 			(*col)[strlen(spliter + 1)] = '\0';
 		} else {
 			*col = 0;

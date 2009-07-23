@@ -122,6 +122,49 @@ void ncterm()
 	}
 }
 
+void ncmgidx(const char* db, int max)
+{
+	const ScanDatabase* database = ScanDatabaseLookup(db);
+	switch (database->type)
+	{
+		case NQTBWDB:
+			nqbwdbmgidx((NQBWDB*)database->ref, max);
+			break;
+	}
+}
+
+void ncidx(const char* db)
+{
+	const ScanDatabase* database = ScanDatabaseLookup(db);
+	switch (database->type)
+	{
+		case NQTBWDB:
+			nqbwdbidx((NQBWDB*)database->ref);
+			break;
+		case NQTFDB:
+			nqfdbidx((NQFDB*)database->ref);
+			break;
+	}
+}
+
+void ncreidx(const char* db)
+{
+	const ScanDatabase* database = ScanDatabaseLookup(db);
+	switch (database->type)
+	{
+		case NQTBWDB:
+			nqbwdbreidx((NQBWDB*)database->ref);
+			break;
+		case NQTFDB:
+			nqfdbreidx((NQFDB*)database->ref);
+			break;
+	}
+}
+
+void ncoutany(char* uuid)
+{
+}
+
 void ncputany(char* uuid)
 {
 	char filename[] = "/home/liu/store/lossless/######################.png";
@@ -130,12 +173,9 @@ void ncputany(char* uuid)
 	char* pch_o = strchr(filename_o, '#');
 	if (pch == NULL || pch_o == NULL)
 		return;
-	frl_md5 b64;
-	memcpy(b64.digest, uuid, 16);
-	char name[23];
-	b64.base64_encode((apr_byte_t*)name);
-	strncpy(pch, name, 22);
-	strncpy(pch_o, name, 22);
+	char* digest = (char*)frl_md5((apr_byte_t*)uuid).digest;
+	strncpy(pch, uuid, 22);
+	strncpy(pch_o, uuid, 22);
 
 	NQBWDB* lfd = (NQBWDB*)ScanDatabaseLookup("lfd")->ref;
 	NQFDB* lh = (NQFDB*)ScanDatabaseLookup("lh")->ref;
@@ -148,16 +188,16 @@ void ncputany(char* uuid)
 	CvMat* lfdrmat = nqdpnew(gray, cvSURFParams(1200, 0));
 	CvMat* lfdmat = nqbweplr(lfdrmat);
 	cvReleaseMat(&lfdrmat);
-	nqbwdbput(lfd, uuid, lfdmat);
+	nqbwdbput(lfd, digest, lfdmat);
 	CvMat* lhmat = nqlhnew(image, 512);
-	nqfdbput(lh, uuid, lhmat);
+	nqfdbput(lh, digest, lhmat);
 	CvMat* gsmat = nqgsnew(gray, 24);
-	nqfdbput(gist, uuid, gsmat);
+	nqfdbput(gist, digest, gsmat);
 	cvReleaseImage(&gray);
 	cvReleaseImage(&image);
 
 	TCMAP* meta = nqmetanew(filename_o);
-	tctdbput(exif, uuid, 16, meta);
+	tctdbput(exif, digest, 16, meta);
 	tcmapdel(meta);
 }
 
@@ -167,7 +207,8 @@ CvMat* ncbwdbget(const char* db, char* uuid)
 	CvMat *desc = nqbwdbget(bwdb, uuid);
 	if (desc == NULL)
 		return NULL;
-	return cvCloneMat(desc);
+	cvIncRefData(desc);
+	return desc;
 }
 
 CvMat* ncfdbget(const char* db, char* uuid)
@@ -176,7 +217,8 @@ CvMat* ncfdbget(const char* db, char* uuid)
 	CvMat *desc = nqfdbget(fdb, uuid);
 	if (desc == NULL)
 		return NULL;
-	return cvCloneMat(desc);
+	cvIncRefData(desc);
+	return desc;
 }
 
 char* nctdbget(const char* db, char* col, char* uuid)
@@ -225,6 +267,19 @@ bool ncwdbput(const char* db, char* uuid, char* word)
 
 int ncqrysearch(NQQRY* qry, char** kstr, float* likeness)
 {
-	nqqrysearch(qry);
-	return nqqryresult(qry, kstr, likeness);
+	if (qry->type == NQCTOR || qry->type == NQCTAND)
+	{
+		nqqrysearch(qry);
+		return nqqryresult(qry, kstr, likeness);
+	} else {
+		NQQRY _qry;
+		memset(&_qry, 0, sizeof(NQQRY));
+		_qry.type = NQCTOR;
+		_qry.cnum = 1;
+		_qry.lmt = QRY_MAX_LMT;
+		_qry.cfd = 1.;
+		_qry.conds = &qry;
+		nqqrysearch(&_qry);
+		return nqqryresult(&_qry, kstr, likeness);
+	}
 }

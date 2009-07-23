@@ -1,6 +1,7 @@
 %{
 #include "_parser.h"
 #include "gram.h"
+#include <string.h>
 static char* nqstrdup(const char* str, unsigned int maxlen);
 static char* downcase_truncate_identifier(const char* ident, int maxlen);
 %}
@@ -128,7 +129,7 @@ static char* nqstrdup(const char* str, unsigned int maxlen)
 	return result;
 }
 
-static char* nqstrdup_m(const char* str, unsigned int maxlen)
+/*static char* nqstrdup_m(const char* str, unsigned int maxlen)
 {
 	unsigned int tlen = strlen(str);
 	int len = (tlen > maxlen) ? maxlen : tlen;
@@ -136,7 +137,7 @@ static char* nqstrdup_m(const char* str, unsigned int maxlen)
 	memcpy(result, str, len);
 	result[len] = '\0';
 	return result;
-}
+}*/
 
 #define HIGHBIT                 (0x80)
 #define IS_HIGHBIT_SET(ch)      ((unsigned char)(ch) & HIGHBIT)
@@ -166,17 +167,21 @@ static apr_pool_t* root = 0;
 static apr_thread_mutex_t* parse_mtx = 0;
 static frl_slab_pool_t* prpool = 0;
 static frl_slab_pool_t* mppool = 0;
+static frl_slab_pool_t* cmdpool = 0;
 
 void nqparseresultdel(NQPARSERESULT* result)
 {
 	switch (result->type)
 	{
 		case NQRTSELECT:
+		{
 			nqpreqrydel((NQPREQRY*)result->result);
 			break;
+		}
 		case NQRTINSERT:
 		case NQRTUPDATE:
 		case NQRTDELETE:
+		{
 			NQMANIPULATE* mp = (NQMANIPULATE*)result->result;
 			switch (mp->type)
 			{
@@ -198,6 +203,13 @@ void nqparseresultdel(NQPARSERESULT* result)
 			}
 			frl_slab_pfree(mp);
 			break;
+		}
+		case NQRTCOMMAND:
+		{
+			NQCOMMAND* cmd = (NQCOMMAND*)result->result;
+			frl_slab_pfree(cmd);
+			break;
+		}
 	}
 	frl_slab_pfree(result);
 }
@@ -230,11 +242,14 @@ NQPARSERESULT* nqparse(char* str, int siz)
 		switch (result->type)
 		{
 			case NQRTSELECT:
+			{
 				result->result = nqpreqrydup((NQPREQRY*)yyresult()->result);
 				break;
+			}
 			case NQRTINSERT:
 			case NQRTUPDATE:
 			case NQRTDELETE:
+			{
 				if (mppool == 0)
 					frl_slab_pool_create(&mppool, root, 128, sizeof(NQMANIPULATE), FRL_LOCK_WITH);
 				NQMANIPULATE* mp = (NQMANIPULATE*)frl_slab_palloc(mppool);
@@ -242,21 +257,30 @@ NQPARSERESULT* nqparse(char* str, int siz)
 				switch (mp->type)
 				{
 					case NQMPSIMPLE:
-						mp->sbj.str = nqstrdup_m(mp->sbj.str, 256);
+						mp->sbj.str = strndup(mp->sbj.str, 256);
 						break;
 					case NQMPUUIDENT:
-						mp->sbj.str = nqstrdup_m(mp->sbj.str, 256);
-						mp->col = (mp->col == 0) ? 0 : nqstrdup_m(mp->col, 256);
-						mp->val = nqstrdup_m(mp->val, 256);
+						mp->sbj.str = strndup(mp->sbj.str, 256);
+						mp->col = (mp->col == 0) ? 0 : strndup(mp->col, 256);
+						mp->val = strndup(mp->val, 256);
 						break;
 					case NQMPWHERE:
 						mp->sbj.qry = nqpreqrydup(mp->sbj.qry);
-						mp->col = (mp->col == 0) ? 0 : nqstrdup_m(mp->col, 256);
-						mp->val = nqstrdup_m(mp->val, 256);
+						mp->col = (mp->col == 0) ? 0 : strndup(mp->col, 256);
+						mp->val = strndup(mp->val, 256);
 						break;
 				}
 				result->result = mp;
 				break;
+			}
+			case NQRTCOMMAND:
+			{
+				if (cmdpool == 0)
+					frl_slab_pool_create(&cmdpool, root, 128, sizeof(NQCOMMAND), FRL_LOCK_WITH);
+				NQCOMMAND* cmd = (NQCOMMAND*)frl_slab_palloc(cmdpool);
+				memcpy(cmd, yyresult()->result, sizeof(NQCOMMAND));
+				result->result = cmd;
+			}
 		}
 	}
 	apr_pool_clear(yymem());
@@ -270,6 +294,8 @@ void nqparsedel()
 		apr_thread_mutex_destroy(parse_mtx);
 	if (mppool != 0)
 		frl_slab_pool_destroy(mppool);
+	if (cmdpool != 0)
+		frl_slab_pool_destroy(cmdpool);
 	if (prpool != 0)
 		frl_slab_pool_destroy(prpool);
 	if (YY_MEM != 0)

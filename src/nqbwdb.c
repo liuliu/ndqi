@@ -394,7 +394,7 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 #if APR_HAS_THREADS
 	apr_thread_rwlock_rdlock(bwdb->rwidxlock);
 #endif
-	double match = 0;
+	double match = 0.6;
 	int tt = 0;
 	NQBWDBIDX* idx_x;
 	for (idx_x = bwdb->idx->next; idx_x != bwdb->idx; idx_x = idx_x->next)
@@ -441,14 +441,14 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 #endif
 	free(odist);
 	free(selected);
-	match = match / (double)tt;
+	match = (tt > 0) ? match / (double)tt : match;
 	idx->cols = dist->cols = 2;
 	idx->step = 8;
 	dist->step = 16;
 #if APR_HAS_THREADS
 	apr_thread_rwlock_rdlock(bwdb->rwunidxlock);
 #endif
-	float idf = log10((float)bwdb->wnum / 2.);
+	float idf = log10(MAX((float)bwdb->wnum / 2., 10.));
 	NQBWDBUNIDX* unidx_x;
 	for (unidx_x = bwdb->unidx->next; unidx_x != bwdb->unidx; unidx_x = unidx_x->next)
 	{
@@ -458,16 +458,14 @@ int nqbwdbsearch(NQBWDB* bwdb, CvMat* bwm, char** kstr, int lmt, bool ordered, f
 		double* dptr = dist->data.db;
 		int i, j, *iptr = idx->data.i;
 		for (i = 0; i < bwm->rows; i++, iptr += 2, dptr += 2)
-			if ((iptr[0] >= 0 && iptr[1] >= 0)&&
-				((dptr[1] < dptr[0] && dptr[1] < dptr[0] * match)||
+			if ((iptr[0] >= 0 && iptr[1] >= 0) &&
+				((dptr[1] < dptr[0] && dptr[1] < dptr[0] * match) ||
 				 (dptr[0] < dptr[1] && dptr[0] < dptr[1] * match)))
 			{
-				void* void_cast = nqrdbget(tdb, unidx_x->kstr);
-				float float_cast;
-				memcpy(&float_cast, &void_cast, sizeof(float));
-				float_cast += idf;
-				memcpy(&void_cast, &float_cast, sizeof(float));
-				nqrdbput(tdb, unidx_x->kstr, void_cast);
+				union { float fl; void* ptr; } it;
+				it.ptr = nqrdbget(tdb, unidx_x->kstr);
+				it.fl += idf;
+				nqrdbput(tdb, unidx_x->kstr, it.ptr);
 			}
 	}
 #if APR_HAS_THREADS

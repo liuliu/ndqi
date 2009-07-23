@@ -7,6 +7,10 @@ void ncinit(void);
 void ncsnap(void);
 void ncsync(void);
 void ncterm(void);
+void ncmgidx(const char* db, int max);
+void ncidx(const char* db);
+void ncreidx(const char* db);
+void ncoutany(char* uuid);
 void ncputany(char* uuid);
 
 CvMat* ncbwdbget(const char* db, char* uuid);

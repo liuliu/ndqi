@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "lib/frl_managed_mem.h"
 
 typedef struct {
 	char* kstr;
@@ -370,6 +371,22 @@ void nqqrydel(NQQRY* qry)
 		nqqrydel(*condptr);
 	if (qry->conds != 0)
 		free(qry->conds);
+	if (qry->col != 0)
+		frl_managed_unref(qry->col);
+	switch (qry->type)
+	{
+		case NQTTCTDB:
+		case NQTTCWDB:
+		case NQTSPHINX:
+			if (qry->sbj.str != 0)
+				frl_managed_unref(qry->sbj.str);
+			break;
+		case NQTBWDB:
+		case NQTFDB:
+			if (qry->sbj.desc != 0)
+				cvDecRefData(qry->sbj.desc);
+			break;
+	}
 	frl_slab_pfree(qry);
 }
 

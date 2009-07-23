@@ -9,6 +9,7 @@
 typedef struct {
 	const char* name;
 	int type;
+	int mode;
     void* ref;
 	const char* refloc;
 	void* hpr;

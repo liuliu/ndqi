@@ -44,6 +44,9 @@ void generic_handler(struct evhttp_request *req, void *arg)
 			NQPLAN* plan;
 			char* kstr[QRY_MAX_LMT];
 			int siz = 0;
+			char name[23];
+			frl_md5 b64;
+
 			switch (result->type)
 			{
 				case NQRTSELECT:
@@ -54,13 +57,15 @@ void generic_handler(struct evhttp_request *req, void *arg)
 				case NQRTINSERT:
 				case NQRTUPDATE:
 				case NQRTDELETE:
+				{
 					NQMANIPULATE* mp = (NQMANIPULATE*)result->result;
 					switch (mp->type)
 					{
 						case NQMPSIMPLE:
-							ncputany((char*)frl_md5((apr_byte_t*)mp->sbj.str).digest);
+							ncputany(mp->sbj.str);
 							siz = 1;
-							kstr[0] = mp->sbj.str;
+							b64.base64_decode((apr_byte_t*)mp->sbj.str);
+							kstr[0] = (char*)b64.digest;
 							break;
 						case NQMPUUIDENT:
 							break;
@@ -71,19 +76,49 @@ void generic_handler(struct evhttp_request *req, void *arg)
 							break;
 					}
 					break;
+				}
+				case NQRTCOMMAND:
+				{
+					NQCOMMAND* cmd = (NQCOMMAND*)result->result;
+					switch (cmd->cmd)
+					{
+						case NQCMDSYNCDISK:
+							ncsnap();
+							break;
+						case NQCMDSYNCMEM:
+							ncsync();
+							break;
+						case NQCMDMGIDX:
+							ncmgidx(cmd->params[0].str, cmd->params[1].i);
+							break;
+						case NQCMDIDX:
+							ncidx(cmd->params[0].str);
+							break;
+						case NQCMDREIDX:
+							ncreidx(cmd->params[0].str);
+							break;
+					}
+					break;
+				}
 			}
-
+			nqparseresultdel(result);
 			evbuffer_add_printf(buf, "[");
 			if (siz > 0 && kstr[0] != 0)
-				evbuffer_add_printf(buf, "%s", kstr[0]);
+			{
+				memcpy(b64.digest, kstr[0], 16);
+				b64.base64_encode((apr_byte_t*)name);
+				evbuffer_add_printf(buf, "%s", name);
+			}
 			int i;
 			for (i = 1; i < siz; i++)
 				if (kstr[i] != 0)
-					evbuffer_add_printf(buf, ",%s", kstr[i]);
+				{
+					memcpy(b64.digest, kstr[i], 16);
+					b64.base64_encode((apr_byte_t*)name);
+					evbuffer_add_printf(buf, ",%s", name);
+				}
 			evbuffer_add_printf(buf, "]\n");
 			evhttp_send_reply(req, HTTP_OK, "OK", buf);
-
-			nqparseresultdel(result);
 		} else {
 			evhttp_send_error(req, HTTP_BADREQUEST, "Syntax Error");
 			F_ERROR("syntax error at\n");

@@ -32,15 +32,28 @@ ncbwdbget	nqclient.c	/^CvMat* ncbwdbget(const char* db, char* uuid)$/;"	f	signat
 ncbwdbget	nqclient.h	/^CvMat* ncbwdbget(const char* db, char* uuid);$/;"	p	signature:(const char* db, char* uuid)
 ncfdbget	nqclient.c	/^CvMat* ncfdbget(const char* db, char* uuid)$/;"	f	signature:(const char* db, char* uuid)
 ncfdbget	nqclient.h	/^CvMat* ncfdbget(const char* db, char* uuid);$/;"	p	signature:(const char* db, char* uuid)
+ncidx	nqclient.c	/^void ncidx(const char* db)$/;"	f	signature:(const char* db)
+ncidx	nqclient.h	/^void ncidx(const char* db);$/;"	p	signature:(const char* db)
 ncinit	nqclient.c	/^void ncinit()$/;"	f
 ncinit	nqclient.h	/^void ncinit(void);$/;"	p	signature:(void)
+ncmgidx	nqclient.c	/^void ncmgidx(const char* db, int max)$/;"	f	signature:(const char* db, int max)
+ncmgidx	nqclient.h	/^void ncmgidx(const char* db, int max);$/;"	p	signature:(const char* db, int max)
+ncoutany	nqclient.c	/^void ncoutany(char* uuid)$/;"	f	signature:(char* uuid)
+ncoutany	nqclient.h	/^void ncoutany(char* uuid);$/;"	p	signature:(char* uuid)
+ncputany	nqclient.c	/^void ncputany(char* uuid)$/;"	f	signature:(char* uuid)
+ncputany	nqclient.h	/^void ncputany(char* uuid);$/;"	p	signature:(char* uuid)
 ncqrysearch	nqclient.c	/^int ncqrysearch(NQQRY* qry, char** kstr, float* likeness)$/;"	f	signature:(NQQRY* qry, char** kstr, float* likeness)
 ncqrysearch	nqclient.h	/^int ncqrysearch(NQQRY* qry, char** kstr, float* likeness = 0);$/;"	p	signature:(NQQRY* qry, char** kstr, float* likeness = 0)
+ncreidx	nqclient.c	/^void ncreidx(const char* db)$/;"	f	signature:(const char* db)
+ncreidx	nqclient.h	/^void ncreidx(const char* db);$/;"	p	signature:(const char* db)
 ncsnap	nqclient.c	/^void ncsnap()$/;"	f
+ncsnap	nqclient.h	/^void ncsnap(void);$/;"	p	signature:(void)
 ncsync	nqclient.c	/^void ncsync()$/;"	f
+ncsync	nqclient.h	/^void ncsync(void);$/;"	p	signature:(void)
 nctdbget	nqclient.c	/^char* nctdbget(const char* db, char* col, char* uuid)$/;"	f	signature:(const char* db, char* col, char* uuid)
 nctdbget	nqclient.h	/^char* nctdbget(const char* db, char* col, char* uuid);$/;"	p	signature:(const char* db, char* col, char* uuid)
 ncterm	nqclient.c	/^void ncterm()$/;"	f
+ncterm	nqclient.h	/^void ncterm(void);$/;"	p	signature:(void)
 ncwdbput	nqclient.c	/^bool ncwdbput(const char* db, char* uuid, char* word)$/;"	f	signature:(const char* db, char* uuid, char* word)
 ncwdbput	nqclient.h	/^bool ncwdbput(const char* db, char* uuid, char* word);$/;"	p	signature:(const char* db, char* uuid, char* word)
 nqplandel	nqplan.c	/^void nqplandel(NQPLAN* plan)$/;"	f	signature:(NQPLAN* plan)

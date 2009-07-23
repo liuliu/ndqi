@@ -1,6 +1,8 @@
 #include "databases.h"
+#include "../nqbwdb.h"
+#include "../nqfdb.h"
 
-#define NQ_DATABASE(a,b,c,d) {a,b,0,c,0,d},
+#define NQ_DATABASE(a,b,c,d,e) {a,b,c,0,d,0,e},
 
 ScanDatabase ScanDatabases[] = {
 #include "dblist.i"

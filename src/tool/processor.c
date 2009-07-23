@@ -50,6 +50,11 @@ int main(int argc, char** argv)
 			char* uuid = cvUUIDCreate(img);
 			int width = (image->width > image->height) ? 800 : image->width * 800 / image->height;
 			int height = (image->height > image->width) ? 800 : image->height * 800 / image->width;
+			if (MAX(image->width, image->height) <= 800)
+			{
+				width = image->width;
+				height = image->height;
+			}
 			IplImage* small = cvCreateImage(cvSize(width, height), 8, 3);
 			cvResize(image, small, CV_INTER_AREA);
 			char filename[] = "/home/liu/store/lossless/######################.png";

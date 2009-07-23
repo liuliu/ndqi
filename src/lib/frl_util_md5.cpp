@@ -6,7 +6,7 @@ int frl_md5::hash(const void* s, const apr_size_t size)
 	return 1;
 }
 
-const apr_byte_t base64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+const apr_byte_t base64table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 int frl_md5::base64_encode(apr_byte_t* q)
 {
@@ -39,14 +39,14 @@ int frl_md5::base64_encode(apr_byte_t* q)
 inline unsigned long long base64_index(const apr_byte_t& x)
 {
 	if (x == '_')
-		return 62;
+		return 63;
 	if (x >= 'a')
 		return x-'a'+26;
 	if (x >= 'A')
 		return x-'A';
 	if (x >= '0')
 		return x-'0'+52;
-	return 63;
+	return 62;
 }
 
 int frl_md5::base64_decode(const apr_byte_t* x)

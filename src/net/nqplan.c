@@ -14,10 +14,12 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 	const ScanDatabase* db = ScanDatabaseLookup(preqry->db);
 	qry->db = db->ref;
 	qry->cfd = preqry->cfd;
-	/* for tcwdb, no need for col, but helper to keep the map of uuid to uid64 */
-	qry->col = (preqry->type & NQTTCWDB) ? db->hpr : preqry->col;
-	qry->op = preqry->op;
 	qry->type = preqry->type & ~(NQSUBQRY | NQSQRYANY | NQSQRYALL);
+	/* for tcwdb, no need for col, but helper to keep the map of uuid to uid64 */
+	qry->col = (qry->type == NQTTCWDB) ? db->hpr : preqry->col;
+	if (qry->type != NQTTCWDB && preqry->col != 0)
+		frl_managed_ref(preqry->col);
+	qry->op = preqry->op;
 	switch (qry->type)
 	{
 		case NQTBWDB:
@@ -31,7 +33,7 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 			frl_managed_ref(preqry->sbj.str);
 	}
 	qry->lmt = preqry->lmt;
-	qry->mode = preqry->mode;
+	qry->mode = db->mode;
 	qry->cnum = preqry->cnum;
 	if (preqry->cnum > 0)
 	{
@@ -80,7 +82,7 @@ int nqplanrun(NQPLAN* plan, char** kstr, float* likeness)
 {
 	NQPLANITER* cur = plan->tail;
 	int i, j, t;
-	for (i == 0; i < plan->cnum; i++)
+	for (i = 0; i < plan->cnum; i++)
 	{
 		t = ncqrysearch(cur->qry, kstr, likeness);
 		if (cur->postqry != 0)

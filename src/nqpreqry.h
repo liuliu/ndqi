@@ -20,7 +20,6 @@ typedef struct NQPREQRY {
 	int type;
 	int op;
 	int cnum;
-	int mode;
 	int order;
 	int lmt;
 	struct NQPREQRY** conds;
