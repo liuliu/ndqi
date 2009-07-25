@@ -11,29 +11,34 @@ static frl_slab_pool_t* plan_iter_pool = 0;
 static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 {
 	NQQRY* qry = nqqrynew();
-	const ScanDatabase* db = ScanDatabaseLookup(preqry->db);
-	qry->db = db->ref;
-	qry->cfd = preqry->cfd;
 	qry->type = preqry->type & ~(NQSUBQRY | NQSQRYANY | NQSQRYALL);
-	/* for tcwdb, no need for col, but helper to keep the map of uuid to uid64 */
-	qry->col = (qry->type == NQTTCWDB) ? db->hpr : preqry->col;
-	if (qry->type != NQTTCWDB && preqry->col != 0)
-		frl_managed_ref(preqry->col);
+	qry->cfd = preqry->cfd;
 	qry->op = preqry->op;
-	switch (qry->type)
+	if (qry->type != NQCTOR && qry->type != NQCTAND)
 	{
-		case NQTBWDB:
-			qry->sbj.desc = ncbwdbget(preqry->db, (char*)frl_md5((apr_byte_t*)preqry->sbj.str).digest);
-			break;
-		case NQTFDB:
-			qry->sbj.desc = ncfdbget(preqry->db, (char*)frl_md5((apr_byte_t*)preqry->sbj.str).digest);
-			break;
-		default:
-			qry->sbj.str = preqry->sbj.str;
-			frl_managed_ref(preqry->sbj.str);
+		const ScanDatabase* db = ScanDatabaseLookup(preqry->db);
+		qry->db = db->ref;
+		/* for tcwdb, no need for col, but helper to keep the map of uuid to uid64 */
+		qry->col = (qry->type == NQTTCWDB) ? db->hpr : preqry->col;
+		if (qry->type != NQTTCWDB && preqry->col != 0)
+			frl_managed_ref(preqry->col);
+		qry->mode = db->mode;
+		switch (qry->type)
+		{
+			case NQTBWDB:
+				qry->sbj.desc = ncbwdbget(preqry->db, (char*)frl_md5((apr_byte_t*)preqry->sbj.str).digest);
+				break;
+			case NQTFDB:
+				qry->sbj.desc = ncfdbget(preqry->db, (char*)frl_md5((apr_byte_t*)preqry->sbj.str).digest);
+				break;
+			case NQTTCTDB:
+			case NQTTCWDB:
+			case NQTSPHINX:
+				qry->sbj.str = preqry->sbj.str;
+				frl_managed_ref(preqry->sbj.str);
+		}
 	}
 	qry->lmt = preqry->lmt;
-	qry->mode = db->mode;
 	qry->cnum = preqry->cnum;
 	if (preqry->cnum > 0)
 	{
@@ -52,7 +57,7 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 		plan->head->prev = prev;
 		plan->head = prev;
 		plan->cnum++;
-		prev->qry = nqqrytrans(plan, preqry);
+		prev->qry = nqqrytrans(plan, preqry->sbj.subqry);
 	}
 	return qry;
 }
@@ -105,6 +110,7 @@ int nqplanrun(NQPLAN* plan, char** kstr, float* likeness)
 				condptr = qry->conds = (NQQRY**)malloc(qry->cnum * sizeof(NQQRY*));
 				for (j = 0; j < qry->cnum; j++, condptr++, ksptr++)
 				{
+					(*condptr) = nqqrynew();
 					(*condptr)->db = qry->db;
 					(*condptr)->cfd = qry->cfd;
 					(*condptr)->col = qry->col;

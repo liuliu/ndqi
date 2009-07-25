@@ -119,6 +119,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 	NQRDB* rdb = nqrdbnew();
 	if (qry->lmt <= 0 || qry->lmt > QRY_MAX_LMT)
 		qry->lmt = QRY_MAX_LMT;
+	bool empty = true;
 	int i, maxlmt = 0;
 	NQQRY** condptr = qry->conds;
 	for (i = 0; i < qry->cnum; i++, condptr++)
@@ -135,6 +136,8 @@ NQRDB* nqqrysearch(NQQRY* qry)
 	condptr = qry->conds;
 	for (i = 0; i < qry->cnum; i++, condptr++)
 	{
+		if (*condptr == 0)
+			continue;
 		memset(kstr, 0, sizeof(kstr[0]) * (*condptr)->lmt);
 		memset(likeness, 0, sizeof(likeness[0]) * (*condptr)->lmt);
 		NQBWDB *ttbwdb, *tbwdb, *bwdb;
@@ -158,6 +161,8 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				k = nqqryresult(*condptr, kstr, likeness);
 				break;
 			case NQTBWDB:
+				if ((*condptr)->sbj.desc == 0)
+					continue;
 				bwdb = (NQBWDB*)(*condptr)->db;
 				tbwdb = (scope != 0) ? nqbwdbjoin(bwdb, scope) : bwdb;
 				ttbwdb = (qry->type == NQCTAND && i > 0) ? nqbwdbjoin(tbwdb, rdb) : tbwdb;
@@ -176,6 +181,8 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					nqbwdbdel(tbwdb);
 				break;
 			case NQTFDB:
+				if ((*condptr)->sbj.desc == 0)
+					continue;
 				fdb = (NQFDB*)(*condptr)->db;
 				tfdb = (scope != 0) ? nqfdbjoin(fdb, scope) : fdb;
 				ttfdb = (qry->type == NQCTAND && i > 0) ? nqfdbjoin(tfdb, rdb) : tfdb;
@@ -194,6 +201,8 @@ NQRDB* nqqrysearch(NQQRY* qry)
 					nqfdbdel(tfdb);
 				break;
 			case NQTTCTDB:
+				if ((*condptr)->sbj.str == 0 || (*condptr)->col == 0)
+					continue;
 				negate = false;
 				tdb = (TCTDB*)(*condptr)->db;
 				colname = (char*)(*condptr)->col;
@@ -253,6 +262,8 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				}
 				break;
 			case NQTTCWDB:
+				if ((*condptr)->sbj.str == 0)
+					continue;
 				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPSTREQ:
@@ -288,7 +299,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 		switch (qry->type)
 		{
 			case NQCTAND:
-				if (i > 0)
+				if (!empty)
 				{
 					if (negate)
 					{
@@ -324,6 +335,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						it.fl += (*condptr)->cfd * *lkptr;
 						nqrdbput(rdb, *ksptr, it.ptr);
 					}
+				empty = false;
 				break;
 		}
 		/* conditionally free resources */
@@ -357,6 +369,7 @@ NQQRY* nqqrynew(void)
 		frl_slab_pool_create(&qry_pool, mtx_pool, 1024, sizeof(NQQRY), FRL_LOCK_WITH);
 	NQQRY* qry = (NQQRY*)frl_slab_palloc(qry_pool);
 	memset(qry, 0, sizeof(NQQRY));
+	qry->order = true;
 	qry->cfd = 1.;
 	return qry;
 }

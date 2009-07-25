@@ -48,9 +48,9 @@ int main(int argc, char** argv)
 			IplImage* image = cvLoadImage(entry->d_name, CV_LOAD_IMAGE_COLOR);
 			CvMat imghdr, *img = cvGetMat(image, &imghdr);
 			char* uuid = cvUUIDCreate(img);
-			int width = (image->width > image->height) ? 800 : image->width * 800 / image->height;
-			int height = (image->height > image->width) ? 800 : image->height * 800 / image->width;
-			if (MAX(image->width, image->height) <= 800)
+			int width = (image->width > image->height) ? 640 : image->width * 640 / image->height;
+			int height = (image->height > image->width) ? 640 : image->height * 640 / image->width;
+			if (MAX(image->width, image->height) <= 640)
 			{
 				width = image->width;
 				height = image->height;
@@ -60,12 +60,12 @@ int main(int argc, char** argv)
 			char filename[] = "/home/liu/store/lossless/######################.png";
 			char* pch = strchr(filename, '#');
 			strncpy(pch, uuid, 22);
-			printf("%s\n", filename);
 			cvSaveImage(filename, small);
 			char filename_o[] = "/home/liu/store/raw/######################.jpg";
 			char* pch_o = strchr(filename_o, '#');
 			strncpy(pch_o, uuid, 22);
 			apr_file_copy(entry->d_name, filename_o, APR_FILE_SOURCE_PERMS, mempool);
+			printf("curl -d \"q=INSERT #%s\" http://localhost:8080/\n", uuid);
 		}
 	}
 

@@ -53,6 +53,22 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					plan = nqplannew((NQPREQRY*)result->result);
 					siz = nqplanrun(plan, kstr);
 					nqplandel(plan);
+					evbuffer_add_printf(buf, "[");
+					if (siz > 0 && kstr[0] != 0)
+					{
+						memcpy(b64.digest, kstr[0], 16);
+						b64.base64_encode((apr_byte_t*)name);
+						evbuffer_add_printf(buf, "\"%s\"", name);
+					}
+					int i;
+					for (i = 1; i < siz; i++)
+						if (kstr[i] != 0)
+						{
+							memcpy(b64.digest, kstr[i], 16);
+							b64.base64_encode((apr_byte_t*)name);
+							evbuffer_add_printf(buf, ",\"%s\"", name);
+						}
+					evbuffer_add_printf(buf, "]\n");
 					break;
 				case NQRTINSERT:
 				case NQRTUPDATE:
@@ -63,9 +79,7 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					{
 						case NQMPSIMPLE:
 							ncputany(mp->sbj.str);
-							siz = 1;
-							b64.base64_decode((apr_byte_t*)mp->sbj.str);
-							kstr[0] = (char*)b64.digest;
+							evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
 							break;
 						case NQMPUUIDENT:
 							break;
@@ -84,40 +98,29 @@ void generic_handler(struct evhttp_request *req, void *arg)
 					{
 						case NQCMDSYNCDISK:
 							ncsnap();
+							evbuffer_add_printf(buf, "true\n");
 							break;
 						case NQCMDSYNCMEM:
 							ncsync();
+							evbuffer_add_printf(buf, "true\n");
 							break;
 						case NQCMDMGIDX:
 							ncmgidx(cmd->params[0].str, cmd->params[1].i);
+							evbuffer_add_printf(buf, "true\n");
 							break;
 						case NQCMDIDX:
 							ncidx(cmd->params[0].str);
+							evbuffer_add_printf(buf, "true\n");
 							break;
 						case NQCMDREIDX:
 							ncreidx(cmd->params[0].str);
+							evbuffer_add_printf(buf, "true\n");
 							break;
 					}
 					break;
 				}
 			}
 			nqparseresultdel(result);
-			evbuffer_add_printf(buf, "[");
-			if (siz > 0 && kstr[0] != 0)
-			{
-				memcpy(b64.digest, kstr[0], 16);
-				b64.base64_encode((apr_byte_t*)name);
-				evbuffer_add_printf(buf, "%s", name);
-			}
-			int i;
-			for (i = 1; i < siz; i++)
-				if (kstr[i] != 0)
-				{
-					memcpy(b64.digest, kstr[i], 16);
-					b64.base64_encode((apr_byte_t*)name);
-					evbuffer_add_printf(buf, ",%s", name);
-				}
-			evbuffer_add_printf(buf, "]\n");
 			evhttp_send_reply(req, HTTP_OK, "OK", buf);
 		} else {
 			evhttp_send_error(req, HTTP_BADREQUEST, "Syntax Error");

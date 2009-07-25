@@ -127,7 +127,7 @@ bool nqfdbput(NQFDB* fdb, char* kstr, CvMat* fm)
 CvMat* nqfdbget(NQFDB* fdb, char* kstr)
 {
 	NQFDBDATUM* dt = (NQFDBDATUM*)nqrdbget(fdb->rdb, kstr);
-	return dt->f;
+	return (dt) ? dt->f : NULL;
 }
 
 typedef struct {
@@ -245,6 +245,7 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float
 #endif
 	NQFDBIDX* idx_x;
 	CvMat* fp = fm->cols > 32 ? cvCreateMat(1, 32, CV_32FC1) : 0;
+	/* search over the indexes (spill tree based, random projection over 32-d) */
 	for (idx_x = fdb->idx->next; idx_x != fdb->idx; idx_x = idx_x->next)
 	{
 		if (fp != 0)
@@ -283,6 +284,7 @@ int nqfdbsearch(NQFDB* fdb, CvMat* fm, char** kstr, int lmt, bool ordered, float
 	apr_thread_rwlock_rdlock(fdb->rwunidxlock);
 #endif
 	NQFDBUNIDX* unidx_x;
+	/* search the non-indexed records (slow) */
 	for (unidx_x = fdb->unidx->next; unidx_x != fdb->unidx; unidx_x = unidx_x->next)
 		if (nqrdbget(fdb->rdb, unidx_x->kstr) != 0)
 		{
@@ -474,10 +476,74 @@ static void nqfidxclr(NQFDB* fdb)
 		cvReleaseFeatureTree(idx->ft);
 		free(idx->kstr);
 		free(idx->data);
+		frl_slab_pfree(idx);
 		idx = next;
 	}
 	fdb->inum = 0;
 	fdb->idx->prev = fdb->idx->next = fdb->idx;
+}
+
+bool nqfdbmgidx(NQFDB* fdb, int max, int naive, double rho, double tau)
+{
+	bool mg, emg = false;
+	do {
+		mg = false;
+		if (fdb->unum >= max)
+			nqfdbidx(fdb, naive, rho, tau);
+#if APR_HAS_THREADS
+		apr_thread_rwlock_wrlock(fdb->rwidxlock);
+#endif
+		NQFDBIDX* idx = fdb->idx->next;
+		while (idx != fdb->idx)
+		{
+			NQFDBIDX* next = idx->next;
+			if (idx->inum < max)
+			{
+				idx->prev->next = idx->next;
+				idx->next->prev = idx->prev;
+#if APR_HAS_THREADS
+				apr_thread_rwlock_wrlock(fdb->rwunidxlock);
+#endif
+				int i, k = 0;
+				char** kstr = idx->kstr;
+				for (i = 0; i < idx->inum; i++, kstr++)
+				{
+					NQFDBDATUM* datum = (NQFDBDATUM*)nqrdbget(fdb->rdb, *kstr);
+					if (datum != 0)
+					{
+						NQFDBUNIDX* unidx = (NQFDBUNIDX*)frl_slab_palloc(unidx_pool);
+						unidx->kstr = *kstr;
+						unidx->datum = datum;
+						unidx->prev = fdb->unidx->prev;
+						unidx->next = fdb->unidx;
+						fdb->unidx->prev->next = unidx;
+						fdb->unidx->prev = unidx;
+						k++;
+					}
+				}
+				fdb->unum += k;
+#if APR_HAS_THREADS
+				apr_thread_rwlock_unlock(fdb->rwunidxlock);
+#endif
+				fdb->inum -= idx->inum;
+				if (idx->p != 0)
+					cvReleaseMat(&idx->p);
+				cvReleaseMat(&idx->f);
+				cvReleaseFeatureTree(idx->ft);
+				free(idx->kstr);
+				free(idx->data);
+				frl_slab_pfree(idx);
+				emg = mg = true;
+			}
+			if (fdb->unum > max)
+				break;
+			idx = next;
+		}
+#if APR_HAS_THREADS
+		apr_thread_rwlock_unlock(fdb->rwidxlock);
+#endif
+	} while (mg);
+	return emg;
 }
 
 bool nqfdbreidx(NQFDB* fdb, int naive, double rho, double tau)
@@ -696,6 +762,7 @@ bool nqfdbsync(NQFDB* fdb, const char* filename)
 					{
 						NQFDBUNIDX* unidx = (NQFDBUNIDX*)frl_slab_palloc(unidx_pool);
 						unidx->kstr = (char*)frl_slab_palloc(kstr_pool);
+						apr_file_read_full(file, unidx->kstr, 16, NULL);
 						unidx->datum = (NQFDBDATUM*)nqrdbget(fdb->rdb, unidx->kstr);
 						unidx->prev = fdb->unidx->prev;
 						unidx->next = fdb->unidx;

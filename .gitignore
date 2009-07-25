@@ -7,5 +7,17 @@ src/lib/*.swp
 src/test/*.[oa]
 src/test/*.~
 src/test/*.swp
+src/net/*.[oa]
+src/net/*.~
+src/net/*.swp
+src/parser/*.[oa]
+src/parser/*.~
+src/parser/*.swp
+src/tool/*.[oa]
+src/tool/*.~
+src/tool/*.swp
+src/config/*.[oa]
+src/config/*.~
+src/config/*.swp
 testdata/*
 build/*

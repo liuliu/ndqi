@@ -353,7 +353,7 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 				{
 					$$.qry->type |= NQSUBQRY | $3.ival;
 					$$.qry->op = NQOPELIKE;
-					$$.qry->sbj.subqry = $4.qry;
+					$$.qry->sbj.subqry = (NQPREQRY*)$5.result->result;
 				} else {
 					yyerror("column name doesn't exist.");
 				}
@@ -365,7 +365,7 @@ LikeStmt:	ColumnStmt EXACT LIKE UUIDENT
 				{
 					$$.qry->type |= NQSUBQRY | $3.ival;
 					$$.qry->op = NQOPLIKE;
-					$$.qry->sbj.subqry = $3.qry;
+					$$.qry->sbj.subqry = (NQPREQRY*)$4.result->result;
 				} else {
 					yyerror("column name doesn't exist.");
 				}
@@ -402,7 +402,7 @@ ColumnStmt:	UUID { $$ = $1; } |
 				memcpy($$.str + strlen($1.str) + 1 + strlen($3.str) + 1, $5.str, strlen($5.str));
 			}
 
-SubQueryStmt: '(' SelectStmt ')' { $$ = $2; };
+SubQueryStmt: '(' SelectStmt ')' { $$ = $2; }
 
 ScalarExp:	ICONST { $$ = $1; } |
 			FCONST { $$ = $1; } |

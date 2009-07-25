@@ -43,14 +43,18 @@ NQPREQRY* nqpreqrydup(NQPREQRY* qry)
 	NQPREQRY* newqry = nqpreqrynew();
 	memcpy(newqry, qry, sizeof(NQPREQRY));
 	newqry->result = 0;
-	NQPREQRY** condptr1 = qry->conds;
-	NQPREQRY** condptr2 = newqry->conds = (NQPREQRY**)malloc(qry->cnum * sizeof(NQPREQRY*));
-	int i;
-	for (i = 0; i < qry->cnum; i++, condptr1++, condptr2++)
-		*condptr2 = nqpreqrydup(*condptr1);
+	if (qry->cnum > 0)
+	{
+		NQPREQRY** condptr1 = qry->conds;
+		NQPREQRY** condptr2 = newqry->conds = (NQPREQRY**)malloc(qry->cnum * sizeof(NQPREQRY*));
+		int i;
+		for (i = 0; i < qry->cnum; i++, condptr1++, condptr2++)
+			*condptr2 = nqpreqrydup(*condptr1);
+	}
 	if (qry->type & NQSUBQRY)
+	{
 		newqry->sbj.subqry = nqpreqrydup(qry->sbj.subqry);
-	else if (qry->sbj.str != 0) {
+	} else if (qry->sbj.str != 0) {
 		newqry->sbj.str = nqstrdup(qry->sbj.str, 1024);
 	}
 	if (qry->col != 0)

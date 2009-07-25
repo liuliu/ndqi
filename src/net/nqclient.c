@@ -130,6 +130,9 @@ void ncmgidx(const char* db, int max)
 		case NQTBWDB:
 			nqbwdbmgidx((NQBWDB*)database->ref, max);
 			break;
+		case NQTFDB:
+			nqfdbmgidx((NQFDB*)database->ref, max);
+			break;
 	}
 }
 

@@ -202,7 +202,7 @@ bool nqbwdbput(NQBWDB* bwdb, char* kstr, CvMat* bwm)
 CvMat* nqbwdbget(NQBWDB* bwdb, char* kstr)
 {
 	NQBWDBDATUM* dt = (NQBWDBDATUM*)nqrdbget(bwdb->rdb, kstr);
-	return dt->bw;
+	return (dt) ? dt->bw : NULL;
 }
 
 typedef struct {
