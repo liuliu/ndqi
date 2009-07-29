@@ -211,10 +211,11 @@ void ncoutany(char* uuid)
 
 void ncputany(char* uuid)
 {
-	char filename[] = "/home/liu/store/lossless/######################.png";
-	char* pch = strchr(filename, '#');
-	char filename_o[] = "/home/liu/store/raw/######################.jpg";
-	char* pch_o = strchr(filename_o, '#');
+#define NQ_DIRECTORY(r,o) char r[] = o;
+#include "../config/directories.i"
+#undef NQ_DIRECTORY
+	char* pch = strchr(LossLessImageDirectory, '#');
+	char* pch_o = strchr(RawImageDirectory, '#');
 	if (pch == NULL || pch_o == NULL)
 		return;
 	frl_md5 b64;
@@ -229,7 +230,7 @@ void ncputany(char* uuid)
 	NQFDB* gist = (NQFDB*)ScanDatabaseLookup("gist")->ref;
 	TCTDB* exif = (TCTDB*)ScanDatabaseLookup("exif")->ref;
 
-	IplImage* image = cvLoadImage(filename, CV_LOAD_IMAGE_COLOR);
+	IplImage* image = cvLoadImage(LossLessImageDirectory, CV_LOAD_IMAGE_COLOR);
 	IplImage* gray = cvCreateImage(cvGetSize(image), 8, 1);
 	cvCvtColor(image, gray, CV_BGR2GRAY);
 	CvMat* lfdrmat = nqdpnew(gray, cvSURFParams(1200, 0));
@@ -243,7 +244,7 @@ void ncputany(char* uuid)
 	cvReleaseImage(&gray);
 	cvReleaseImage(&image);
 
-	TCMAP* meta = nqmetanew(filename_o);
+	TCMAP* meta = nqmetanew(RawImageDirectory);
 	tctdbput(exif, uuid, 16, meta);
 	tcmapdel(meta);
 }
