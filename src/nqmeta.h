@@ -13,6 +13,5 @@
 #include <stdint.h>
 
 TCMAP* nqmetanew(const char* file);
-bool nqmetasetindex(TCTDB* tdb);
 
 #endif

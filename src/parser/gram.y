@@ -149,7 +149,7 @@ InsertStmt:	INSERT UUIDENT
 				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
 				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
 				{
-					mp->type = NQMPUUIDENT;
+					mp->type = NQMPWHERE;
 					mp->sbj.qry = $6.qry;
 					mp->val = $4.str;
 					$$.result->result = mp;

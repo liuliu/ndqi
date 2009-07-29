@@ -50,44 +50,98 @@ void generic_handler(struct evhttp_request *req, void *arg)
 			switch (result->type)
 			{
 				case NQRTSELECT:
+				{
+					/* TODO: crash with limit keyword when request twice */
 					plan = nqplannew((NQPREQRY*)result->result);
 					siz = nqplanrun(plan, kstr);
-					nqplandel(plan);
 					evbuffer_add_printf(buf, "[");
-					if (siz > 0 && kstr[0] != 0)
-					{
-						memcpy(b64.digest, kstr[0], 16);
-						b64.base64_encode((apr_byte_t*)name);
-						evbuffer_add_printf(buf, "\"%s\"", name);
-					}
-					int i;
-					for (i = 1; i < siz; i++)
+					int i; bool no_delims = true;
+					for (i = 0; i < siz; i++)
 						if (kstr[i] != 0)
 						{
 							memcpy(b64.digest, kstr[i], 16);
 							b64.base64_encode((apr_byte_t*)name);
-							evbuffer_add_printf(buf, ",\"%s\"", name);
+							if (no_delims)
+							{
+								evbuffer_add_printf(buf, "\"%s\"", name);
+								no_delims = false;
+							} else
+								evbuffer_add_printf(buf, ",\"%s\"", name);
 						}
 					evbuffer_add_printf(buf, "]\n");
+					nqplandel(plan);
 					break;
-				case NQRTINSERT:
+				}
 				case NQRTUPDATE:
+				case NQRTINSERT:
 				case NQRTDELETE:
 				{
 					NQMANIPULATE* mp = (NQMANIPULATE*)result->result;
 					switch (mp->type)
 					{
 						case NQMPSIMPLE:
-							ncputany(mp->sbj.str);
+							if (result->type == NQRTDELETE)
+								ncoutany((char*)frl_md5((apr_byte_t*)mp->sbj.str).digest);
+							else
+								ncputany((char*)frl_md5((apr_byte_t*)mp->sbj.str).digest);
 							evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
 							break;
 						case NQMPUUIDENT:
+							switch (mp->dbtype)
+							{
+								case NQTTDB:
+									if (result->type != NQRTDELETE)
+										nctdbput(mp->db, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest, mp->val);
+									else
+										nctdbout(mp->db, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest, mp->val);
+									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
+									break;
+								case NQTTCTDB:
+									if (result->type != NQRTDELETE)
+										nctctdbput(mp->db, mp->col, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest, mp->val);
+									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
+									break;
+								case NQTFDB:
+								case NQTBWDB:
+									evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
+									break;
+							}
 							break;
 						case NQMPWHERE:
+						{
 							plan = nqplannew(mp->sbj.qry);
 							siz = nqplanrun(plan, kstr);
+							evbuffer_add_printf(buf, "[");
+							int i; bool no_delims = true;
+							for (i = 0; i < siz; i++)
+								if (kstr[i] != 0)
+								{
+									switch (mp->dbtype)
+									{
+										case NQTTDB:
+											if (result->type != NQRTDELETE)
+												nctdbput(mp->db, kstr[i], mp->val);
+											else
+												nctdbout(mp->db, kstr[i], mp->val);
+											break;
+										case NQTTCTDB:
+											if (result->type != NQRTDELETE)
+												nctctdbput(mp->db, mp->col, kstr[i], mp->val);
+											break;
+									}
+									memcpy(b64.digest, kstr[i], 16);
+									b64.base64_encode((apr_byte_t*)name);
+									if (no_delims)
+									{
+										evbuffer_add_printf(buf, "\"%s\"", name);
+										no_delims = false;
+									} else
+										evbuffer_add_printf(buf, ",\"%s\"", name);
+								}
+							evbuffer_add_printf(buf, "]\n");
 							nqplandel(plan);
 							break;
+						}
 					}
 					break;
 				}

@@ -1,7 +1,7 @@
 #include "nqrdb.h"
 #include "assert.h"
 
-inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
+static inline bool kmatch(uint32_t* kstr1, uint32_t* kstr2, uint32_t k)
 {
 	for (; k < 4; k++)
 		if (kstr1[k] != kstr2[k])

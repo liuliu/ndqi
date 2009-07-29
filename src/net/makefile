@@ -9,7 +9,7 @@ all: nqserver
 clean:
 	rm *.o ../parser/*.o ../config/*.o ../lib/*.o ../*.o ../parser/gram.h ../parser/gram.c ../parser/gram.out ../parser/scan.c nqserver
 
-nqserver: nqserver.o nqplan.o nqclient.o ../parser/scan.o ../parser/gram.o ../parser/keywords.o ../nqbwdb.o ../nqfdb.o ../nqqry.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_managed_mem.o ../lib/frl_util_md5.o ../lib/mlapcluster.o $(OPENCV)/src/ml/ml_inner_functions.o ../lib/cvgist.o ../lib/cvlocalhist.o ../config/databases.o ../nqdp.o ../nqlh.o ../nqgs.o ../nqmeta.o
+nqserver: nqserver.o nqplan.o nqclient.o ../parser/scan.o ../parser/gram.o ../parser/keywords.o ../nqbwdb.o ../nqfdb.o ../nqtdb.o ../nqqry.o ../nqpreqry.o ../nqrdb.o ../lib/frl_slab_pool.o ../lib/frl_managed_mem.o ../lib/frl_util_md5.o ../lib/mlapcluster.o $(OPENCV)/src/ml/ml_inner_functions.o ../lib/cvgist.o ../lib/cvlocalhist.o ../config/databases.o ../nqdp.o ../nqlh.o ../nqgs.o ../nqmeta.o
 	g++ -o $@ $^ $(LINKFLAG)
 
 ../parser/scan.c: ../parser/scan.l ../parser/gram.h

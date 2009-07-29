@@ -14,11 +14,9 @@
 typedef struct NQQRY {
 	void* db;
 	void* col;
-	void* orderby;
 	union {
 		char* str;
 		CvMat* desc;
-		NQRDB* sub;
 	} sbj;
 	float cfd;
 	int type;
@@ -37,8 +35,8 @@ enum {
 	NQTRDB    = 0x03,	/* rdb type                */
 	NQTBWDB   = 0x04,	/* bwdb type               */
 	NQTFDB    = 0x05,	/* fdb type                */
-	NQTTCTDB  = 0x06,	/* tokyo-cabinet table db  */
-	NQTTCWDB  = 0x07,	/* tokyo-cabinet word db   */
+	NQTTDB    = 0x06,	/* tdb type (tag db)       */
+	NQTTCTDB  = 0x07,	/* tokyo-cabinet table db  */
 	NQTSPHINX = 0x08,	/* sphinx full-text search */
 	NQSUBQRY  = 0x10,	/* sub-query               */
 	NQSQRYANY = 0x30,	/* sub-query for any       */

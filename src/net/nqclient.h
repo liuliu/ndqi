@@ -2,6 +2,7 @@
 #define _GUARD_NQCLIENT_
 
 #include "../nqqry.h"
+#include <tcutil.h>
 
 void ncinit(void);
 void ncsnap(void);
@@ -15,8 +16,11 @@ void ncputany(char* uuid);
 
 CvMat* ncbwdbget(const char* db, char* uuid);
 CvMat* ncfdbget(const char* db, char* uuid);
-char* nctdbget(const char* db, char* col, char* uuid);
-bool ncwdbput(const char* db, char* uuid, char* word);
+char* nctctdbget(const char* db, char* col, char* uuid);
+bool nctctdbput(const char* db, char* col, char* uuid, char* val);
+TCLIST* nctdbget(const char* db, char* uuid);
+bool nctdbput(const char* db, char* uuid, char* word);
+bool nctdbout(const char* db, char* uuid, char* word);
 int ncqrysearch(NQQRY* qry, char** kstr, float* likeness = 0);
 
 #endif
