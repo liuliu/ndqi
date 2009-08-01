@@ -8,6 +8,6 @@
 
 #include <cv.h>
 
-CvMat* nqgsnew(CvArr* image, int n);
+CvMat* nqgsnew(CvArr* image);
 
 #endif

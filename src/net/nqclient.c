@@ -239,7 +239,7 @@ void ncputany(char* uuid)
 	nqbwdbput(lfd, uuid, lfdmat);
 	CvMat* lhmat = nqlhnew(image, 512);
 	nqfdbput(lh, uuid, lhmat);
-	CvMat* gsmat = nqgsnew(gray, 24);
+	CvMat* gsmat = nqgsnew(gray);
 	nqfdbput(gist, uuid, gsmat);
 	cvReleaseImage(&gray);
 	cvReleaseImage(&image);
