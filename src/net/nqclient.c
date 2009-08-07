@@ -8,6 +8,7 @@
 #include "../nqlh.h"
 #include "../nqgs.h"
 #include "../nqmeta.h"
+#include "../nqauto.h"
 
 /* 3rd party library */
 #include <tcutil.h>
@@ -229,6 +230,7 @@ void ncputany(char* uuid)
 	NQFDB* lh = (NQFDB*)ScanDatabaseLookup("lh")->ref;
 	NQFDB* gist = (NQFDB*)ScanDatabaseLookup("gist")->ref;
 	TCTDB* exif = (TCTDB*)ScanDatabaseLookup("exif")->ref;
+	TCTDB* kod = (TCTDB*)ScanDatabaseLookup("kod")->ref;
 
 	IplImage* image = cvLoadImage(LossLessImageDirectory, CV_LOAD_IMAGE_COLOR);
 	IplImage* gray = cvCreateImage(cvGetSize(image), 8, 1);
@@ -241,6 +243,9 @@ void ncputany(char* uuid)
 	nqfdbput(lh, uuid, lhmat);
 	CvMat* gsmat = nqgsnew(gray);
 	nqfdbput(gist, uuid, gsmat);
+	TCMAP* kodcol = nqkodnew(image);
+	tctdbput(kod, uuid, 16, kodcol);
+	tcmapdel(kodcol);
 	cvReleaseImage(&gray);
 	cvReleaseImage(&image);
 
