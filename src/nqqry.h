@@ -9,7 +9,7 @@
 #include <cv.h>
 #include "nqrdb.h"
 
-#define QRY_MAX_LMT (2000)
+#define QRY_MAX_LMT (100000)
 
 typedef struct NQQRY {
 	void* db;
@@ -19,6 +19,7 @@ typedef struct NQQRY {
 		CvMat* desc;
 	} sbj;
 	float cfd;
+	float thr;
 	int type;
 	int op;
 	int cnum;

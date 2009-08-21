@@ -14,7 +14,7 @@ static NQPARSERESULT* YY_RESULT = 0;
 	NQPARSERESULT* result;
 }
 
-%nonassoc ALL, ANY, APPEND, ASC, BETWEEN, BY, CACHE, DELETE, DESC, DISK, DISTINCT, EXACT, EXISTS, FROM, IN, INDEX, INSERT, INTO, IS, LIKE, LIMIT, MEMORY, MERGE, NULL_P, ORDER, REINDEX, SELECT, SOME, SYNCHRONIZE, UPDATE, WHERE
+%nonassoc ABOVE, ALL, ANY, APPEND, ASC, BETWEEN, BY, CACHE, DELETE, DESC, DISK, DISTINCT, EXACT, EXISTS, FROM, IN, INDEX, INSERT, INTO, IS, LIKE, LIMIT, MEMORY, MERGE, NULL_P, ORDER, REINDEX, SELECT, SOME, SYNCHRONIZE, UPDATE, WHERE
 %nonassoc UUID, UUIDENT, IDENT, FCONST, ICONST
 %nonassoc STRTYPE, NUMTYPE, NOTYPE
 %nonassoc NUMGT, NUMGE, NUMLT, NUMLE, COLNE, COLEQ
@@ -222,6 +222,7 @@ CondStmt:	CondStmt OR CondStmt
 			} |
 			CondStmt ORDER BY ColumnStmt
 			{
+				$$ = $3;
 			} |
 			'(' CondStmt ')' { $$ = $2; } |
 			PredicateStmt { $$ = $1; }
@@ -317,11 +318,18 @@ BetweenStmt:	ColumnStmt BETWEEN ScalarExp AND ScalarExp
 
 InStmt:	ScalarExp IN SubQueryStmt;
 
-LikeCfdStmt:	LikeStmt |
-				LikeStmt ScalarExp '%'
+LikeCfdStmt:	LikeThrStmt |
+				LikeThrStmt ScalarExp '%'
 				{
 					$$ = $1;
 					$$.qry->cfd = strtod($2.str, NULL) * 0.01;
+				}
+
+LikeThrStmt:	LikeStmt |
+				LikeStmt ABOVE ScalarExp
+				{
+					$$ = $1;
+					$$.qry->thr = strtod($3.str, NULL);
 				}
 
 LikeStmt:	ColumnStmt EXACT LIKE UUIDENT

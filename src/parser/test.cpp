@@ -25,5 +25,8 @@ int main()
 	char ql7[] = "delete tag=\"beach\" from #Dh2uakSd98fnwEi3ne-1_3";
 	result = nqparse(ql7, strlen(ql7));
 	printf("db: %s, val: %s, uuid: %s\n", ((NQMANIPULATE*)(result->result))->db, ((NQMANIPULATE*)(result->result))->val, ((NQMANIPULATE*)(result->result))->sbj.str);
+    char ql8[] = "select # where lfd like #Dh2uakSd98fnwEi3ne-1_3 above 0.5";
+	result = nqparse(ql8, strlen(ql8));
+	printf("db: %s, uuid: %s, thr: %f\n", ((NQPREQRY*)(result->result))->db, ((NQPREQRY*)(result->result))->sbj.str, ((NQPREQRY*)(result->result))->thr);
 	nqparsedel();
 }

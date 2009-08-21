@@ -164,6 +164,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				bwdb = (NQBWDB*)(*condptr)->db;
 				tbwdb = (scope != 0) ? nqbwdbjoin(bwdb, scope) : bwdb;
 				ttbwdb = (qry->type == NQCTAND && i > 0) ? nqbwdbjoin(tbwdb, rdb) : tbwdb;
+				k = 0;
 				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPLIKE:
@@ -173,6 +174,12 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						k = nqbwdblike(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, (*condptr)->mode, 0.6, true, likeness);
 						break;
 				}
+				for (j = 0; j < k; j++)
+					if (log(1. + likeness[j] / 50.f) <= (*condptr)->thr)
+					{
+						k = j;
+						break;
+					}
 				if (qry->type == NQCTAND && i > 0)
 					nqbwdbdel(ttbwdb);
 				if (scope != 0)
@@ -184,6 +191,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 				fdb = (NQFDB*)(*condptr)->db;
 				tfdb = (scope != 0) ? nqfdbjoin(fdb, scope) : fdb;
 				ttfdb = (qry->type == NQCTAND && i > 0) ? nqfdbjoin(tfdb, rdb) : tfdb;
+				k = 0;
 				switch ((*condptr)->op & ~NQOPNOT)
 				{
 					case NQOPLIKE:
@@ -193,6 +201,12 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						k = nqfdblike(ttfdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
 						break;
 				}
+				for (j = 0; j < k; j++)
+					if (likeness[j] <= (*condptr)->thr)
+					{
+						k = j;
+						break;
+					}
 				if (qry->type == NQCTAND && i > 0)
 					nqfdbdel(ttfdb);
 				if (scope != 0)

@@ -13,6 +13,7 @@ static NQQRY* nqqrytrans(NQPLAN* plan, NQPREQRY* preqry)
 	NQQRY* qry = nqqrynew();
 	qry->type = preqry->type & ~(NQSUBQRY | NQSQRYANY | NQSQRYALL);
 	qry->cfd = preqry->cfd;
+	qry->thr = preqry->thr;
 	qry->op = preqry->op;
 	if (qry->type != NQCTOR && qry->type != NQCTAND)
 	{
