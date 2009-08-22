@@ -3,7 +3,7 @@
 #include <sys/queue.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <getopt.h>
 
 #include <err.h>
 #include <event.h>
@@ -203,8 +203,12 @@ int main(int argc, char** argv)
 	struct evhttp *httpd;
 	char addr[] = "0.0.0.0\0\0\0\0\0\0\0\0\0";
 	int port = 8080;
+	bool nosync = false;
+	struct option longopts[] = { { "no-sync", no_argument, 0, 0x6e73 },
+								 { 0, 0, 0, 0 } };
+	int idxptr = 0;
 
-	while (-1 != (o = getopt(argc, argv, "d:l:p:hvV")))
+	while (-1 != (o = getopt_long(argc, argv, "d:l:p:hvV", longopts, &idxptr)))
 	{
 		switch (o)
 		{
@@ -213,7 +217,11 @@ int main(int argc, char** argv)
 				break;
 			case 'p':
 				port = strtol(optarg, NULL, 10);
+				break;
 			case 'd':
+				break;
+			case 0x6e73:
+				nosync = true;
 				break;
 			case 'h':
 				show_help();
@@ -232,6 +240,12 @@ int main(int argc, char** argv)
 	event_init();
 	F_INFO("http init at %s : %d\n", addr, port);
 	F_ERROR_IF_RUN(NULL == (httpd = evhttp_start(addr, port)), return 0, "cannot binding port or IP address\n");
+
+	if (!nosync)
+	{
+		ncsync();
+		F_INFO("db sync\n");
+	}
 
 	/* Set a callback for all other requests. */
 	evhttp_set_gencb(httpd, generic_handler, NULL);

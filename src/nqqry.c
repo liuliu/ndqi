@@ -175,7 +175,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 						break;
 				}
 				for (j = 0; j < k; j++)
-					if (log(1. + likeness[j] / 50.f) <= (*condptr)->thr)
+					if (log(1. + likeness[j] / 20.f) <= (*condptr)->thr)
 					{
 						k = j;
 						break;
