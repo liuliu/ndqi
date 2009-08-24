@@ -67,8 +67,6 @@ static NQRDBDATUM* nqrdbirt(NQRDB* rdb, NQRDBDATUM* rec, uint8_t ht, uint32_t i,
 	nrec->next = rdb->head;
 	rdb->head->prev->next = nrec;
 	rdb->head->prev = nrec;
-	if (rec == nrec)
-		printf("%d\n", rec);
 	rec->chd[i] = nrec;
 	rec->rnum++;
 	rdb->rnum++;
