@@ -169,7 +169,54 @@ static apr_pool_t* root = 0;
 static apr_thread_mutex_t* parse_mtx = 0;
 static frl_slab_pool_t* prpool = 0;
 static frl_slab_pool_t* mppool = 0;
+static frl_slab_pool_t* mplspool = 0;
 static frl_slab_pool_t* cmdpool = 0;
+
+static void nqmplistdel(NQMPLIST* mplist)
+{
+	NQMPLIST *cur, *last = mplist;
+	for (cur = mplist->next; cur != mplist; cur = cur->next)
+	{
+		if (last->col != 0)
+			free(last->col);
+		if (last->val != 0)
+			free(last->val);
+		frl_slab_pfree(last);
+		last = cur;
+	}
+	if (last->col != 0)
+		free(last->col);
+	if (last->val != 0)
+		free(last->val);
+	frl_slab_pfree(last);
+}
+
+static NQMPLIST* nqmplistdup(NQMPLIST* mplist)
+{
+	if (mplspool == 0)
+		frl_slab_pool_create(&mplspool, root, 128, sizeof(NQMPLIST), FRL_LOCK_WITH);
+	NQMPLIST* list = (NQMPLIST*)frl_slab_palloc(mplspool);
+	list->type = mplist->type;
+	list->db = mplist->db;
+	list->prev = list->next = list;
+	list->col = (mplist->col == 0) ? 0 : strndup(mplist->col, 256);
+	list->val = (mplist->val == 0) ? 0 : strndup(mplist->val, 256);
+	NQMPLIST *cur, *listcur = list;
+	int i = 0;
+	for (cur = mplist->next; cur != mplist; cur = cur->next)
+	{
+		NQMPLIST* nls = (NQMPLIST*)frl_slab_palloc(mplspool);
+		nls->type = cur->type;
+		nls->db = cur->db;
+		nls->col = (cur->col == 0) ? 0 : strndup(cur->col, 256);
+		nls->val = (cur->val == 0) ? 0 : strndup(cur->val, 256);
+		nls->prev = listcur;
+		nls->next = listcur->next;
+		listcur->next = nls;
+		listcur = nls;
+	}
+	return list;
+}
 
 void nqparseresultdel(NQPARSERESULT* result)
 {
@@ -192,15 +239,11 @@ void nqparseresultdel(NQPARSERESULT* result)
 					break;
 				case NQMPUUIDENT:
 					free(mp->sbj.str);
-					if (mp->col != 0)
-						free(mp->col);
-					free(mp->val);
+					nqmplistdel(mp->assign);
 					break;
 				case NQMPWHERE:
 					nqpreqrydel(mp->sbj.qry);
-					if (mp->col != 0)
-						free(mp->col);
-					free(mp->val);
+					nqmplistdel(mp->assign);
 					break;
 			}
 			frl_slab_pfree(mp);
@@ -263,13 +306,11 @@ NQPARSERESULT* nqparse(char* str, int siz)
 						break;
 					case NQMPUUIDENT:
 						mp->sbj.str = strndup(mp->sbj.str, 256);
-						mp->col = (mp->col == 0) ? 0 : strndup(mp->col, 256);
-						mp->val = strndup(mp->val, 256);
+						mp->assign = nqmplistdup(mp->assign);
 						break;
 					case NQMPWHERE:
 						mp->sbj.qry = nqpreqrydup(mp->sbj.qry);
-						mp->col = (mp->col == 0) ? 0 : strndup(mp->col, 256);
-						mp->val = strndup(mp->val, 256);
+						mp->assign = nqmplistdup(mp->assign);
 						break;
 				}
 				result->result = mp;

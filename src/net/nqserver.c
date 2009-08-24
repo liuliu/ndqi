@@ -15,6 +15,31 @@
 #include "nqplan.h"
 #include "nqclient.h"
 
+static bool putval(NQMPLIST* cur, char* kstr)
+{
+	switch (cur->type)
+	{
+		case NQTTDB:
+			nctdbput(cur->db, kstr, cur->val);
+			return true;
+		case NQTTCTDB:
+			nctctdbput(cur->db, cur->col, kstr, cur->val);
+			return true;
+	}
+	return false;
+}
+
+static bool outval(NQMPLIST* cur, char* kstr)
+{
+	switch (cur->type)
+	{
+		case NQTTDB:
+			nctdbout(cur->db, kstr, cur->val);
+			return true;
+	}
+	return false;
+}
+
 void generic_handler(struct evhttp_request *req, void *arg)
 {
 	const char* uri = evhttp_request_uri(req);
@@ -89,24 +114,33 @@ void generic_handler(struct evhttp_request *req, void *arg)
 							evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
 							break;
 						case NQMPUUIDENT:
-							switch (mp->dbtype)
+							if (result->type != NQRTDELETE)
 							{
-								case NQTTDB:
-									if (result->type != NQRTDELETE)
-										nctdbput(mp->db, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest, mp->val);
-									else
-										nctdbout(mp->db, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest, mp->val);
+								NQMPLIST* cur = mp->assign;
+								if (putval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
 									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
-									break;
-								case NQTTCTDB:
-									if (result->type != NQRTDELETE)
-										nctctdbput(mp->db, mp->col, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest, mp->val);
-									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
-									break;
-								case NQTFDB:
-								case NQTBWDB:
+								else
 									evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
-									break;
+								for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
+								{
+									if (putval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
+										evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
+									else
+										evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
+								}
+							} else {
+								NQMPLIST* cur = mp->assign;
+								if (outval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
+									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
+								else
+									evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
+								for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
+								{
+									if (outval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
+										evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
+									else
+										evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
+								}
 							}
 							break;
 						case NQMPWHERE:
@@ -118,27 +152,30 @@ void generic_handler(struct evhttp_request *req, void *arg)
 							for (i = 0; i < siz; i++)
 								if (kstr[i] != 0)
 								{
-									switch (mp->dbtype)
+									bool ok = false;
+									if (result->type != NQRTDELETE)
 									{
-										case NQTTDB:
-											if (result->type != NQRTDELETE)
-												nctdbput(mp->db, kstr[i], mp->val);
-											else
-												nctdbout(mp->db, kstr[i], mp->val);
-											break;
-										case NQTTCTDB:
-											if (result->type != NQRTDELETE)
-												nctctdbput(mp->db, mp->col, kstr[i], mp->val);
-											break;
+										NQMPLIST* cur = mp->assign;
+										ok = putval(cur, kstr[i]) || ok;
+										for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
+											ok = putval(cur, kstr[i]) || ok;
+									} else {
+										NQMPLIST* cur = mp->assign;
+										ok = outval(cur, kstr[i]) || ok;
+										for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
+											ok = outval(cur, kstr[i]) || ok;
 									}
-									memcpy(b64.digest, kstr[i], 16);
-									b64.base64_encode((apr_byte_t*)name);
-									if (no_delims)
+									if (ok)
 									{
-										evbuffer_add_printf(buf, "\"%s\"", name);
-										no_delims = false;
-									} else
-										evbuffer_add_printf(buf, ",\"%s\"", name);
+										memcpy(b64.digest, kstr[i], 16);
+										b64.base64_encode((apr_byte_t*)name);
+										if (no_delims)
+										{
+											evbuffer_add_printf(buf, "\"%s\"", name);
+											no_delims = false;
+										} else
+											evbuffer_add_printf(buf, ",\"%s\"", name);
+									}
 								}
 							evbuffer_add_printf(buf, "]\n");
 							nqplandel(plan);

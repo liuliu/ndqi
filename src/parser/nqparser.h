@@ -8,16 +8,22 @@ typedef struct {
 	void* result;
 } NQPARSERESULT;
 
-typedef struct {
+typedef struct NQMPLIST {
 	int type;
-	int dbtype;
 	const char* db;
 	char* col;
+	char* val;
+	struct NQMPLIST* prev;
+	struct NQMPLIST* next;
+} NQMPLIST;
+
+typedef struct {
+	int type;
+	NQMPLIST* assign;
 	union {
 		char* str;
 		struct NQPREQRY* qry;
 	} sbj;
-	char* val;
 } NQMANIPULATE;
 
 typedef union {

@@ -11,7 +11,8 @@ static NQPARSERESULT* YY_RESULT = 0;
 	char *str;
 	const char *keyword;
 	NQPREQRY *qry;
-	NQPARSERESULT* result;
+	NQMPLIST *mplist;
+	NQPARSERESULT *result;
 }
 
 %nonassoc ABOVE, ALL, ANY, APPEND, ASC, BETWEEN, BY, CACHE, DELETE, DESC, DISK, DISTINCT, EXACT, EXISTS, FROM, IN, INDEX, INSERT, INTO, IS, LIKE, LIMIT, MEMORY, MERGE, NULL_P, ORDER, REINDEX, SELECT, SOME, SYNCHRONIZE, UPDATE, WHERE
@@ -87,35 +88,25 @@ DeleteStmt:	DELETE UUIDENT
 				mp->sbj.str = $2.str;
 				$$.result->result = mp;
 			} |
-			DELETE ColumnStmt COLEQ ScalarExp FROM UUIDENT
+			DELETE ColumnEqListStmt FROM UUIDENT
 			{
 				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
 				$$.result->type = NQRTDELETE;
 				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
-				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
-				{
-					mp->type = NQMPUUIDENT;
-					mp->sbj.str = $6.str;
-					mp->val = $4.str;
-					$$.result->result = mp;
-				} else {
-					yyerror("column name doesn't exist.");
-				}
+				mp->type = NQMPUUIDENT;
+				mp->sbj.str = $4.str;
+				mp->assign = $2.mplist;
+				$$.result->result = mp;
 			} |
-			DELETE ColumnStmt COLEQ ScalarExp WHERE CondStmt
+			DELETE ColumnEqListStmt WHERE CondStmt
 			{
 				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
 				$$.result->type = NQRTDELETE;
 				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
-				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
-				{
-					mp->type = NQMPWHERE;
-					mp->sbj.qry = $6.qry;
-					mp->val = $4.str;
-					$$.result->result = mp;
-				} else {
-					yyerror("column name doesn't exist.");
-				}
+				mp->type = NQMPWHERE;
+				mp->sbj.qry = $4.qry;
+				mp->assign = $2.mplist;
+				$$.result->result = mp;
 			}
 
 InsertStmt:	INSERT UUIDENT
@@ -127,36 +118,54 @@ InsertStmt:	INSERT UUIDENT
 				mp->sbj.str = $2.str;
 				$$.result->result = mp;
 			} |
-			INSERT ColumnStmt COLEQ ScalarExp INTO UUIDENT
+			INSERT ColumnEqListStmt INTO UUIDENT
 			{
 				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
 				$$.result->type = NQRTINSERT;
 				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
-				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
-				{
-					mp->type = NQMPUUIDENT;
-					mp->sbj.str = $6.str;
-					mp->val = $4.str;
-					$$.result->result = mp;
-				} else {
-					yyerror("column name doesn't exist.");
-				}
+				mp->type = NQMPUUIDENT;
+				mp->sbj.str = $4.str;
+				mp->assign = $2.mplist;
+				$$.result->result = mp;
 			} |
-			INSERT ColumnStmt COLEQ ScalarExp WHERE CondStmt
+			INSERT ColumnEqListStmt WHERE CondStmt
 			{
 				$$.result = (NQPARSERESULT*)apr_palloc(yymem(), sizeof(NQPARSERESULT));
 				$$.result->type = NQRTINSERT;
 				NQMANIPULATE* mp = (NQMANIPULATE*)apr_palloc(yymem(), sizeof(NQMANIPULATE));
-				if (nqcolident(&mp->dbtype, &mp->db, &mp->col, $2.str))
-				{
-					mp->type = NQMPWHERE;
-					mp->sbj.qry = $6.qry;
-					mp->val = $4.str;
-					$$.result->result = mp;
-				} else {
-					yyerror("column name doesn't exist.");
-				}
+				mp->type = NQMPWHERE;
+				mp->sbj.qry = $4.qry;
+				mp->assign = $2.mplist;
+				$$.result->result = mp;
 			}
+
+ColumnEqListStmt:	ColumnStmt COLEQ ScalarExp
+					{
+						NQMPLIST* mplist = (NQMPLIST*)apr_palloc(yymem(), sizeof(NQMPLIST));
+						if (nqcolident(&mplist->type, &mplist->db, &mplist->col, $1.str))
+						{
+							mplist->val = $3.str;
+							mplist->prev = mplist->next = mplist;
+							$$.mplist = mplist;
+						} else {
+							yyerror("column name doesn't exist.");
+						}
+					} |
+					ColumnEqListStmt ',' ColumnStmt COLEQ ScalarExp
+					{
+						NQMPLIST* mplist = (NQMPLIST*)apr_palloc(yymem(), sizeof(NQMPLIST));
+						if (nqcolident(&mplist->type, &mplist->db, &mplist->col, $3.str))
+						{
+							mplist->val = $5.str;
+							mplist->prev = $1.mplist->prev;
+							mplist->next = $1.mplist;
+							$1.mplist->prev->next = mplist;
+							$1.mplist->prev = mplist;
+							$$.mplist = mplist;
+						} else {
+							yyerror("column name doesn't exist.");
+						}
+					}
 
 SelectStmt:	SELECT ColumnOptListStmt WHERE CondStmt
 			{
