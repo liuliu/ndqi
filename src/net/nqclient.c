@@ -233,6 +233,8 @@ void ncputany(char* uuid)
 	TCTDB* kod = (TCTDB*)ScanDatabaseLookup("kod")->ref;
 
 	IplImage* image = cvLoadImage(LossLessImageDirectory, CV_LOAD_IMAGE_COLOR);
+	if (image == NULL)
+		return;
 	IplImage* gray = cvCreateImage(cvGetSize(image), 8, 1);
 	cvCvtColor(image, gray, CV_BGR2GRAY);
 	CvMat* lfdrmat = nqdpnew(gray, cvSURFParams(1200, 0));
@@ -298,7 +300,7 @@ bool nctctdbput(const char* db, char* col, char* uuid, char* val)
 	TCTDB* tdb = (TCTDB*)ScanDatabaseLookup(db)->ref;
 	TCMAP* row = tctdbget(tdb, uuid, 16);
 	if (row == NULL)
-		return false;
+		row = tcmapnew();
 	tcmapput(row, col, strlen(col), val, strlen(val));
 	bool result = tctdbput(tdb, uuid, 16, row);
 	tcmapdel(row);

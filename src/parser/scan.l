@@ -41,18 +41,14 @@ integer			{digit}+
 decimal			(({digit}*\.{digit}+)|({digit}+\.{digit}*))
 real			({integer}|{decimal})[Ee][-+]?{digit}+
 
+other			.
+
 %%
 
 {whitespace} |
 {comment}
 				{
 					/* ignore */
-				}
-
-{dquote}   |
-{self}     |
-{operator}		{
-					return yytext[0];
 				}
 
 ">"				{ return NUMGT; }
@@ -102,6 +98,12 @@ real			({integer}|{decimal})[Ee][-+]?{digit}+
 					return IDENT;
 				}
 
+{dquote}   |
+{self}     |
+{operator} |
+{other}			{
+					return yytext[0];
+				}
 %%
 
 bool YY_ERROR;

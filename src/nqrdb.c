@@ -67,6 +67,8 @@ static NQRDBDATUM* nqrdbirt(NQRDB* rdb, NQRDBDATUM* rec, uint8_t ht, uint32_t i,
 	nrec->next = rdb->head;
 	rdb->head->prev->next = nrec;
 	rdb->head->prev = nrec;
+	if (rec == nrec)
+		printf("%d\n", rec);
 	rec->chd[i] = nrec;
 	rec->rnum++;
 	rdb->rnum++;
@@ -354,6 +356,8 @@ void nqrdbdel(NQRDB* rdb)
 	apr_thread_rwlock_destroy(rdb->rwlock);
 #endif
 	NQRDBDATUM* cur = rdb->head;
+	if (cur->chd != 0)
+		frl_slab_pfree(cur->chd);
 	frl_slab_pfree(cur);
 	for (cur = cur->next; cur != rdb->head; cur = cur->next)
 	{

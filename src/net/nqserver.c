@@ -33,6 +33,8 @@ void generic_handler(struct evhttp_request *req, void *arg)
 	}
 	if (q != NULL)
 	{
+		F_INFO("Q <= %s from %s\n", q, req->remote_host);
+
 		struct evbuffer *buf;
 		buf = evbuffer_new();
 		if (buf == NULL)
@@ -183,7 +185,7 @@ void generic_handler(struct evhttp_request *req, void *arg)
 		free(q);
 	} else {
 		evhttp_send_error(req, HTTP_BADREQUEST, "Wrong Argument");
-			F_ERROR("wrong argument at\n");
+		F_ERROR("wrong argument at\n");
 	}
 }
 

@@ -90,6 +90,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_free(frl_slab_pool_t* pool)
 			{
 				frl_mem_t* mem = (frl_mem_t*)val;
 				mem->block = block;
+				mem->refcount = 1;
 				mem->pointer = (void*)(val+SIZEOF_FRL_MEM_T);
 				apr_atomic_casptr((volatile void**)&pool->block, block, pool_block);
 				return mem->pointer;
@@ -103,6 +104,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_free(frl_slab_pool_t* pool)
 			return NULL;
 		frl_mem_t* mem = (frl_mem_t*)(*block->stack_pointer);
 		mem->block = block;
+		mem->refcount = 1;
 		mem->pointer = (void*)(*block->stack_pointer+SIZEOF_FRL_MEM_T);
 		block->stack_pointer--;
 		block->next = pool_block;
@@ -159,6 +161,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_with(frl_slab_pool_t* pool)
 			block->stack_pointer--;
 			frl_mem_t* mem = (frl_mem_t*)pop;
 			mem->block = block;
+			mem->refcount = 1;
 			mem->pointer = (void*)(pop+SIZEOF_FRL_MEM_T);
 			pool->block = block;
 #if APR_HAS_THREADS
@@ -174,6 +177,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_with(frl_slab_pool_t* pool)
 		return NULL;
 	frl_mem_t* mem = (frl_mem_t*)(*block->stack_pointer);
 	mem->block = block;
+	mem->refcount = 1;
 	mem->pointer = (void*)(*block->stack_pointer+SIZEOF_FRL_MEM_T);
 	block->stack_pointer--;
 	block->next = last_block->next;

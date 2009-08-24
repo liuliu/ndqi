@@ -366,7 +366,9 @@ bool nqfdbidx(NQFDB* fdb, int naive, double rho, double tau)
 	if (cols > 32)
 	{
 		idx->p = cvCreateMat(32, cols, CV_32FC1);
-		CvRNG rng_state = cvRNG((int)(&fdb->unidx->next));
+		union { int i; void* ptr; } it;
+		it.ptr = &fdb->unidx->next;
+		CvRNG rng_state = cvRNG(it.i);
 		cvRandArr(&rng_state, idx->p, CV_RAND_NORMAL, cvRealScalar(-1.), cvRealScalar(1.));
 		int i;
 		float* pptr = idx->p->data.fl;

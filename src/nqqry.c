@@ -119,7 +119,7 @@ NQRDB* nqqrysearch(NQQRY* qry)
 	if (qry->lmt <= 0 || qry->lmt > QRY_MAX_LMT)
 		qry->lmt = QRY_MAX_LMT;
 	bool empty = true;
-	int i, maxlmt = 0;
+	int i, pass, maxlmt = 0;
 	NQQRY** condptr = qry->conds;
 	for (i = 0; i < qry->cnum; i++, condptr++)
 	{
@@ -132,157 +132,129 @@ NQRDB* nqqrysearch(NQQRY* qry)
 	}
 	char** kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
 	float* likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
-	condptr = qry->conds;
-	for (i = 0; i < qry->cnum; i++, condptr++)
+	for (pass = 0; pass < 2; pass++)
 	{
-		if (*condptr == 0)
-			continue;
-		memset(kstr, 0, sizeof(kstr[0]) * (*condptr)->lmt);
-		memset(likeness, 0, sizeof(likeness[0]) * (*condptr)->lmt);
-		NQBWDB *ttbwdb, *tbwdb, *bwdb;
-		NQFDB *ttfdb, *tfdb, *fdb;
-		TCTDB *tdb;
-		NQTDB *ntdb;
-		TCLIST *tclist;
-		char *colname;
-		TDBQRY *tdbqry;
-		int j, k, TDBQCNOT;
-		bool negate = (*condptr)->op & NQOPNOT;
-		switch ((*condptr)->type)
+		condptr = qry->conds;
+		for (i = 0; i < qry->cnum; i++, condptr++)
 		{
-			case NQCTAND:
-			case NQCTOR:
-				(*condptr)->order = true;
-				if (qry->type == NQCTAND && i > 0)
-					(*condptr)->result = rdb;
-				nqqrysearch(*condptr);
-				k = nqqryresult(*condptr, kstr, likeness);
-				break;
-			case NQTBWDB:
-				if ((*condptr)->sbj.desc == 0)
-					continue;
-				bwdb = (NQBWDB*)(*condptr)->db;
-				tbwdb = (scope != 0) ? nqbwdbjoin(bwdb, scope) : bwdb;
-				ttbwdb = (qry->type == NQCTAND && i > 0) ? nqbwdbjoin(tbwdb, rdb) : tbwdb;
-				k = 0;
-				switch ((*condptr)->op & ~NQOPNOT)
-				{
-					case NQOPLIKE:
-						k = nqbwdbsearch(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
-						break;
-					case NQOPELIKE:
-						k = nqbwdblike(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, (*condptr)->mode, 0.6, true, likeness);
-						break;
-				}
-				for (j = 0; j < k; j++)
-					if (log(1. + likeness[j] / 20.f) <= (*condptr)->thr)
+			if (*condptr == 0)
+				continue;
+			memset(kstr, 0, sizeof(kstr[0]) * (*condptr)->lmt);
+			memset(likeness, 0, sizeof(likeness[0]) * (*condptr)->lmt);
+			NQBWDB *ttbwdb, *tbwdb, *bwdb;
+			NQFDB *ttfdb, *tfdb, *fdb;
+			TCTDB *tdb;
+			NQTDB *ntdb;
+			TCLIST *tclist;
+			char *colname;
+			TDBQRY *tdbqry;
+			int j, k, TDBQCNOT;
+			int negate = (((*condptr)->op & NQOPNOT) != 0);
+			if (pass ^ negate)
+				continue;
+			switch ((*condptr)->type)
+			{
+				case NQCTAND:
+				case NQCTOR:
+					(*condptr)->order = true;
+					if (qry->type == NQCTAND && !empty)
+						(*condptr)->result = rdb;
+					nqqrysearch(*condptr);
+					k = nqqryresult(*condptr, kstr, likeness);
+					break;
+				case NQTBWDB:
+					if ((*condptr)->sbj.desc == 0)
+						continue;
+					bwdb = (NQBWDB*)(*condptr)->db;
+					tbwdb = (scope != 0) ? nqbwdbjoin(bwdb, scope) : bwdb;
+					ttbwdb = (qry->type == NQCTAND && !empty) ? nqbwdbjoin(tbwdb, rdb) : tbwdb;
+					k = 0;
+					switch ((*condptr)->op & ~NQOPNOT)
 					{
-						k = j;
-						break;
+						case NQOPLIKE:
+							k = nqbwdbsearch(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
+							break;
+						case NQOPELIKE:
+							k = nqbwdblike(ttbwdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, (*condptr)->mode, 0.6, true, likeness);
+							break;
 					}
-				if (qry->type == NQCTAND && i > 0)
-					nqbwdbdel(ttbwdb);
-				if (scope != 0)
-					nqbwdbdel(tbwdb);
-				break;
-			case NQTFDB:
-				if ((*condptr)->sbj.desc == 0)
-					continue;
-				fdb = (NQFDB*)(*condptr)->db;
-				tfdb = (scope != 0) ? nqfdbjoin(fdb, scope) : fdb;
-				ttfdb = (qry->type == NQCTAND && i > 0) ? nqfdbjoin(tfdb, rdb) : tfdb;
-				k = 0;
-				switch ((*condptr)->op & ~NQOPNOT)
-				{
-					case NQOPLIKE:
-						k = nqfdbsearch(ttfdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
-						break;
-					case NQOPELIKE:
-						k = nqfdblike(ttfdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
-						break;
-				}
-				for (j = 0; j < k; j++)
-					if (likeness[j] <= (*condptr)->thr)
+					for (j = 0; j < k; j++)
+						if (log(1. + likeness[j] / 20.f) <= (*condptr)->thr)
+						{
+							k = j;
+							break;
+						}
+					if (qry->type == NQCTAND && !empty)
+						nqbwdbdel(ttbwdb);
+					if (scope != 0)
+						nqbwdbdel(tbwdb);
+					break;
+				case NQTFDB:
+					if ((*condptr)->sbj.desc == 0)
+						continue;
+					fdb = (NQFDB*)(*condptr)->db;
+					tfdb = (scope != 0) ? nqfdbjoin(fdb, scope) : fdb;
+					ttfdb = (qry->type == NQCTAND && !empty) ? nqfdbjoin(tfdb, rdb) : tfdb;
+					k = 0;
+					switch ((*condptr)->op & ~NQOPNOT)
 					{
-						k = j;
-						break;
+						case NQOPLIKE:
+							k = nqfdbsearch(ttfdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
+							break;
+						case NQOPELIKE:
+							k = nqfdblike(ttfdb, (*condptr)->sbj.desc, kstr, (*condptr)->lmt, true, likeness);
+							break;
 					}
-				if (qry->type == NQCTAND && i > 0)
-					nqfdbdel(ttfdb);
-				if (scope != 0)
-					nqfdbdel(tfdb);
-				break;
-			case NQTTCTDB:
-				if ((*condptr)->sbj.str == 0 || (*condptr)->col == 0)
-					continue;
-				negate = false;
-				tdb = (TCTDB*)(*condptr)->db;
-				colname = (char*)(*condptr)->col;
-				tdbqry = tctdbqrynew(tdb);
-				TDBQCNOT = ((*condptr)->op & NQOPNOT) ? TDBQCNEGATE : 0;
-				switch ((*condptr)->op & ~NQOPNOT)
-				{
-					case NQOPNUMEQ:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMEQ, (*condptr)->sbj.str);
-						break;
-					case NQOPNUMGT:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMGT, (*condptr)->sbj.str);
-						break;
-					case NQOPNUMLT:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMLT, (*condptr)->sbj.str);
-						break;
-					case NQOPNUMGE:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMGE, (*condptr)->sbj.str);
-						break;
-					case NQOPNUMLE:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMLE, (*condptr)->sbj.str);
-						break;
-					case NQOPNUMBT:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMBT, (*condptr)->sbj.str);
-						break;
-					case NQOPSTREQ:
-					case NQOPLIKE:
-					case NQOPELIKE:
-						tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTREQ, (*condptr)->sbj.str);
-						break;
-					case NQOPNULL:
-						tctdbqryaddcond(tdbqry, colname, ~TDBQCNOT & TDBQCSTRBW, "");
-						break;
-				}
-				{
-					tclist = tctdbqrysearch(tdbqry);
-					k = tclistnum(tclist);
-					if (k > maxlmt)
+					for (j = 0; j < k; j++)
+						if (likeness[j] <= (*condptr)->thr)
+						{
+							k = j;
+							break;
+						}
+					if (qry->type == NQCTAND && !empty)
+						nqfdbdel(ttfdb);
+					if (scope != 0)
+						nqfdbdel(tfdb);
+					break;
+				case NQTTCTDB:
+					if ((*condptr)->sbj.str == 0 || (*condptr)->col == 0)
+						continue;
+					negate = false;
+					tdb = (TCTDB*)(*condptr)->db;
+					colname = (char*)(*condptr)->col;
+					tdbqry = tctdbqrynew(tdb);
+					TDBQCNOT = ((*condptr)->op & NQOPNOT) ? TDBQCNEGATE : 0;
+					switch ((*condptr)->op & ~NQOPNOT)
 					{
-						maxlmt = k;
-						free(kstr);
-						free(likeness);
-						kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
-						likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
+						case NQOPNUMEQ:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMEQ, (*condptr)->sbj.str);
+							break;
+						case NQOPNUMGT:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMGT, (*condptr)->sbj.str);
+							break;
+						case NQOPNUMLT:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMLT, (*condptr)->sbj.str);
+							break;
+						case NQOPNUMGE:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMGE, (*condptr)->sbj.str);
+							break;
+						case NQOPNUMLE:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMLE, (*condptr)->sbj.str);
+							break;
+						case NQOPNUMBT:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCNUMBT, (*condptr)->sbj.str);
+							break;
+						case NQOPSTREQ:
+						case NQOPLIKE:
+						case NQOPELIKE:
+							tctdbqryaddcond(tdbqry, colname, TDBQCNOT | TDBQCSTREQ, (*condptr)->sbj.str);
+							break;
+						case NQOPNULL:
+							tctdbqryaddcond(tdbqry, colname, ~TDBQCNOT & TDBQCSTRBW, "");
+							break;
 					}
-					memset(kstr, 0, sizeof(kstr[0]) * k);
-					memset(likeness, 0, sizeof(likeness[0]) * k);
-					char** ksptr = kstr;
-					float* lkptr = likeness;
-					for (j = 0; j < k; j++, ksptr++, lkptr++)
 					{
-						int ksiz;
-						*ksptr = (char*)tclistval(tclist, j, &ksiz);
-						*lkptr = 1.;
-					}
-					tctdbqrydel(tdbqry);
-				}
-				break;
-			case NQTTDB:
-				if ((*condptr)->sbj.str == 0)
-					continue;
-				switch ((*condptr)->op & ~NQOPNOT)
-				{
-					case NQOPSTREQ:
-					case NQOPLIKE:
-					case NQOPELIKE:
-						ntdb = (NQTDB*)(*condptr)->db;
-						tclist = nqtdbsearch(ntdb, (*condptr)->sbj.str);
+						tclist = tctdbqrysearch(tdbqry);
 						k = tclistnum(tclist);
 						if (k > maxlmt)
 						{
@@ -302,58 +274,92 @@ NQRDB* nqqrysearch(NQQRY* qry)
 							*ksptr = (char*)tclistval(tclist, j, &ksiz);
 							*lkptr = 1.;
 						}
-						break;
-				}
-				break;
-		}
-		switch (qry->type)
-		{
-			case NQCTAND:
-				if (!empty)
-				{
-					if (negate)
-					{
-						char** ksptr = kstr;
-						for (j = 0; j < k; j++, ksptr++)
-							nqrdbout(rdb, *ksptr);
-					} else {
-						nqrdbfilter(rdb, kstr, k);
-						union { float fl; void* ptr; } it;
-						char** ksptr = kstr;
-						float* lkptr = likeness;
-						for (j = 0; j < k; j++, ksptr++, lkptr++)
-							if (*ksptr != 0 && (scope == 0 || nqrdbget(scope, *ksptr)))
-							{
-								it.ptr = nqrdbget(rdb, *ksptr);
-								if (it.ptr != 0)
-								{
-									it.fl += (*condptr)->cfd * *lkptr;
-									nqrdbput(rdb, *ksptr, it.ptr);
-								}
-							}
+						tctdbqrydel(tdbqry);
 					}
 					break;
-				}
-			case NQCTOR:
-				union { float fl; void* ptr; } it;
-				char** ksptr = kstr;
-				float* lkptr = likeness;
-				for (j = 0; j < k; j++, ksptr++, lkptr++)
-					if (*ksptr != 0 && (scope == 0 || nqrdbget(scope, *ksptr)))
+				case NQTTDB:
+					if ((*condptr)->sbj.str == 0)
+						continue;
+					switch ((*condptr)->op & ~NQOPNOT)
 					{
-						it.ptr = nqrdbget(rdb, *ksptr);
-						it.fl += (*condptr)->cfd * *lkptr;
-						nqrdbput(rdb, *ksptr, it.ptr);
+						case NQOPSTREQ:
+						case NQOPLIKE:
+						case NQOPELIKE:
+							ntdb = (NQTDB*)(*condptr)->db;
+							tclist = nqtdbsearch(ntdb, (*condptr)->sbj.str);
+							k = tclistnum(tclist);
+							if (k > maxlmt)
+							{
+								maxlmt = k;
+								free(kstr);
+								free(likeness);
+								kstr = (char**)malloc(sizeof(kstr[0]) * maxlmt);
+								likeness = (float*)malloc(sizeof(likeness[0]) * maxlmt);
+							}
+							memset(kstr, 0, sizeof(kstr[0]) * k);
+							memset(likeness, 0, sizeof(likeness[0]) * k);
+							char** ksptr = kstr;
+							float* lkptr = likeness;
+							for (j = 0; j < k; j++, ksptr++, lkptr++)
+							{
+								int ksiz;
+								*ksptr = (char*)tclistval(tclist, j, &ksiz);
+								*lkptr = 1.;
+							}
+							break;
 					}
-				empty = false;
-				break;
-		}
-		/* conditionally free resources */
-		if ((*condptr)->type == NQCTAND || (*condptr)->type == NQCTOR)
-			nqrdbdel((*condptr)->result);
-		if ((*condptr)->type == NQTTCTDB || (*condptr)->type == NQTTDB)
-		{
-			tclistdel(tclist);
+					break;
+			}
+			switch (qry->type)
+			{
+				case NQCTAND:
+					if (!empty)
+					{
+						if (negate)
+						{
+							char** ksptr = kstr;
+							for (j = 0; j < k; j++, ksptr++)
+								nqrdbout(rdb, *ksptr);
+						} else {
+							nqrdbfilter(rdb, kstr, k);
+							union { float fl; void* ptr; } it;
+							char** ksptr = kstr;
+							float* lkptr = likeness;
+							for (j = 0; j < k; j++, ksptr++, lkptr++)
+								if (*ksptr != 0 && (scope == 0 || nqrdbget(scope, *ksptr)))
+								{
+									it.ptr = nqrdbget(rdb, *ksptr);
+									if (it.ptr != 0)
+									{
+										it.fl += (*condptr)->cfd * *lkptr;
+										nqrdbput(rdb, *ksptr, it.ptr);
+									}
+								}
+						}
+						break;
+					}
+				case NQCTOR:
+					union { float fl; void* ptr; } it;
+					char** ksptr = kstr;
+					float* lkptr = likeness;
+					for (j = 0; j < k; j++, ksptr++, lkptr++)
+						if (*ksptr != 0 && (scope == 0 || nqrdbget(scope, *ksptr)))
+						{
+							it.ptr = nqrdbget(rdb, *ksptr);
+							it.fl += (*condptr)->cfd * *lkptr;
+							nqrdbput(rdb, *ksptr, it.ptr);
+						}
+					empty = false;
+					break;
+			}
+			/* conditionally free resources */
+			if ((*condptr)->type == NQCTAND || (*condptr)->type == NQCTOR)
+			{
+				nqrdbdel((*condptr)->result);
+				(*condptr)->result = 0;
+			}
+			if ((*condptr)->type == NQTTCTDB || (*condptr)->type == NQTTDB)
+				tclistdel(tclist);
 		}
 	}
 	free(kstr);

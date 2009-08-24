@@ -938,8 +938,9 @@ bool nqbwdbsnap(NQBWDB* bwdb, const char* filename)
 					BUF_PTR_VAL(bufptr, stemptr->idf, float);
 					for (j = 0; j < stemptr->rnum; j++)
 					{
-						int kp = (int)nqrdbget(kstrmap, stemptr->kstr[j]);
-						BUF_PTR_VAL(bufptr, kp, int);
+						union { int i; void* ptr; } it;
+						it.ptr = nqrdbget(kstrmap, stemptr->kstr[j]);
+						BUF_PTR_VAL(bufptr, it.i, int);
 					}
 				}
 				nqrdbdel(kstrmap);
