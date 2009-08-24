@@ -116,31 +116,25 @@ void generic_handler(struct evhttp_request *req, void *arg)
 						case NQMPUUIDENT:
 							if (result->type != NQRTDELETE)
 							{
+								bool ok = false;
 								NQMPLIST* cur = mp->assign;
-								if (putval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
+								ok = putval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest) || ok;
+								for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
+									ok = putval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest) || ok;
+								if (ok)
 									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
 								else
 									evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
-								for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
-								{
-									if (putval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
-										evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
-									else
-										evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
-								}
 							} else {
+								bool ok = false;
 								NQMPLIST* cur = mp->assign;
-								if (outval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
+								ok = outval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest) || ok;
+								for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
+									ok = outval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest) || ok;
+								if (ok)
 									evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
 								else
 									evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
-								for (cur = mp->assign->next; cur != mp->assign; cur = cur->next)
-								{
-									if (outval(cur, (char*)frl_md5((apr_byte_t*)mp->sbj.str).digest))
-										evbuffer_add_printf(buf, "[\"%s\"]\n", mp->sbj.str);
-									else
-										evbuffer_add_printf(buf, "[]\n", mp->sbj.str);
-								}
 							}
 							break;
 						case NQMPWHERE:
