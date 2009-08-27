@@ -18,31 +18,32 @@ struct frl_slab_pool_t;
 
 struct frl_slab_block_t
 {
-	apr_uint32_t capacity;
-	apr_byte_t** usage_stack;
 	apr_byte_t** stack_pointer;
-	apr_byte_t* arena;
 	frl_slab_block_t* next;
+	apr_byte_t** usage_stack;
+	apr_uint32_t capacity;
+	apr_byte_t* arena;
 	frl_slab_pool_t* pool;
 };
 
 struct frl_slab_pool_t
 {
+	frl_slab_block_t* block;
 #if APR_HAS_THREADS
 	apr_thread_mutex_t* mutex;
 #endif
 	apr_uint32_t per_size;
 	apr_uint32_t max_capacity;
-	frl_slab_block_t* block;
 	frl_lock_u lock;
 };
 
 struct frl_mem_t
 {
-	apr_uint32_t id;
 	volatile apr_uint32_t refcount;
-	void* pointer;
+	volatile apr_uint32_t occupied;
 	frl_slab_block_t* block;
+	apr_uint32_t id;
+	void* pointer;
 };
 
 struct frl_mem_safe_t

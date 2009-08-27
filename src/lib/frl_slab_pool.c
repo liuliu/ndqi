@@ -6,6 +6,7 @@
  */
 
 #include "frl_slab_pool.h"
+#include <assert.h>
 
 APR_DECLARE(apr_status_t) frl_slab_block_create(frl_slab_block_t** newblock, frl_slab_pool_t* pool, apr_size_t capacity)
 {
@@ -90,6 +91,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_free(frl_slab_pool_t* pool)
 			{
 				frl_mem_t* mem = (frl_mem_t*)val;
 				mem->block = block;
+				mem->occupied = true;
 				mem->refcount = 1;
 				mem->pointer = (void*)(val+SIZEOF_FRL_MEM_T);
 				apr_atomic_casptr((volatile void**)&pool->block, block, pool_block);
@@ -104,6 +106,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_free(frl_slab_pool_t* pool)
 			return NULL;
 		frl_mem_t* mem = (frl_mem_t*)(*block->stack_pointer);
 		mem->block = block;
+		mem->occupied = true;
 		mem->refcount = 1;
 		mem->pointer = (void*)(*block->stack_pointer+SIZEOF_FRL_MEM_T);
 		block->stack_pointer--;
@@ -122,6 +125,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_free(frl_slab_pool_t* pool)
 APR_DECLARE(void) frl_slab_pfree_lock_free(void* pointer)
 {
 	frl_mem_t* mem = (frl_mem_t*)((apr_byte_t*)pointer-SIZEOF_FRL_MEM_T);
+	apr_atomic_cas32(&mem->occupied, 0, 0);
 	frl_slab_block_t* block = mem->block;
 	apr_byte_t* cmpval = 0;
 	apr_byte_t* oldval = 0;
@@ -161,6 +165,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_with(frl_slab_pool_t* pool)
 			block->stack_pointer--;
 			frl_mem_t* mem = (frl_mem_t*)pop;
 			mem->block = block;
+			mem->occupied = true;
 			mem->refcount = 1;
 			mem->pointer = (void*)(pop+SIZEOF_FRL_MEM_T);
 			pool->block = block;
@@ -177,6 +182,7 @@ APR_DECLARE(void*) frl_slab_palloc_lock_with(frl_slab_pool_t* pool)
 		return NULL;
 	frl_mem_t* mem = (frl_mem_t*)(*block->stack_pointer);
 	mem->block = block;
+	mem->occupied = true;
 	mem->refcount = 1;
 	mem->pointer = (void*)(*block->stack_pointer+SIZEOF_FRL_MEM_T);
 	block->stack_pointer--;
@@ -198,6 +204,7 @@ APR_DECLARE(void) frl_slab_pfree_lock_with(void* pointer)
 #if APR_HAS_THREADS
 	apr_thread_mutex_lock(pool->mutex);
 #endif
+	mem->occupied = false;
 	block->stack_pointer++;
 	*block->stack_pointer = (apr_byte_t*)mem;
 #if APR_HAS_THREADS
@@ -217,6 +224,7 @@ APR_DECLARE(void*) frl_slab_palloc(frl_slab_pool_t* pool)
 APR_DECLARE(void) frl_slab_pfree(void* pointer)
 {
 	frl_mem_t* mem = (frl_mem_t*)((apr_byte_t*)pointer-SIZEOF_FRL_MEM_T);
+	assert(mem->occupied);
 	frl_slab_pool_t* pool = mem->block->pool;
 	if (FRL_LOCK_FREE == pool->lock)
 		frl_slab_pfree_lock_free(pointer);

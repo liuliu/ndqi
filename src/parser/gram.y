@@ -451,6 +451,18 @@ static int nqqrytype(char* str)
 				default:
 					return NUMTYPE;
 			}
+		case 'a': /* "admin" */
+			return NUMTYPE;
+		case 'k': /* "kod" */
+			return NUMTYPE;
+		case 'm': /* "misc" */
+			switch (str[5])
+			{
+				case 'n': /* "name" */
+					return STRTYPE;
+				default:
+					return NUMTYPE;
+			}
 		default:
 			return NOTYPE;
 	}
