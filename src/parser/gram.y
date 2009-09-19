@@ -15,7 +15,7 @@ static NQPARSERESULT* YY_RESULT = 0;
 	NQPARSERESULT *result;
 }
 
-%nonassoc ABOVE, ALL, ANY, APPEND, ASC, BETWEEN, BY, CACHE, DELETE, DESC, DISK, DISTINCT, EXACT, EXISTS, FROM, IN, INDEX, INSERT, INTO, IS, LIKE, LIMIT, MEMORY, MERGE, NULL_P, ORDER, REINDEX, SELECT, SOME, SYNCHRONIZE, UPDATE, WHERE
+%nonassoc ABOVE, ALL, ANY, APPEND, ASC, BETWEEN, BY, CACHE, DELETE, DESC, DISK, DISTINCT, EXACT, EXISTS, FROM, IN, INDEX, INSERT, INTO, IS, LIKE, LIMIT, MEMORY, MERGE, NULL_P, ORDER, REINDEX, SELECT, SOME, SYNCHRONIZE, UPDATE, WHERE, WITH
 %nonassoc UUID, UUIDENT, IDENT, FCONST, ICONST
 %nonassoc STRTYPE, NUMTYPE, NOTYPE
 %nonassoc NUMGT, NUMGE, NUMLT, NUMLE, COLNE, COLEQ
@@ -332,10 +332,25 @@ LikeCfdStmt:	LikeThrStmt |
 				{
 					$$ = $1;
 					$$.qry->cfd = strtod($2.str, NULL) * 0.01;
+				} |
+				LikeThrStmt WITH ScalarExp
+				{
+					$$ = $1;
+					$$.qry->cfd = strtod($3.str, NULL);
+				} |
+				LikeThrStmt WITH ScalarExp '%'
+				{
+					$$ = $1;
+					$$.qry->cfd = strtod($3.str, NULL) * 0.01;
 				}
 
 LikeThrStmt:	LikeStmt |
 				LikeStmt ABOVE ScalarExp
+				{
+					$$ = $1;
+					$$.qry->thr = strtod($3.str, NULL);
+				} |
+				LikeStmt NUMGT ScalarExp
 				{
 					$$ = $1;
 					$$.qry->thr = strtod($3.str, NULL);
@@ -432,6 +447,8 @@ NQPARSERESULT* yyresult()
 	return YY_RESULT;
 }
 
+/* VERY IMPORTANT
+ * ALWAYS CHANGE THIS FUNCTION AFTER ADD NEW COLUMN OR TC-DATABASE */
 static int nqqrytype(char* str)
 {
 	switch (str[0])
