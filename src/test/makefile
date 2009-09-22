@@ -1,6 +1,6 @@
 OPENCV=/opt/opencv
 OUTDIR=../../build
-COMPFLAG=-O3
+COMPFLAG=-O3 --fast-math -msse2
 LINKFLAG=-ldl -lpthread -lrt -lapr-1 -laprutil-1 -lcxcore -lcv -lhighgui -ltokyocabinet -ltokyodystopia -lexif
 LINKLIB=-L"$(OPENCV)/lib"
 CXXFLAGS=-I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/opencv"
@@ -50,4 +50,10 @@ clean:
 	rm *.o ../lib/*.o ../*.o
 
 .c.o:
-	g++ $(CXXFLAGS) $< -o $@ -g -c $(COMPFLAG)
+	g++ $(CXXFLAGS) $< -o $@ -c $(COMPFLAG)
+
+.cpp.o:
+	g++ $(CXXFLAGS) $< -o $@ -c $(COMPFLAG)
+
+.cc.o:
+	g++ $(CXXFLAGS) $< -o $@ -c $(COMPFLAG)
