@@ -7,6 +7,9 @@ CXXFLAGS=-I"/opt/apr/include" -I"/opt/apr-util/include" -I"$(OPENCV)/include/ope
 
 # all: $(OUTDIR)/rdb_test $(OUTDIR)/dpdb_test $(OUTDIR)/irdb_test $(OUTDIR)/idx_test $(OUTDIR)/lh_test $(OUTDIR)/gs_test $(OUTDIR)/cx_test $(OUTDIR)/qry_test $(OUTDIR)/mm_test $(OUTDIR)/file_dpdb_test $(OUTDIR)/file_lh_test $(OUTDIR)/tdb_test
 
+$(OUTDIR)/idb_test: idb_test.o ../nqidb.o ../lib/frl_slab_pool.o ../lib/frl_util_md5.o
+	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
+
 $(OUTDIR)/tdb_test: tdb_test.o ../nqtdb.o
 	g++ $(CXXFLAGS) $(LINKLIB) -o $@ $^ $(LINKFLAG)
 
