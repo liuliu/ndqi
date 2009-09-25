@@ -9,10 +9,10 @@
 
 apr_pool_t* mempool;
 
-void sumup(char* kstr, void* data, void* ud)
+void sumup(char* kstr, void*, void* ud)
 {
 	uint32_t* t = (uint32_t*)ud;
-	*t += *((int*)data);
+	*t += *((int*)kstr);
 }
 
 int main()
@@ -68,21 +68,12 @@ int main()
 	}
 	time = apr_time_now()-time;
 	printf("look up 250,000 null key and 250,000 key in idb in %d microsecond(s).\n", time);
-/*
-	char** kstr = (char**)malloc(2000 * sizeof(char*));
-	for (int i = 249000; i < 251000; i++)
-		kstr[i - 249000] = (char*)key_cache[i].digest;
-	time = apr_time_now();
-	nqrdbfilter(rdb, kstr, 2000);
-	time = apr_time_now()-time;
-	free(kstr);
-	printf("filter from 250,000 to only left 1,000 valid and 1,000 invalid key-value pairs in %d microsecond(s).\n", time);
 	uint32_t t = 0;
 	time = apr_time_now();
-	nqrdbforeach(rdb, sumup, &t);
+	nqidbforeach(idb, sumup, &t);
 	time = apr_time_now()-time;
 	printf("foreach test: total sum is %d in %d microsecond(s).\n", t, time);
-*/
+	nqidbdel(idb);
 	apr_terminate();
 	return 0;
 }

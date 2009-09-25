@@ -212,10 +212,48 @@ bool nqidbout(NQIDB* idb, char* kstr)
 	return true;
 }
 
+static void nqidbiter(NQIDBDATUM* con, NQFOREACH op, void* ud)
+{
+	int i, max = con->i[0] >> 16;
+	op((char*)&con->i[1], NULL, ud);
+	NQIDBDATUM* coni = con->con[0];
+	for (i = 0; i < max; ++i)
+	{
+		nqidbiter(coni, op, ud);
+		coni = (NQIDBDATUM*)((char*)coni + NQIDBDATUMSIZ);
+	}
+}
+
 bool nqidbforeach(NQIDB* idb, NQFOREACH op, void* ud)
 {
+	if (idb->rnum > 0)
+	{
+		nqidbiter(idb->con, op, ud);
+		return true;
+	}
+	return false;
+}
+
+static void nqidbdelitem(NQIDBDATUM* con)
+{
+	int i, max = con->i[0] >> 16;
+	if (max > 0)
+	{
+		NQIDBDATUM* coni = con->con[0];
+		for (i = 0; i < max; ++i)
+		{
+			nqidbdelitem(coni);
+			coni = (NQIDBDATUM*)((char*)coni + NQIDBDATUMSIZ);
+		}
+		frl_slab_pfree(con->con[0]);
+	}
 }
 
 void nqidbdel(NQIDB* idb)
 {
+	if (idb->rnum > 0)
+		nqidbdelitem(idb->con);
+	if (idb->con != NULL)
+		frl_slab_pfree(idb->con);
+	frl_slab_pfree(idb);
 }

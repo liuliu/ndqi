@@ -82,6 +82,7 @@ int main()
 	}
 	time = apr_time_now()-time;
 	printf("look up 250,000 null key-value pairs and 250,000 key-value pairs in rdb in %d microsecond(s).\n", time);
+/*
 	char** kstr = (char**)malloc(2000 * sizeof(char*));
 	for (int i = 249000; i < 251000; i++)
 		kstr[i - 249000] = (char*)key_cache[i].digest;
@@ -90,6 +91,7 @@ int main()
 	time = apr_time_now()-time;
 	free(kstr);
 	printf("filter from 250,000 to only left 1,000 valid and 1,000 invalid key-value pairs in %d microsecond(s).\n", time);
+*/
 	uint32_t t = 0;
 	time = apr_time_now();
 	nqrdbforeach(rdb, sumup, &t);
