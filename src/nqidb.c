@@ -1,3 +1,8 @@
+/********************************************************
+ * The Memory Efficient Set API of NDQI
+ * Copyright (C) 2009 Liu Liu
+ ********************************************************/
+
 #include "nqidb.h"
 #include "assert.h"
 

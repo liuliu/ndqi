@@ -1,3 +1,8 @@
+/********************************************************
+ * The Memory Efficient Set API Header of NDQI
+ * Copyright (C) 2009 Liu Liu
+ ********************************************************/
+
 #ifndef _GUARD_NQIDB_
 #define _GUARD_NQIDB_
 

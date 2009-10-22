@@ -5,6 +5,7 @@
 
 #include "nqbwdb.h"
 #include "lib/mlapcluster.h"
+#include "lib/cvl1stomp.h"
 
 static apr_pool_t* mtx_pool = 0;
 static frl_slab_pool_t* db_pool = 0;
